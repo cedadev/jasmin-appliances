@@ -1,0 +1,13 @@
+---
+# Sorted by maintainer name, role name
+- src: mrlesmithjr.squid
+- src: oasis-roles.kdump
+- src: resmo.ntp
+- src: singleplatform-eng.users
+- src: stackhpc.cluster-infra
+- src: stackhpc.cluster-nfs
+  url: https://github.com/stackhpc/ansible-role-cluster-nfs
+- src: stackhpc.openhpc
+- src: stackhpc.os-container-infra
+- src: stackhpc.os-config
+...
