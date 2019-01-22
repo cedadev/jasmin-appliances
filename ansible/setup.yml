@@ -1,0 +1,45 @@
+---
+# Query OpenStack Barbican to retrieve secret keys
+# needed for a cluster deployment
+#- hosts: openstack
+#  roles:
+#    - role: alaska_secrets
+#      secret_name: "alaska.auth.p3-monitor"
+#      secret_var: "alaska_auth_p3_monitor"
+  
+# Apply generic setup configuration that is universally useful
+- hosts: cluster
+  become: yes
+  roles: []
+
+#    - role: oasis-roles.kdump
+#      kdump_package: kexec-tools
+#      kdump_conf_path: /etc/kdump.conf
+#      kdump_become_user: root
+#      kdump_crash_path: /var/crash
+#      kdump_core_collector_args: makedumpfile -l --message-level 1 -d 31
+#      when: kdump_enable | default(true)
+#    - role: cluster_setup
+#    - role: stackhpc.os-config
+#      #monitor_secret: "{{ hostvars['localhost']['alaska_auth_p3_monitor'] }}"
+#      monitor_secret: "truffles"
+#      os_config_content: |
+#        ---
+#        clouds:
+#          {{ alaska_cloud }}:
+#            auth:
+#              auth_url: http://{{ controller_vip }}:5000
+#              project_name: p3
+#              domain_name: default
+#          alaska-monasca:
+#            auth:
+#              auth_url: http://{{ controller_vip }}:5000
+#              project_name: p3
+#              domain_name: default
+#              username: p3-monitor
+#              password: {{ monitor_secret }}
+#            region: RegionOne
+#      os_config_destination: "/etc/openstack"
+#      os_config_owner: root
+#      os_config_group: root
+...

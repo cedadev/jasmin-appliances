@@ -4,9 +4,13 @@
 - src: oasis-roles.kdump
 - src: resmo.ntp
 - src: singleplatform-eng.users
-- src: stackhpc.cluster-infra
-- src: stackhpc.cluster-nfs
-  url: https://github.com/stackhpc/ansible-role-cluster-nfs
+- src: https://github.com/stackhpc/ansible-role-cluster-infra
+  version: newton-backport
+  name: stackhpc.cluster-infra
+- src: https://github.com/cedadev/jasmin-cluster-infra-ansible
+  name: jasmin.cluster-infra
+- src: https://github.com/stackhpc/ansible-role-cluster-nfs
+  name: stackhpc.cluster-nfs
 - src: stackhpc.openhpc
 - src: stackhpc.os-container-infra
 - src: stackhpc.os-config
