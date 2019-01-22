@@ -10,19 +10,7 @@
 - hosts: cluster
   tasks:
     - import_tasks: cluster-hosts.yml 
-
-- hosts:
-    - nfs
-    - compute
-    - login
-  become: true
-  tasks:
-    - name: expose NFS services in firewall
-      firewalld:
-        service: nfs
-        state: enabled
-        immediate: yes
-        permanent: yes
+    - import_tasks: cluster-firewalld.yml 
 
 - hosts:
     - cluster
@@ -53,33 +41,6 @@
       users: "{{ jasmin_users }}"
       groups_to_create: "{{ jasmin_groups }}"
 
-- hosts:
-    - login
-  become: yes
-  tasks:
-
-    - name: Ensure the ports for slurmctld are open in firewalld
-      firewalld:
-        port: "{{item}}"
-        state: enabled
-        immediate: yes
-        permanent: yes
-      with_items:
-        - "6817/tcp"
-        - "62000-63999/tcp"
-
-- hosts:
-    - compute
-  become: yes
-  tasks:
-
-    - name: Ensure the ports for slurmd are open in firewalld
-      firewalld:
-        port: "6818/tcp"
-        state: enabled
-        immediate: yes
-        permanent: yes
-
         
 - hosts:
     - login
@@ -106,7 +67,4 @@
       slurm_cluster_name: "{{ cluster_name }}"
       slurm_partitions: "{{ openhpc_slurm_partitions }}"
       slurm_control_host: "{{ groups['login'] | first }}"
-      slurm_srun_port_range:
-        lower: 62000
-        upper: 63999
 

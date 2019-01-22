@@ -118,9 +118,16 @@ jasmin_groups:
     gid: 2000
 
 jasmin_users: 
+  - username: "hsilk"
+    groups: [ "{{ jasmin_group_name }}" ]
+    name: "Holly Silk <holly@stackhpc.com>"
+    home: "{{jasmin_homedir}}/hsilk"
+    uid: 3390
+    ssh_key:
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsysvkkEbEDSx/xcgA9fEmd6KTD4wBlEEeo9dqM2TEbwxg3Pl5nuji44dXzl0+01fwDR7Zn8I79XYZMgVaAQl9wRK6x7jLnJWpLo2+jhC1gu2108P7yWWplpFS40LHRAU1SDMvNfDM2drNx3T3tmoNlr7HnO8URnBslWtjNCAbdY4B2p7jJmdCfQdtvxpzUDVMilihXxXZ8016WYQYdDQmUTyGWn+oHBDegpKPodFFswRhTavFO/OGbACTZ18W6Sv57ShzI0DrKPmU9uSs7PyZJuazn2ZDEWa330w2gpmG7+1GsKibsgxTNVGbp/FuSDv1G1FY8kDTbVNNH1gzUkbj hsilk@Hollys-MacBook-Air.local"
   - username: "stig"
     groups: [ "{{ jasmin_group_name }}" ]
-    name: "Stig Teler <stig@stackhpc.com>"
+    name: "Stig Telfer <stig@stackhpc.com>"
     home: "{{jasmin_homedir}}/stig"
     uid: 3391
     ssh_key:
