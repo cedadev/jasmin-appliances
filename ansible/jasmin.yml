@@ -7,13 +7,9 @@
     - role: jasmin.cluster-infra
       cluster_network: "caastest-U-internal"
 
-- hosts: openstack
+- hosts: cluster
   tasks:
-    - debug:
-        var: groups
-
-- include: ssh-known-hosts.yml
-- include: setup.yml
+    - import_tasks: cluster-hosts.yml 
 
 - hosts:
     - nfs
