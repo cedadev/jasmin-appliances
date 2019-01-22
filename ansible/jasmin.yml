@@ -7,12 +7,18 @@
     - role: jasmin.cluster-infra
       cluster_network: "caastest-U-internal"
 
+- hosts: openstack
+  tasks:
+    - debug:
+        var: groups
+
 - include: ssh-known-hosts.yml
 - include: setup.yml
 
 - hosts:
-    - cluster_nfs_servers
-    - cluster_nfs_clients
+    - nfs
+    - compute
+    - login
   become: true
   tasks:
     - name: expose NFS services in firewall
@@ -30,14 +36,14 @@
 
     - role: stackhpc.cluster-nfs
       nfs_enable:
-        server: "{{ inventory_hostname in groups['cluster_nfs_servers'] }}"
-        clients: "{{ inventory_hostname in groups['cluster_nfs_clients'] }}"
-      nfs_server: "{{ groups['cluster_nfs_servers'] | first }}"
+        server: "{{ inventory_hostname in groups['nfs'] }}"
+        clients: "{{ inventory_hostname in groups['compute'] or inventory_hostname in groups['login'] }}"
+      nfs_server: "{{ groups['nfs'] | first }}"
 
 
 - hosts:
-    - cluster_login
-    - cluster_batch
+    - login
+    - compute
   become: yes
   pre_tasks:
 
@@ -52,7 +58,7 @@
       groups_to_create: "{{ jasmin_groups }}"
 
 - hosts:
-    - cluster_control
+    - login
   become: yes
   tasks:
 
@@ -67,7 +73,7 @@
         - "62000-63999/tcp"
 
 - hosts:
-    - cluster_batch
+    - compute
   become: yes
   tasks:
 
@@ -80,9 +86,8 @@
 
         
 - hosts:
-    - cluster_control
-    - cluster_login
-    - cluster_batch
+    - login
+    - compute
   become: yes
   pre_tasks:
 
@@ -99,12 +104,12 @@
   roles:
     - role: stackhpc.openhpc
       openhpc_enable:
-        control: "{{ inventory_hostname in groups['cluster_control'] }}"
-        batch: "{{ inventory_hostname in groups['cluster_batch'] }}"
+        control: "{{ inventory_hostname in groups['login'] }}"
+        batch: "{{ inventory_hostname in groups['compute'] }}"
         runtime: true
       slurm_cluster_name: "{{ cluster_name }}"
       slurm_partitions: "{{ openhpc_slurm_partitions }}"
-      slurm_control_host: "{{ groups['cluster_control'] | first }}"
+      slurm_control_host: "{{ groups['login'] | first }}"
       slurm_srun_port_range:
         lower: 62000
         upper: 63999

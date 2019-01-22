@@ -1,7 +1,7 @@
 ---
 # This name is used for the Heat stack and as a prefix for the
 # cluster node hostnames.
-cluster_name: ohpc
+cluster_name: holly
 
 cluster_net:
   - { net: "caastest-U-internal", subnet: "caastest-U-internal" }
