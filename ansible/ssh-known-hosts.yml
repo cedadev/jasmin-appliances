@@ -1,0 +1,36 @@
+---
+- name: Ensure servers are in SSH known hosts
+  hosts: cluster
+  tags:
+    - ssh-known-hosts
+  gather_facts: false
+  tasks:
+    - name: Scan for SSH keys
+      local_action:
+        module: command ssh-keyscan {{ item }}
+      with_items:
+        - "{{ ansible_host|default(inventory_hostname) }}"
+      register: keyscan_result
+      changed_when: False
+
+- name: Ensure servers are in SSH known hosts
+  hosts: localhost
+  tags:
+    - ssh-known-hosts
+  gather_facts: false
+  tasks:
+    - name: Ensure servers are in SSH known hosts
+      blockinfile:
+        block: |
+          {% for host in groups['cluster'] %}
+          {% if 'keyscan_result' in hostvars[host] %}
+          {% for result in hostvars[host].keyscan_result.results %}
+          {% for key in result.stdout_lines %}
+          {{ key }}
+          {% endfor %}
+          {% endfor %}
+          {% endif %}
+          {% endfor %}
+        create: true
+        marker: "# {mark} P3-APPLIANCES MANAGED BLOCK FOR {{ cluster_name }}"
+        path: "~/.ssh/known_hosts"
