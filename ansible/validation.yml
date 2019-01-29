@@ -1,0 +1,99 @@
+---
+# A series of simple tests to validate the Slurm cluster deployment
+# These will eventually be split into different files to test the 
+# different stages of the deployment.
+# Login and compute groups of slurm cluster have been used as hosts for now.
+
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_network: "caastest-U-internal"
+      cluster_deploy_user: 'centos'
+
+- hosts:
+  - login
+  - compute
+  tasks:
+    - name: get ids of all users
+      shell: id {{ item.username }}
+      with_items:
+        - "{{ jasmin_users }}" 
+      register: shell_result
+      run_once: true
+      ignore_errors: yes
+ 
+    - set_fact:
+        check_users: "{{ shell_result.results | selectattr('rc','equalto', 1) | map(attribute='stderr') | list}}"
+    
+    - fail:
+        msg: "{{ check_users }}"
+      when: check_users
+
+    - set_fact:
+        check_mount: "{{ ansible_mounts | selectattr('mount','equalto', jasmin_homedir) | list}}"
+
+    - fail:
+        msg: "filesystem not mounted on NFS clients"
+      when: not check_mount
+
+    - name: check status of munge process
+      shell: "systemctl status munge"
+      register: munge_status
+      run_once: true
+      failed_when: "'failed' in munge_status.stdout"
+
+    - name: check for failed services
+      shell: "systemctl --state=failed"
+      register: failed_services
+      run_once: true
+
+    - debug:
+        msg: "{{ failed_services.stdout }}"
+
+# run some simple slurm jobs
+- hosts: login
+  tasks:
+    - name: Slurm job to get hostname of compute nodes
+      shell: srun -N 2 hostname
+      register: srun_hostname
+      run_once: true
+      failed_when: srun_hostname.rc != 0
+
+    - debug:
+        msg: "hostnames of compute nodes {{ srun_hostname.stdout_lines }}"
+
+    - name: running IMB-MPI1 through Slurm
+      shell: |
+        module load gnu openmpi imb 
+        salloc -N 2 mpirun IMB-MPI1 PingPong
+      register: mpi
+      run_once: true
+      failed_when: mpi.rc != 0 
+
+    - debug:
+         msg: "{{ mpi.stdout_lines }}"
+
+#Testing NFS clients can read/write.
+#To do: change the hosts to nfs_clients
+    - name: Create a test file on the login node
+      become: true
+      become_user: "{{ jasmin_users | map(attribute='username') | first}}" 
+      tempfile:
+        path: "{{ jasmin_users | map(attribute='home') | first }}"
+      register: tempfile_name
+    
+    - name: write to test file
+      become: true
+      become_user: "{{ jasmin_users | map(attribute='username') | first}}" 
+      copy:
+        content: "{{ tempfile_name.path }}"
+        dest: "{{ tempfile_name.path }}"
+
+- hosts: compute[0]
+  tasks:
+    - name: Remove test file from nfs clients
+      become: true
+      become_user: "{{ jasmin_users | map(attribute='username') | first}}"
+      file:
+        path: "{{ hostvars[groups['login']|first]['tempfile_name'].path }}"
+        state: absent
