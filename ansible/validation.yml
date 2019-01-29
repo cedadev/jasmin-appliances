@@ -8,7 +8,6 @@
   roles:
     - role: jasmin.cluster-infra
       cluster_network: "caastest-U-internal"
-      cluster_deploy_user: 'centos'
 
 - hosts:
   - login
@@ -23,7 +22,7 @@
       ignore_errors: yes
  
     - set_fact:
-        check_users: "{{ shell_result.results | selectattr('rc','equalto', 1) | map(attribute='stderr') | list}}"
+        check_users: "{{ shell_result.results | rejectattr('rc','equalto', 0) | map(attribute='stderr') | list}}"
     
     - fail:
         msg: "{{ check_users }}"
@@ -40,7 +39,10 @@
       shell: "systemctl status munge"
       register: munge_status
       run_once: true
-      failed_when: "'failed' in munge_status.stdout"
+      failed_when: "'inactive' in munge_status.stdout"
+
+    - debug:
+        msg: "{{ munge_status }}"
 
     - name: check for failed services
       shell: "systemctl --state=failed"

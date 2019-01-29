@@ -11,9 +11,7 @@
   name: jasmin.cluster-infra
 - src: https://github.com/stackhpc/ansible-role-cluster-nfs
   name: stackhpc.cluster-nfs
-- src: https://github.com/stackhpc/ansible-role-openhpc
-  name: stackhpc.openhpc
-  version: mark-verbal-feedback
+- src: stackhpc.openhpc
 - src: stackhpc.os-container-infra
 - src: stackhpc.os-config
 ...

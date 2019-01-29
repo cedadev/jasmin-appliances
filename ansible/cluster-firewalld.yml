@@ -1,3 +1,6 @@
+---
+# Playbook to open firewall access to all hosts on the local IP subnet
+
 - set_fact:
     private_subnet: "{{ [ansible_default_ipv4.network, ansible_default_ipv4.netmask] | join('/') | ipaddr('net') }}"
 - name: open firewall for local tenant network
