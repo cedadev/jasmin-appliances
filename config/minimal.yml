@@ -13,13 +13,16 @@ cluster_groups:
   - "{{ slurm_compute }}"
   - "{{ cluster_nfs }}"
 
+#cluster_gw_group: "login"
+
 slurm_login:
   name: "login"
   flavor: "j1.small"
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: 1
-  root_volume_size: 1
+  root_volume_size: 0
+  node_resource: "Cluster::Node" 
 
 slurm_compute:
   name: "compute"
@@ -27,7 +30,8 @@ slurm_compute:
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: 2
-  root_volume_size: 1
+  root_volume_size: 0
+  node_resource: "Cluster::Node" 
 
 cluster_nfs:
   name: "nfs"
@@ -35,8 +39,8 @@ cluster_nfs:
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: 1
-  root_volume_size: 1
-
+  root_volume_size: 20
+  node_resource: "Cluster::NodeWithVolume" 
 
 # Node group assignments for cluster roles.
 # These group assignments are appended to the cluster inventory file.
