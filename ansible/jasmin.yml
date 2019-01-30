@@ -37,11 +37,20 @@
       file:
         path: "{{ jasmin_homedir }}"
         state: directory
+      run_once: true
 
   roles:
+    # Run the user creation once to create the user home directories
     - role: singleplatform-eng.users
       users: "{{ jasmin_users }}"
       groups_to_create: "{{ jasmin_groups }}"
+      run_once: true
+
+    # Run the user creation again (without home dir) on all nodes
+    - role: singleplatform-eng.users
+      users: "{{ jasmin_users }}"
+      groups_to_create: "{{ jasmin_groups }}"
+      users_create_homedirs: false
 
         
 - hosts:
