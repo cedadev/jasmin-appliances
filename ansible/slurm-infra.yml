@@ -1,0 +1,92 @@
+---
+# This playbook uses the Ansible OpenStack modules to create a cluster
+# using a number of baremetal compute node instances, and configure it
+# for a SLURM partition
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_network: "caastest-U-internal"
+      cluster_name: "{{ nfs_name }}"
+      cluster_groups: "{{ nfs_groups }}"
+      cluster_deploy_user: "{{ nfs_deploy_user }}"
+      cluster_net: "{{ nfs_net }}"
+
+    - role: jasmin.cluster-infra
+      cluster_network: "caastest-U-internal"
+      cluster_name: "{{ slurm_name }}"
+      cluster_groups: "{{ slurm_groups }}"
+      cluster_deploy_user: "{{ slurm_deploy_user }}"
+      cluster_net: "{{ slurm_net }}"
+
+- hosts:
+    - cluster
+  become: true
+  tasks:
+    - import_tasks: cluster-hosts.yml 
+    - import_tasks: cluster-firewalld.yml 
+
+- hosts:
+    - cluster
+  become: true  
+  roles:
+    - role: resmo.ntp
+
+#    - role: stackhpc.cluster-nfs
+#      nfs_enable:
+#        server: "{{ inventory_hostname in groups['nfs'] }}"
+#        clients: "{{ inventory_hostname in groups['compute'] or inventory_hostname in groups['login'] }}"
+#      nfs_server: "{{ groups['nfs'] | first }}"
+- import_playbook: nfs.yml
+
+- hosts:
+    - slurm_login
+    - slurm_compute
+  become: yes
+  pre_tasks:
+
+    - name: Ensure user home dir root exists
+      file:
+        path: "{{ jasmin_homedir }}"
+        state: directory
+      run_once: true
+
+  roles:
+    # Run the user creation once to create the user home directories
+    - role: singleplatform-eng.users
+      users: "{{ jasmin_users }}"
+      groups_to_create: "{{ jasmin_groups }}"
+      run_once: true
+
+    # Run the user creation again (without home dir) on all nodes
+    - role: singleplatform-eng.users
+      users: "{{ jasmin_users }}"
+      groups_to_create: "{{ jasmin_groups }}"
+      users_create_homedirs: false
+
+        
+- hosts:
+    - login
+    - compute
+  become: yes
+  pre_tasks:
+
+    - name: Ensure the OpenHPC package repo rpm is present
+      yum:
+        name: "https://github.com/openhpc/ohpc/releases/download/v1.3.GA/ohpc-release-1.3-1.el7.x86_64.rpm"
+        state: present
+
+    - name: Ensure latest python is present
+      yum:
+        name: python
+        state: latest
+
+  roles:
+    - role: stackhpc.openhpc
+      openhpc_enable:
+        control: "{{ inventory_hostname in groups['login'] }}"
+        batch: "{{ inventory_hostname in groups['compute'] }}"
+        runtime: true
+      slurm_cluster_name: "{{ slurm_name }}"
+      slurm_partitions: "{{ openhpc_slurm_partitions }}"
+      slurm_control_host: "{{ groups['login'] | first }}"
+
