@@ -1,7 +1,7 @@
 ---
 # Sorted by maintainer name, role name
 - src: mrlesmithjr.squid
-- src: oasis-roles.kdump
+- src: oasis_roles.kdump
 - src: resmo.ntp
 - src: singleplatform-eng.users
 - src: https://github.com/stackhpc/ansible-role-cluster-infra
