@@ -17,14 +17,4 @@
   tasks:
     - import_tasks: cluster-firewalld.yml 
 
-#- hosts: cluster
-#  become: true
-#
-#  roles:
-#    - role: stackhpc.cluster-nfs
-#      nfs_enable:
-#        server: true 
-#        clients: false
-#      nfs_server: "{{ groups['server'] | first }}"
-
 - import_playbook: nfs.yml
