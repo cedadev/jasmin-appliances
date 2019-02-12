@@ -22,8 +22,6 @@ slurm_login:
   num_nodes: 1
   root_volume_size: 0
   node_resource: "Cluster::Node" 
-  extra_groups:
-    - "nfs_clients"
 
 slurm_compute:
   name: "compute"
@@ -33,8 +31,6 @@ slurm_compute:
   num_nodes: 2
   root_volume_size: 0
   node_resource: "Cluster::Node" 
-  extra_groups:
-    - "nfs_clients"
 
 # Define a list of SLURM partitions to create.
 openhpc_slurm_partitions: 
