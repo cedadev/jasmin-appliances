@@ -20,5 +20,5 @@ nfs_group_server:
   num_nodes: 1
   root_volume_size: 20
   node_resource: "Cluster::NodeWithVolume" 
-
+  nodenet_resource: "Cluster::NodeNet1"
 
