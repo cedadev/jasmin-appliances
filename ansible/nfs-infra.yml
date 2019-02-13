@@ -1,0 +1,20 @@
+---
+# This playbook uses the Ansible OpenStack modules to create a cluster
+# using a number of baremetal compute node instances, and configure it
+# for a NFS server 
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_network: "caastest-U-internal"
+      cluster_groups: "{{ nfs_groups }}"
+      cluster_name: "{{ nfs_name }}"
+      cluster_deploy_user: "{{ nfs_deploy_user }}"
+      cluster_net: "{{ nfs_net }}"
+
+- hosts:
+    - cluster
+  become: true
+  tasks:
+    - import_tasks: cluster-firewalld.yml 
+
+- import_playbook: nfs.yml
