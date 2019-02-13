@@ -1,0 +1,28 @@
+---
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_network: "caastest-U-internal"
+      cluster_name: "{{ slurm_name }}"
+      cluster_groups: "{{ slurm_groups }}"
+      cluster_deploy_user: "{{ slurm_deploy_user }}"
+      cluster_net: "{{ slurm_net }}"
+
+- hosts: login
+  become: yes
+  tasks:
+    - name: Get last compute node
+      set_fact:
+        compute_node: "{{ groups['compute'] | last }}"
+
+    - name: Drain compute node  
+      shell: "scontrol update nodename={{ compute_node }} state=DRAIN reason='maintenance'"
+      register: drain
+      run_once: true
+
+    - name: Check node has drained
+      shell: "sinfo --states=DRAINED"
+      register: drained_nodes
+      until: "drained_nodes.stdout.find(compute_node) != -1"
+      delay: 300
+      retries: 288
