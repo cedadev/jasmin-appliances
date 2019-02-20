@@ -1,0 +1,29 @@
+---
+# This playbook uses the Ansible OpenStack modules to create a cluster
+# for a BeeGFS server 
+
+- hosts: cluster
+  roles:
+    # Note: The NFS clients are likely to be drawn from across a multi-node
+    # platform deployment. This playbook assumes the existence of a meta-group,
+    # nfs_clients, which contains all clients in the cluster.
+    - role: stackhpc.beegfs
+      beegfs_enable:
+        admon: false
+        mgmt: "{{ inventory_hostname in groups[beegfs_name + '_mds'] }}"
+        meta: "{{ inventory_hostname in groups[beegfs_name + '_mds'] }}"
+        oss: "{{ inventory_hostname in groups[beegfs_name + '_oss'] }}"
+        tuning: "{{ inventory_hostname in groups[beegfs_name + '_oss'] }}"
+        client: "{{ inventory_hostname in groups['beegfs_clients'] }}"
+      beegfs_oss:
+      - dev: "/dev/sdb"
+        port: 8003
+      beegfs_mgmt_host: "{{ groups[beegfs_name + '_mds'] | first }}"
+      beegfs_client:
+      - path: "{{ jasmin_homedir }}"
+        port: 8004
+      beegfs_fstype: "xfs"
+      beegfs_force_format: false
+      beegfs_interfaces: ["eth0"]
+      beegfs_rdma: false
+      beegfs_state: present

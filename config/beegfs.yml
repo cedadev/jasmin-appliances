@@ -1,0 +1,33 @@
+---
+# This name is used for the Heat stack and as a prefix for the
+# cluster node hostnames.
+beegfs_name: beegfs
+
+beegfs_deploy_user: 'centos'
+
+beegfs_net: "caastest-U-internal"
+
+beegfs_groups:
+  - "{{ beegfs_group_mds }}"
+  - "{{ beegfs_group_oss }}"
+
+beegfs_group_mds:
+  name: "mds"
+  flavor: "j1.small"
+  image: "centos-7-20190104"
+  user: "centos"
+  num_nodes: 1
+  root_volume_size: 10
+  node_resource: "Cluster::NodeWithVolume" 
+  nodenet_resource: "Cluster::NodeNet1"
+
+beegfs_group_oss:
+  name: "oss"
+  flavor: "j1.small"
+  image: "centos-7-20190104"
+  user: "centos"
+  num_nodes: 3
+  root_volume_size: 10
+  node_resource: "Cluster::NodeWithVolume" 
+  nodenet_resource: "Cluster::NodeNet1"
+
