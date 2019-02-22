@@ -1,0 +1,37 @@
+---
+# This task list can configure Slurm nodes to use older OpenHPC update
+# repositories, allowing to test updates to newer SLURM packages.
+# It can also restore the latest repository.
+#
+# Variables:
+# - configure_older_updates: true to limit to older OpenHPC updates
+
+- name: Disable OpenHPC updates repository
+  ini_file:
+    dest: /etc/yum.repos.d/OpenHPC.repo
+    section: OpenHPC-updates
+    option: enabled
+    value: 0
+  when: configure_older_updates is defined and configure_older_updates|bool
+
+- name: Enable repositories providing older updates
+  copy:
+    dest: /etc/yum.repos.d/OpenHPC:1.3:Update{{ item }}.repo
+    content: |
+      [OpenHPC_1.3_Update{{ item }}]
+      name=1.3.{{ item }} - Update #{{ item }} (CentOS_7)
+      type=rpm-md
+      baseurl=http://build.openhpc.community/OpenHPC:/1.3:/Update{{ item }}/CentOS_7/
+      gpgcheck=1
+      gpgkey=http://build.openhpc.community/OpenHPC:/1.3:/Update{{ item }}/CentOS_7/repodata/repomd.xml.key
+      enabled=1
+  with_sequence: start=1 end=5 format=%d
+  when: configure_older_updates is defined and configure_older_updates|bool
+
+- name: Enable OpenHPC updates repository
+  ini_file:
+    dest: /etc/yum.repos.d/OpenHPC.repo
+    section: OpenHPC-updates
+    option: enabled
+    value: 1
+  when: configure_older_updates is not defined or not configure_older_updates|bool

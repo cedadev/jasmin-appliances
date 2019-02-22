@@ -1,20 +1,21 @@
 ---
-# Ansible playbook to resume Slurm compute nodes. Waits for compute nodes to
+# Ansible tasks to resume Slurm compute nodes. Waits for compute nodes to
 # change state for 5 minutes.
 #
 # Variables:
 # - nodes_to_resume: list of compute nodes to resume
+# - resume_timeout: seconds to wait for nodes to resume, default is 300.
 
 - name: Resume compute nodes
   become: yes
-  shell: "scontrol update nodename={{ item }} state=RESUME"
+  command: "scontrol update nodename={{ item }} state=RESUME"
   # If called with hosts: <group>, execute only on the first host of the group
   run_once: true
   with_items: "{{ nodes_to_resume }}"
 
 - name: Check nodes have resumed
-  shell: "sinfo --noheader --Node --format='%N' --states=ALLOC,IDLE"
+  command: "sinfo --noheader --Node --format='%N' --states=ALLOC,IDLE"
   register: resumed_nodes
   until: "resumed_nodes.stdout_lines is superset(nodes_to_resume)"
   delay: 10
-  retries: 30
+  retries: "{{ (resume_timeout|default(300) / 10)|int }}"
