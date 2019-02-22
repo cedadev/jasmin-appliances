@@ -1,0 +1,20 @@
+---
+# Ansible playbook to drain Slurm compute nodes. Waits for compute nodes to be
+# drained for up to a day.
+#
+# Variables:
+# - nodes_to_drain: list of compute nodes to drain
+
+- name: Drain compute nodes
+  become: yes
+  shell: "scontrol update nodename={{ item }} state=DRAIN reason='maintenance'"
+  # If called with hosts: <group>, execute only on the first host of the group
+  run_once: true
+  with_items: "{{ nodes_to_drain }}"
+
+- name: Check nodes have drained
+  shell: "sinfo --noheader --Node --format='%N' --states=DRAINED"
+  register: drained_nodes
+  until: "drained_nodes.stdout_lines is superset(nodes_to_drain)"
+  delay: 10
+  retries: 8640
