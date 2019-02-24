@@ -6,7 +6,7 @@
   roles:
     # Note: The NFS clients are likely to be drawn from across a multi-node
     # platform deployment. This playbook assumes the existence of a meta-group,
-    # nfs_clients, which contains all clients in the cluster.
+    # beegfs_clients, which contains all clients in the cluster.
     - role: stackhpc.beegfs
       beegfs_enable:
         admon: false

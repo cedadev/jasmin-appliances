@@ -1,6 +1,6 @@
 ---
 # This playbook uses the Ansible OpenStack modules to create a cluster
-# using a number of baremetal compute node instances, and configure it
+# using a number of compute node instances, and configure it
 # for a SLURM partition
 - hosts: openstack
   roles:
