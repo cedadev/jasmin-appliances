@@ -24,6 +24,7 @@ slurm_login:
   node_resource: "Cluster::Node" 
   extra_groups:
     - "nfs_clients"
+    - "beegfs_clients"
   nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP"
   nodenet_fips:
     - uuid: "8723c186-d15f-44d5-9421-e12bf2a03325"
@@ -42,6 +43,7 @@ slurm_compute:
   nodenet_resource: "Cluster::NodeNet1"
   extra_groups:
     - "nfs_clients"
+    - "beegfs_clients"
 
 # Define a list of SLURM partitions to create.
 openhpc_slurm_partitions: 

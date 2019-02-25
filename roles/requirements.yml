@@ -11,6 +11,7 @@
   name: jasmin.cluster-infra
 - src: https://github.com/stackhpc/ansible-role-cluster-nfs
   name: stackhpc.cluster-nfs
+- src: stackhpc.beegfs
 - src: stackhpc.openhpc
 - src: stackhpc.os-container-infra
 - src: stackhpc.os-config
