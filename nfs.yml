@@ -1,0 +1,16 @@
+---
+# This playbook uses the Ansible OpenStack modules to create a cluster
+# using a number of baremetal compute node instances, and configure it
+# for a NFS server 
+
+- hosts: cluster
+  roles:
+    # Note: The NFS clients are likely to be drawn from across a multi-node
+    # platform deployment. This playbook assumes the existence of a meta-group,
+    # nfs_clients, which contains all clients in the cluster.
+    - role: stackhpc.cluster-nfs
+      become: true
+      nfs_enable:
+        server: "{{ inventory_hostname in groups[nfs_name + '_server'] }}" 
+        clients:  "{{ inventory_hostname in groups['nfs_clients'] }}" 
+      nfs_server: "{{ groups[nfs_name + '_server'] | first }}"

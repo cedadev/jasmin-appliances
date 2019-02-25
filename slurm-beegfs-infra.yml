@@ -1,30 +1,28 @@
 ---
 # This playbook uses the Ansible OpenStack modules to create a cluster
-# using a number of baremetal compute node instances, and configure it
+# using a number of compute node instances, and configure it
 # for a SLURM partition
 - hosts: openstack
   roles:
     - role: jasmin.cluster-infra
+      cluster_auth_type: "{{ openstack_auth_type }}"
+      cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
       cluster_name: "{{ slurm_name }}"
       cluster_groups: "{{ slurm_groups }}"
       cluster_deploy_user: "{{ slurm_deploy_user }}"
       cluster_net: "{{ slurm_net }}"
-  tasks:
-    - name: add slurm cluster to nfs_clients group
-      add_host:
-        name: "{{ item }}"
-        groups: nfs_clients
-      with_items: "{{ groups['cluster'] }}"
+      cluster_gw_group: "{{ slurm_gw_group }}"
 
-- hosts: openstack
-  roles:
     - role: jasmin.cluster-infra
+      cluster_auth_type: "{{ openstack_auth_type }}"
+      cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
-      cluster_name: "{{ nfs_name }}"
-      cluster_groups: "{{ nfs_groups }}"
-      cluster_deploy_user: "{{ nfs_deploy_user }}"
-      cluster_net: "{{ nfs_net }}"
+      cluster_name: "{{ beegfs_name }}"
+      cluster_groups: "{{ beegfs_groups }}"
+      cluster_deploy_user: "{{ beegfs_deploy_user }}"
+      cluster_net: "{{ beegfs_net }}"
+      cluster_gw_group: "{{ slurm_gw_group }}"
 
 - hosts:
     - cluster
@@ -39,11 +37,11 @@
   roles:
     - role: resmo.ntp
 
-- import_playbook: nfs.yml
+- import_playbook: beegfs.yml
 
 - hosts:
-    - slurm_login
-    - slurm_compute
+    - "{{ slurm_name }}_login"
+    - "{{ slurm_name }}_compute"
   become: yes
   pre_tasks:
 
@@ -68,8 +66,8 @@
 
         
 - hosts:
-    - login
-    - compute
+    - "{{ slurm_name }}_login"
+    - "{{ slurm_name }}_compute"
   become: yes
   pre_tasks:
 
@@ -86,10 +84,10 @@
   roles:
     - role: stackhpc.openhpc
       openhpc_enable:
-        control: "{{ inventory_hostname in groups['login'] }}"
-        batch: "{{ inventory_hostname in groups['compute'] }}"
+        control: "{{ inventory_hostname in groups[slurm_name + '_login'] }}"
+        batch: "{{ inventory_hostname in groups[slurm_name + '_compute'] }}"
         runtime: true
       openhpc_cluster_name: "{{ slurm_name }}"
       openhpc_slurm_partitions: "{{ openhpc_slurm_partitions }}"
-      openhpc_slurm_control_host: "{{ groups['login'] | first }}"
+      openhpc_slurm_control_host: "{{ groups[slurm_name + '_login'] | first }}"
 

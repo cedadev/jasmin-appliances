@@ -1,0 +1,45 @@
+---
+# This name is used for the Heat stack and as a prefix for the
+# cluster node hostnames.
+cluster_name: test
+
+cluster_deploy_user: 'centos'
+
+cluster_network: "caastest-U-internal"
+
+cluster_groups:
+  - "{{ test_fip }}"
+  - "{{ test_int }}"
+
+cluster_gw_group: "fip"
+
+test_int:
+  name: "int"
+  flavor: "j1.small"
+  image: "centos-7-20190104"
+  user: "centos"
+  num_nodes: 1
+  root_volume_size: 0
+  node_resource: "Cluster::Node" 
+  nodenet_resource: "Cluster::NodeNet1" 
+  nodenet_fips: []
+
+test_fip:
+  name: "fip"
+  flavor: "j1.small"
+  image: "centos-7-20190104"
+  user: "centos"
+  num_nodes: 1
+  root_volume_size: 0
+  node_resource: "Cluster::Node" 
+  nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP" 
+  nodenet_fips:
+    - uuid: "fbd8781c-0917-41a3-8a66-ecaf0f05826a"
+      ip: "192.171.139.250"
+
+# Node group assignments for cluster roles.
+# These group assignments are appended to the cluster inventory file.
+# The names of these roles are cross-referenced to groups referred to
+# in playbooks in the ansible/ directory.
+cluster_roles: []
+

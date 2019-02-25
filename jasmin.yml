@@ -75,7 +75,6 @@
         control: "{{ inventory_hostname in groups['login'] }}"
         batch: "{{ inventory_hostname in groups['compute'] }}"
         runtime: true
-      slurm_cluster_name: "{{ cluster_name }}"
-      slurm_partitions: "{{ openhpc_slurm_partitions }}"
-      slurm_control_host: "{{ groups['login'] | first }}"
-
+      openhpc_cluster_name: "{{ cluster_name }}"
+      openhpc_slurm_partitions: "{{ openhpc_slurm_partitions }}"
+      openhpc_slurm_control_host: "{{ groups['login'] | first }}"

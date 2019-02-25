@@ -1,19 +1,18 @@
 ---
 # This name is used for the Heat stack and as a prefix for the
 # cluster node hostnames.
-cluster_name: holly
+cluster_name: test
 
 cluster_deploy_user: 'centos'
 
-cluster_net:
-  - { net: "caastest-U-internal", subnet: "caastest-U-internal" }
+cluster_net: "caastest-U-internal"
 
 cluster_groups:
   - "{{ slurm_login }}"
   - "{{ slurm_compute }}"
   - "{{ cluster_nfs }}"
 
-#cluster_gw_group: "login"
+cluster_gw_group: "login"
 
 slurm_login:
   name: "login"
@@ -23,15 +22,21 @@ slurm_login:
   num_nodes: 1
   root_volume_size: 0
   node_resource: "Cluster::Node" 
+  nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP" 
+  nodenet_fips:
+    - uuid: "fbd8781c-0917-41a3-8a66-ecaf0f05826a"
+      ip: "192.171.139.250"
 
 slurm_compute:
   name: "compute"
-  flavor: "j2.small"
+  flavor: "j2.tiny"
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: 2
   root_volume_size: 0
   node_resource: "Cluster::Node" 
+  nodenet_resource: "Cluster::NodeNet1" 
+  nodenet_fips: []
 
 cluster_nfs:
   name: "nfs"
@@ -41,6 +46,8 @@ cluster_nfs:
   num_nodes: 1
   root_volume_size: 20
   node_resource: "Cluster::NodeWithVolume" 
+  nodenet_resource: "Cluster::NodeNet1" 
+  nodenet_fips: []
 
 # Node group assignments for cluster roles.
 # These group assignments are appended to the cluster inventory file.
