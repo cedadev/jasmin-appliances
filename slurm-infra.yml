@@ -20,6 +20,7 @@
       cluster_deploy_user: "{{ nfs_deploy_user }}"
       cluster_net: "{{ nfs_net }}"
       cluster_gw_group: "{{ slurm_gw_group }}"
+      cluster_tag: "{{ nfs_tag }}"
 
 - hosts:
     - cluster

@@ -23,6 +23,7 @@
       cluster_deploy_user: "{{ beegfs_deploy_user }}"
       cluster_net: "{{ beegfs_net }}"
       cluster_gw_group: "{{ slurm_gw_group }}"
+      cluster_tag: "{{ beegfs_tag }}"
 
 - hosts:
     - cluster

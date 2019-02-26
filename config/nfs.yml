@@ -11,6 +11,7 @@ nfs_net:
 nfs_groups:
   - "{{ nfs_group_server }}"
 #cluster_gw_group: "login"
+nfs_tag: "storage"
 
 nfs_group_server:
   name: "server"
