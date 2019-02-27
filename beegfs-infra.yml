@@ -1,0 +1,23 @@
+---
+# This playbook uses the Ansible OpenStack modules to create a cluster
+# using a number of compute node instances, and configure it
+# for a BeeGFS server
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_auth_type: "{{ openstack_auth_type }}"
+      cluster_auth: "{{ openstack_auth }}"
+      cluster_network: "caastest-U-internal"
+      cluster_name: "{{ beegfs_name }}"
+      cluster_groups: "{{ beegfs_groups }}"
+      cluster_deploy_user: "{{ beegfs_deploy_user }}"
+      cluster_net: "{{ beegfs_net }}"
+      cluster_gw_group: "{{ beegfs_gw_group }}"
+
+- hosts:
+    - cluster
+  become: true
+  tasks:
+    - import_tasks: cluster-firewalld.yml
+
+- import_playbook: beegfs.yml

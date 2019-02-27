@@ -14,7 +14,7 @@
         meta: "{{ inventory_hostname in groups[beegfs_name + '_mds'] }}"
         oss: "{{ inventory_hostname in groups[beegfs_name + '_oss'] }}"
         tuning: "{{ inventory_hostname in groups[beegfs_name + '_oss'] }}"
-        client: "{{ inventory_hostname in groups['beegfs_clients'] }}"
+        client: "{{ 'beegfs_clients' in groups and inventory_hostname in groups['beegfs_clients'] }}"
       beegfs_oss:
       - dev: "/dev/sdb"
         port: 8003
