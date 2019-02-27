@@ -5,11 +5,11 @@ nfs_name: nfs
 
 nfs_deploy_user: 'centos'
 
-nfs_net:
-  - { net: "caastest-U-internal", subnet: "caastest-U-internal" }
+nfs_net: "caastest-U-internal"
 
 nfs_groups:
   - "{{ nfs_group_server }}"
+
 #cluster_gw_group: "login"
 
 nfs_group_server:

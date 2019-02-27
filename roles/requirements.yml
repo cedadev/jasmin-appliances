@@ -7,8 +7,9 @@
 - src: https://github.com/stackhpc/ansible-role-cluster-infra
   version: newton-backport
   name: stackhpc.cluster-infra
-- src: https://github.com/cedadev/jasmin-cluster-infra-ansible
+- src: https://github.com/stackhpc/jasmin-cluster-infra-ansible
   name: jasmin.cluster-infra
+  version: issue-23
 - src: https://github.com/stackhpc/ansible-role-cluster-nfs
   name: stackhpc.cluster-nfs
 - src: stackhpc.beegfs

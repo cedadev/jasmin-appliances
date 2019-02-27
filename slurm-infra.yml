@@ -5,6 +5,8 @@
 - hosts: openstack
   roles:
     - role: jasmin.cluster-infra
+      cluster_auth_type: "{{ openstack_auth_type }}"
+      cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
       cluster_name: "{{ slurm_name }}"
       cluster_groups: "{{ slurm_groups }}"
@@ -12,8 +14,9 @@
       cluster_net: "{{ slurm_net }}"
       cluster_gw_group: "{{ slurm_gw_group }}"
 
-
     - role: jasmin.cluster-infra
+      cluster_auth_type: "{{ openstack_auth_type }}"
+      cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
       cluster_name: "{{ nfs_name }}"
       cluster_groups: "{{ nfs_groups }}"
