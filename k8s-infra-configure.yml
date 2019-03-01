@@ -1,0 +1,21 @@
+---
+#####
+## Performs Kubernetes cluster configuration for any inventory that defines
+## the groups "kube-masters" and "kube-workers"
+#####
+
+# Do cluster setup for all hosts
+- hosts: kube-masters,kube-workers
+  #remote_user: root
+  roles:
+    - jasmin.k8s-ansible/kubeadm
+  become: yes
+
+# Install addons via the master
+- hosts: kube-masters
+  #remote_user: root
+  roles:
+    - jasmin.k8s-ansible/helm
+    - jasmin.k8s-ansible/ingress_nginx
+    - jasmin.k8s-ansible/kubernetes_dashboard
+  become: yes

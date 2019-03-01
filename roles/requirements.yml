@@ -1,19 +1,22 @@
 ---
 # Sorted by maintainer name, role name
-- src: mrlesmithjr.squid
-- src: oasis_roles.kdump
-- src: resmo.ntp
-- src: singleplatform-eng.users
-- src: https://github.com/stackhpc/ansible-role-cluster-infra
-  version: newton-backport
-  name: stackhpc.cluster-infra
-- src: https://github.com/stackhpc/jasmin-cluster-infra-ansible
-  name: jasmin.cluster-infra
-  version: issue-23
-- src: https://github.com/stackhpc/ansible-role-cluster-nfs
-  name: stackhpc.cluster-nfs
-- src: stackhpc.beegfs
-- src: stackhpc.openhpc
-- src: stackhpc.os-container-infra
-- src: stackhpc.os-config
+- name: jasmin.cluster-infra
+  src: https://github.com/cedadev/jasmin-cluster-infra-ansible
+  version: master
+- name: jasmin.k8s-ansible
+  src: https://github.com/brtknr/k8s-ansible
+  version: use-gw-host
+#- name: stackhpc.cluster-nfs
+#  src: https://github.com/stackhpc/ansible-role-cluster-nfs
+#- src: mrlesmithjr.squid
+#- src: oasis_roles.kdump
+#- src: resmo.ntp
+#- src: singleplatform-eng.users
+#- src: stackhpc.beegfs
+#- src: stackhpc.openhpc
+#- src: stackhpc.os-container-infra
+#- src: stackhpc.os-config
+#- name: stackhpc.cluster-infra
+#  src: https://github.com/stackhpc/ansible-role-cluster-infra
+#  version: newton-backport
 ...
