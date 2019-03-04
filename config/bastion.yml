@@ -1,0 +1,30 @@
+---
+# This name is used for the Heat stack and as a prefix for the
+# cluster node hostnames.
+bastion_name: hbastion
+
+bastion_deploy_user: 'centos'
+
+bastion_net: "caastest-U-internal"
+
+bastion_groups:
+  - "{{ bastion_group }}"
+
+bastion_gw_group: "bastion"
+
+bastion_group:
+  name: "bastion"
+  flavor: "j1.tiny"
+  image: "centos-7-20190104"
+  user: "centos"
+  num_nodes: 1
+  root_volume_size: 10
+  node_resource: "Cluster::Node"
+  nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP"
+  nodenet_fips:
+#    - uuid: "fbd8781c-0917-41a3-8a66-ecaf0f05826a"
+#      ip: "192.171.139.250"
+#    - uuid: "8723c186-d15f-44d5-9421-e12bf2a03325"
+#      ip: "192.171.139.249"
+    - uuid: "69832fbb-f4f1-4d88-b848-799a9c3fe695"
+      ip: "192.171.139.236"

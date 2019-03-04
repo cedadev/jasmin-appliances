@@ -8,11 +8,29 @@
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
+      cluster_name: "{{ bastion_name }}"
+      cluster_groups: "{{ bastion_groups }}"
+      cluster_deploy_user: "{{ bastion_deploy_user }}"
+      cluster_net: "{{ bastion_net }}"
+      cluster_gw_group: "{{ bastion_gw_group }}"
+
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_auth_type: "{{ openstack_auth_type }}"
+      cluster_auth: "{{ openstack_auth }}"
+      cluster_network: "caastest-U-internal"
       cluster_name: "{{ beegfs_name }}"
       cluster_groups: "{{ beegfs_groups }}"
       cluster_deploy_user: "{{ beegfs_deploy_user }}"
       cluster_net: "{{ beegfs_net }}"
-      cluster_gw_group: "{{ beegfs_gw_group }}"
+      cluster_gw_group: "{{ bastion_gw_group }}"
+  tasks:
+    - name: add beegfs cluster to beegfs_servers group
+      add_host:
+       name: "{{ item }}"
+       groups: beegfs_servers
+      loop: "{{ groups['mds'] + groups['oss'] }}"
 
 - hosts:
     - cluster
@@ -21,3 +39,16 @@
     - import_tasks: cluster-firewalld.yml
 
 - import_playbook: beegfs.yml
+
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_auth_type: "{{ openstack_auth_type }}"
+      cluster_auth: "{{ openstack_auth }}"
+      cluster_network: "caastest-U-internal"
+      cluster_name: "{{ bastion_name }}"
+      cluster_groups: "{{ bastion_groups }}"
+      cluster_deploy_user: "{{ bastion_deploy_user }}"
+      cluster_net: "{{ bastion_net }}"
+      cluster_gw_group: "{{ bastion_gw_group }}"
+      cluster_state: absent

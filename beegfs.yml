@@ -2,7 +2,9 @@
 # This playbook uses the Ansible OpenStack modules to create a cluster
 # for a BeeGFS server 
 
-- hosts: cluster
+- hosts:
+    -  beegfs_servers
+    -  beegfs_clients
   roles:
     # Note: The NFS clients are likely to be drawn from across a multi-node
     # platform deployment. This playbook assumes the existence of a meta-group,
