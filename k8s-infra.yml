@@ -8,38 +8,15 @@
 - import_playbook: k8s-infra-variables.yml
   when: cluster_state | lower == 'present'
 
-# Provision a separate stack for the bastion
-- hosts: openstack
-  roles:
-    - role: jasmin.cluster-infra
-      vars:
-        cluster_name: "{{ cluster_gw_name }}"
-        cluster_state: present
-        cluster_groups:
-          - "{{ cluster_gw }}"
-      when: cluster_state | lower == 'present'
-
 # Provision the cluster infrastructure
 - hosts: openstack
   roles:
     - role: jasmin.cluster-infra
-      vars:
-        cluster_groups:
-          - name: kube-masters
-            user: "{{ cluster_deploy_user }}"
-            node_resource: "Cluster::Node"
-            nodenet_resource: "Cluster::NodeNet1"
-            num_nodes: "{{ cluster_num_masters }}"
-            flavor: "{{ cluster_master_flavor | default('j3.medium') }}"
-            root_volume_size: "{{ cluster_root_volume_size | default(20) }}"
-          - name: kube-workers
-            user: "{{ cluster_deploy_user }}"
-            node_resource: "Cluster::Node"
-            nodenet_resource: "Cluster::NodeNet1"
-            num_nodes: "{{ cluster_num_workers }}"
-            flavor: "{{ cluster_worker_flavor | default('j3.medium') }}"
-            root_volume_size: "{{ cluster_root_volume_size | default(20) }}"
-  when: false
+      cluster_groups:
+        - "{{ cluster_gw }}"
+        - "{{ cluster_masters }}"
+        - "{{ cluster_workers }}"
+      when: cluster_state | lower == 'present'
 
 # Do the configuration
 - import_playbook: k8s-infra-configure.yml
@@ -48,14 +25,13 @@
     openstack_trust_id: "{{ hostvars['localhost']['openstack_trust_id'] }}"
     openstack_user_id: "{{ hostvars['localhost']['openstack_user_id'] }}"
     openstack_project_id: "{{ hostvars['localhost']['openstack_project_id'] }}"
-  when: cluster_state | lower == 'present' and false
+  when: cluster_state | lower == 'present'
 
 # Delete the bastion
 - hosts: openstack
   roles:
     - role: jasmin.cluster-infra
-      vars:
-        cluster_name: "{{ cluster_gw_name }}"
-        cluster_groups:
-          - "{{ cluster_gw }}"
-        cluster_state: absent
+      cluster_stack_update_only: true
+      cluster_groups:
+        - "{{ cluster_masters }}"
+        - "{{ cluster_workers }}"

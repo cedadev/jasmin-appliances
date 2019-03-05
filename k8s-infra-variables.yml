@@ -2,7 +2,22 @@
 - hosts: openstack
   tasks:
     - set_fact:
-        cluster_gw_name: "{{ cluster_name }}-bastion"
+        cluster_masters:
+          name: kube-masters
+          user: "{{ cluster_deploy_user }}"
+          node_resource: "Cluster::Node"
+          nodenet_resource: "Cluster::NodeNet1"
+          num_nodes: "{{ cluster_num_masters }}"
+          flavor: "{{ cluster_master_flavor | default('j3.medium') }}"
+          root_volume_size: "{{ cluster_root_volume_size | default(20) }}"
+        cluster_workers:
+          name: kube-workers
+          user: "{{ cluster_deploy_user }}"
+          node_resource: "Cluster::Node"
+          nodenet_resource: "Cluster::NodeNet1"
+          num_nodes: "{{ cluster_num_workers }}"
+          flavor: "{{ cluster_worker_flavor | default('j3.medium') }}"
+          root_volume_size: "{{ cluster_root_volume_size | default(20) }}"
     - block:
         - name: Authenticate to the cloud and retrieve current project_id, user_id and auth_token
           os_keystone_trust:
