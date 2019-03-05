@@ -2,7 +2,7 @@
 - hosts: openstack
   tasks:
     - set_fact:
-        cluster_gw_name: "{{ cluster_k8s_name }}-bastion"
+        cluster_gw_name: "{{ cluster_name }}-bastion"
     - block:
         - name: Authenticate to the cloud and retrieve current project_id, user_id and auth_token
           os_keystone_trust:
