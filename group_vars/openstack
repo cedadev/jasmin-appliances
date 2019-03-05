@@ -29,4 +29,4 @@ cluster_gw:
       ip: "{{ cluster_fip_ip }}"
   num_nodes: 1
   flavor: "j1.tiny"
-  root_volume_size: 10
+  root_volume_size: 0
