@@ -8,14 +8,14 @@
 - hosts: kube-masters,kube-workers
   #remote_user: root
   roles:
-    - jasmin.k8s-ansible/kubeadm
+    - jasmin.k8s/kubeadm
   become: yes
 
 # Install addons via the master
 - hosts: kube-masters
   #remote_user: root
   roles:
-    - jasmin.k8s-ansible/helm
-    - jasmin.k8s-ansible/ingress_nginx
-    - jasmin.k8s-ansible/kubernetes_dashboard
+    - jasmin.k8s/helm
+    - jasmin.k8s/ingress_nginx
+    - jasmin.k8s/kubernetes_dashboard
   become: yes

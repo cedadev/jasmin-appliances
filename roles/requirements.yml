@@ -3,7 +3,7 @@
 - name: jasmin.cluster-infra
   src: https://github.com/cedadev/jasmin-cluster-infra-ansible
   version: master
-- name: jasmin.k8s-ansible
+- name: jasmin.k8s
   src: https://github.com/brtknr/k8s-ansible
   version: use-gw-host
 #- name: stackhpc.cluster-nfs
