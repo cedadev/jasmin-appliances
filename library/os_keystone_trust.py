@@ -99,9 +99,8 @@ def main():
     sdk, cloud = openstack_cloud_from_module(module)
     try:
         project_id = cloud.current_project.id
-        trustor_user_id = cloud.current_user_id
         trust = cloud.identity.create_trust(
-            trustor_user_id=trustor_user_id,
+            trustor_user_id=cloud.current_user_id,
             trustee_user_id=trustee_user_id,
             project_id=project_id,
             impersonation=impersonation,
@@ -110,7 +109,6 @@ def main():
         module.exit_json(
             changed=True,
             trust_id=trust.id,
-            trustor_user_id=trustor_user_id,
             project_id=project_id,
         )
     except Exception as e:

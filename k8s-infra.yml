@@ -23,7 +23,6 @@
   vars:
     cloud_provider: openstack
     openstack_trust_id: "{{ hostvars[groups['openstack'] | first]['openstack_trust_id'] }}"
-    openstack_user_id: "{{ hostvars[groups['openstack'] | first]['openstack_user_id'] }}"
     openstack_project_id: "{{ hostvars[groups['openstack'] | first]['openstack_project_id'] }}"
   when: cluster_state | lower == 'present'
 
