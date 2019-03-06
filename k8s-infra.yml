@@ -1,0 +1,37 @@
+---
+#####
+## Playbook that provisions and then configures a Kubernetes
+## cluster on OpenStack
+#####
+
+# Setting this in a separate play is the only way to avoid a recursive templating error
+- import_playbook: k8s-infra-variables.yml
+  when: cluster_state | lower == 'present'
+
+# Provision the cluster infrastructure
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_groups:
+        - "{{ cluster_gw }}"
+        - "{{ cluster_masters }}"
+        - "{{ cluster_workers }}"
+      when: cluster_state | lower == 'present'
+
+# Do the configuration
+- import_playbook: k8s-infra-configure.yml
+  vars:
+    cloud_provider: openstack
+    openstack_trust_id: "{{ hostvars[groups['openstack'] | first]['openstack_trust_id'] }}"
+    openstack_project_id: "{{ hostvars[groups['openstack'] | first]['openstack_project_id'] }}"
+  when: cluster_state | lower == 'present'
+
+# Delete the bastion
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_stack_update_only: true
+      cluster_groups:
+        - "{{ cluster_gw | combine({ 'num_nodes': 0 }) }}"
+        - "{{ cluster_masters }}"
+        - "{{ cluster_workers }}"
