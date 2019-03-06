@@ -13,7 +13,15 @@
       cluster_deploy_user: "{{ slurm_deploy_user }}"
       cluster_net: "{{ slurm_net }}"
       cluster_gw_group: "{{ slurm_gw_group }}"
+  tasks:
+    - name: add slurm cluster to nfs_clients group
+      add_host:
+        name: "{{ item }}"
+        groups: nfs_clients
+      with_items: "{{ groups['cluster'] }}"
 
+- hosts: openstack
+  roles:
     - role: jasmin.cluster-infra
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
