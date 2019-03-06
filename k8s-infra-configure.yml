@@ -8,7 +8,7 @@
 - hosts: kube-masters,kube-workers
   roles:
     - role: jasmin.k8s/kubeadm
-      kube_role: "{% 'master' if inventory_hostname in groups['kube-masters'] else 'worker' %}"
+      kube_role: "{{ 'master' if inventory_hostname in groups['kube-masters'] else 'worker' }}"
   become: yes
 
 # Install addons via the master

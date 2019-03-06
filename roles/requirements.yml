@@ -4,19 +4,19 @@
   src: https://github.com/cedadev/jasmin-cluster-infra-ansible
   version: master
 - name: jasmin.k8s
-  src: https://github.com/brtknr/k8s-ansible
+  src: https://github.com/cedadev/k8s-ansible
   version: master
-#- name: stackhpc.cluster-nfs
-#  src: https://github.com/stackhpc/ansible-role-cluster-nfs
-#- src: mrlesmithjr.squid
-#- src: oasis_roles.kdump
-#- src: resmo.ntp
-#- src: singleplatform-eng.users
-#- src: stackhpc.beegfs
-#- src: stackhpc.openhpc
-#- src: stackhpc.os-container-infra
-#- src: stackhpc.os-config
-#- name: stackhpc.cluster-infra
-#  src: https://github.com/stackhpc/ansible-role-cluster-infra
-#  version: newton-backport
+- src: mrlesmithjr.squid
+- src: oasis_roles.kdump
+- src: resmo.ntp
+- src: singleplatform-eng.users
+- src: stackhpc.beegfs
+- src: stackhpc.openhpc
+- src: stackhpc.os-container-infra
+- src: stackhpc.os-config
+- name: stackhpc.cluster-nfs
+  src: https://github.com/stackhpc/ansible-role-cluster-nfs
+- name: stackhpc.cluster-infra
+  src: https://github.com/stackhpc/ansible-role-cluster-infra
+  version: newton-backport
 ...
