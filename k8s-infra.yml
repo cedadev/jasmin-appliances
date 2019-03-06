@@ -13,9 +13,9 @@
   roles:
     - role: jasmin.cluster-infra
       cluster_groups:
+        - "{{ cluster_gw }}"
         - "{{ cluster_masters }}"
         - "{{ cluster_workers }}"
-        - "{{ cluster_gw }}"
       when: cluster_state | lower == 'present'
 
 # Do the configuration
@@ -32,5 +32,6 @@
     - role: jasmin.cluster-infra
       cluster_stack_update_only: true
       cluster_groups:
+        - "{{ cluster_gw | combine({ 'num_nodes': 0 }) }}"
         - "{{ cluster_masters }}"
         - "{{ cluster_workers }}"
