@@ -6,14 +6,13 @@
 
 # Do cluster setup for all hosts
 - hosts: kube-masters,kube-workers
-  #remote_user: root
   roles:
-    - jasmin.k8s/kubeadm
+    - role: jasmin.k8s/kubeadm
+      kube_role: "{% 'master' if inventory_hostname in groups['kube-masters'] else 'worker' %}"
   become: yes
 
 # Install addons via the master
 - hosts: kube-masters
-  #remote_user: root
   roles:
     - jasmin.k8s/helm
     - jasmin.k8s/ingress_nginx

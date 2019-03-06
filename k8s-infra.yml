@@ -22,9 +22,9 @@
 - import_playbook: k8s-infra-configure.yml
   vars:
     cloud_provider: openstack
-    openstack_trust_id: "{{ hostvars['localhost']['openstack_trust_id'] }}"
-    openstack_user_id: "{{ hostvars['localhost']['openstack_user_id'] }}"
-    openstack_project_id: "{{ hostvars['localhost']['openstack_project_id'] }}"
+    openstack_trust_id: "{{ hostvars[groups['openstack'] | first]['openstack_trust_id'] }}"
+    openstack_user_id: "{{ hostvars[groups['openstack'] | first]['openstack_user_id'] }}"
+    openstack_project_id: "{{ hostvars[groups['openstack'] | first]['openstack_project_id'] }}"
   when: cluster_state | lower == 'present'
 
 # Delete the bastion

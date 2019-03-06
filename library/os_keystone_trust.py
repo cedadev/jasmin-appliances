@@ -15,11 +15,12 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: os_keystone_trust
-short_description: Retrieve an auth token
+short_description: Retrieve a keystone trust_id
 version_added: "1.0"
 author: "Bharat Kunwar (@brtknr)"
 description:
-    - Retrieve an auth token from an OpenStack Cloud
+    - Retrieve a keystone trust_id, trustor_user_id and project_id from an
+      OpenStack Cloud
 requirements:
     - "python >= 2.7"
     - "openstacksdk"
@@ -51,12 +52,12 @@ EXAMPLES = '''
     trustee_user_id: abc123
     roles:
       - name: _member_
+  register: result
 
 - name: Show output
-  debug: var=trust_id
-- debug: var=trustor_user_id
-- debug: var=project_id
-- debug: var=auth_token
+  debug: var=result.trust_id
+- debug: var=result.trustor_user_id
+- debug: var=result.project_id
 '''
 
 RETURN = '''
@@ -70,10 +71,6 @@ trustor_user_id:
     type: str
 project_id:
     description: Openstack Project ID
-    returned: success
-    type: str
-auth_token:
-    description: Openstack API Auth Token
     returned: success
     type: str
 '''
@@ -112,12 +109,9 @@ def main():
         )
         module.exit_json(
             changed=True,
-            ansible_facts=dict(
-                trust_id=trust.id,
-                trustor_user_id=trustor_user_id,
-                project_id=project_id,
-                auth_token=cloud.auth_token
-            )
+            trust_id=trust.id,
+            trustor_user_id=trustor_user_id,
+            project_id=project_id,
         )
     except Exception as e:
         module.fail_json(msg=str(e), exception=traceback.format_exc())

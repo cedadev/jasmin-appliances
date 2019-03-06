@@ -25,11 +25,12 @@
             impersonation: true
             roles:
               - name: "{{ cluster_delegate_role }}"
+          register: result
         - name: Set openstack_project_id, openstack_user_id and opestack_trust_id as fact
           set_fact:
-            openstack_project_id: "{{ project_id | default(lookup('env', 'OS_PROJECT_ID')) }}"
-            openstack_user_id: "{{ user_id | default(lookup('env', 'OS_USER_ID')) }}"
-            openstack_trust_id: "{{ trust_id | default(lookup('env', 'OS_TRUST_ID')) }}"
+            openstack_project_id: "{{ result.project_id | default(lookup('env', 'OS_PROJECT_ID')) }}"
+            openstack_user_id: "{{ result.user_id | default(lookup('env', 'OS_USER_ID')) }}"
+            openstack_trust_id: "{{ result.trust_id | default(lookup('env', 'OS_TRUST_ID')) }}"
       when:
         (openstack_trust_id is not defined or
         openstack_project_id is not defined or

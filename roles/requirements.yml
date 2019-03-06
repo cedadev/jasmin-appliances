@@ -5,7 +5,7 @@
   version: master
 - name: jasmin.k8s
   src: https://github.com/brtknr/k8s-ansible
-  version: use-gw-host
+  version: master
 #- name: stackhpc.cluster-nfs
 #  src: https://github.com/stackhpc/ansible-role-cluster-nfs
 #- src: mrlesmithjr.squid
