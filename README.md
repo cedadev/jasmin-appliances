@@ -20,7 +20,8 @@ Make sure you have a public key uploaded to OpenStack:
     $ openstack keypair list
 
 Launch a cluster by calling the jasmin.yml playbook, passing a config file as
-Ansible extra variables, and providing a keypair to use to connect to the
-cluster. For example:
+Ansible extra variables, providing a keypair to use to connect to the cluster,
+and assigning a unique name to the cluster (which will be used to name the
+stack). For example:
 
-    $ ansible-playbook -i inventory jasmin.yml -e @config/minimal.yml -e cluster_keypair=<keypair_name>
+    $ ansible-playbook -i inventory jasmin.yml -e @config/minimal.yml -e cluster_keypair=<keypair_name> -e cluster_name=<stack_name>
