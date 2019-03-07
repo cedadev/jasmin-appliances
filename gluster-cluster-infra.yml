@@ -1,0 +1,30 @@
+---
+# This playbook uses the Ansible OpenStack modules to create a cluster
+# using a number of compute node instances, and configure it
+# for a gluster cluster.
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_auth_type: "{{ openstack_auth_type }}"
+      cluster_auth: "{{ openstack_auth }}"
+      cluster_network: "caastest-U-internal"
+      cluster_name: "{{ gluster_cluster_name }}"
+      cluster_groups: "{{ gluster_cluster_groups }}" 
+      cluster_deploy_user: "{{ gluster_cluster_deploy_user }}"
+      cluster_net: "{{ gluster_cluster_net }}"
+      cluster_gw_group: "{{ gluster_cluster_gw_group }}"
+
+- hosts:
+    - cluster
+  become: true
+  tasks:
+    - import_tasks: cluster-hosts.yml 
+    - import_tasks: cluster-firewalld.yml
+
+- hosts:
+    - cluster
+  become: true  
+  roles:
+    - role: resmo.ntp
+
+- import_playbook: gluster-cluster.yml

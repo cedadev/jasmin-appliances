@@ -1,0 +1,21 @@
+---
+- hosts:
+    - servers
+    - clients
+  roles:
+    - role: stackhpc.gluster-cluster
+      become: true
+      gluster_cluster_volume_name: "{{ gluster_cluster_name }}"
+      gluster_cluster_storage_group_name: servers
+      gluster_cluster_block_devices: 
+        - sdb
+      gluster_cluster_transport_interface: eth0
+      gluster_cluster_transport_mode: tcp
+      gluster_cluster_volume_options:
+        cluster.nufa: 'on'
+      gluster_enable:
+        servers: "{{ inventory_hostname in groups[gluster_cluster_name + '_servers'] }}"
+        clients: "{{ inventory_hostname in groups[gluster_cluster_name + '_clients'] }}"
+      gluster_cluster_server: "{{ groups[gluster_cluster_name + '_servers'] | first }}"
+      gluster_cluster_server_export: "/srv/home"
+      gluster_cluster_client_mntpoint: "{{ jasmin_homedir }}"

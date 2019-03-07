@@ -1,0 +1,39 @@
+---
+# This name is used for the Heat stack and as a prefix for the
+# cluster node hostnames.
+gluster_cluster_name: gluster-cluster
+
+gluster_cluster_deploy_user: 'centos'
+
+gluster_cluster_net: "caastest-U-internal"
+
+gluster_cluster_groups:
+  - "{{ gluster_cluster_group_servers }}"
+  - "{{ gluster_cluster_group_clients }}"
+
+gluster_cluster_gw_group: "servers"
+
+gluster_cluster_group_servers:
+  name: "servers"
+  flavor: "j1.small"
+  image: "centos-7-20190104"
+  user: "centos"
+  num_nodes: 1
+  root_volume_size: 10
+  node_resource: "Cluster::NodeWithVolume" 
+  nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP"
+    - uuid: "69832fbb-f4f1-4d88-b848-799a9c3fe695"
+      ip: "192.171.139.236"
+
+gluster_cluster_group_clients:
+  name: "clients"
+  flavor: "j1.small"
+  image: "centos-7-20190104"
+  user: "centos"
+  num_nodes: 2
+  root_volume_size: 10
+  node_resource: "Cluster::NodeWithVolume" 
+  nodenet_resource: "Cluster::NodeNet1"
+
+
+jasmin_homedir: "/jasmin"
