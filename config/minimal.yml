@@ -38,6 +38,11 @@ slurm_compute:
   nodenet_resource: "Cluster::NodeNet1" 
   nodenet_fips: []
 
+cluster_nfs_info:
+  storage_type: "nfs"
+  nfs_servers: "$PRIMARY_IPS"
+  nfs_export: "/srv/home"
+
 cluster_nfs:
   name: "nfs"
   flavor: "j1.small"
@@ -48,6 +53,7 @@ cluster_nfs:
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1" 
   nodenet_fips: []
+  info: "{{ cluster_nfs_info | to_json }}"
 
 # Node group assignments for cluster roles.
 # These group assignments are appended to the cluster inventory file.
