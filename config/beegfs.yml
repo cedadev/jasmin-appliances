@@ -11,6 +11,8 @@ beegfs_groups:
   - "{{ beegfs_group_mds }}"
   - "{{ beegfs_group_oss }}"
 
+beegfs_tag: "storage"
+
 beegfs_group_mds:
   name: "mds"
   flavor: "j1.small"
