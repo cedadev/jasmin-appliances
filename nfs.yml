@@ -12,5 +12,5 @@
       become: true
       nfs_enable:
         server: "{{ inventory_hostname in groups[nfs_name + '_server'] }}" 
-        clients:  "{{ inventory_hostname in groups['nfs_clients'] }}" 
+        clients:  "{{ 'nfs_clients' in groups and  inventory_hostname in groups['nfs_clients'] }}" 
       nfs_server: "{{ groups[nfs_name + '_server'] | first }}"

@@ -41,9 +41,6 @@
       run_once: true
       failed_when: "'inactive' in munge_status.stdout"
 
-    - debug:
-        msg: "{{ munge_status }}"
-
     - name: check for failed services
       shell: "systemctl --state=failed"
       register: failed_services
