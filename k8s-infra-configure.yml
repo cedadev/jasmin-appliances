@@ -1,0 +1,20 @@
+---
+#####
+## Performs Kubernetes cluster configuration for any inventory that defines
+## the groups "kube-masters" and "kube-workers"
+#####
+
+# Do cluster setup for all hosts
+- hosts: kube-masters,kube-workers
+  roles:
+    - role: jasmin.k8s/kubeadm
+      kube_role: "{{ 'master' if inventory_hostname in groups['kube-masters'] else 'worker' }}"
+  become: yes
+
+# Install addons via the master
+- hosts: kube-masters
+  roles:
+    - jasmin.k8s/helm
+    - jasmin.k8s/ingress_nginx
+    - jasmin.k8s/kubernetes_dashboard
+  become: yes
