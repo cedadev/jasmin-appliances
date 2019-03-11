@@ -29,13 +29,14 @@
       yum:
         name: '*'
         state: latest
-    - name: Check for reboot hint
-      shell: LAST_KERNEL=$(rpm -q --last kernel | awk 'NR==1 {sub(/kernel-/,""); print $1}'); if [ $LAST_KERNEL != "{{ ansible_kernel }}" ]; then echo 'reboot'; else echo 'no'; fi
-      ignore_errors: true
-      register: reboot_hint
+    - name: Check if reboot is required
+      command: needs-restarting -r
+      changed_when: false
+      failed_when: false
+      register: reboot_required
     - name: Rebooting
       reboot:
-      when: reboot_hint.stdout.find("reboot") != -1
+      when: reboot_required.rc != 0
 
 - hosts: login
   gather_facts: no
