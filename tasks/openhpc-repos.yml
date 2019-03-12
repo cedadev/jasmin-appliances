@@ -16,16 +16,18 @@
 
 - name: Enable repositories providing older updates
   copy:
-    dest: /etc/yum.repos.d/OpenHPC:1.3:Update{{ item }}.repo
+    dest: /etc/yum.repos.d/OpenHPC:1.3:Update{{ point_release }}.repo
     content: |
-      [OpenHPC_1.3_Update{{ item }}]
-      name=1.3.{{ item }} - Update #{{ item }} (CentOS_7)
+      [OpenHPC_1.3_Update{{ point_release }}]
+      name=1.3.{{ point_release }} - Update #{{ point_release }} (CentOS_7)
       type=rpm-md
-      baseurl=http://build.openhpc.community/OpenHPC:/1.3:/Update{{ item }}/CentOS_7/
+      baseurl=http://build.openhpc.community/OpenHPC:/1.3:/Update{{ point_release }}/CentOS_7/
       gpgcheck=1
-      gpgkey=http://build.openhpc.community/OpenHPC:/1.3:/Update{{ item }}/CentOS_7/repodata/repomd.xml.key
+      gpgkey=http://build.openhpc.community/OpenHPC:/1.3:/Update{{ point_release }}/CentOS_7/repodata/repomd.xml.key
       enabled=1
   with_sequence: start=1 end=5 format=%d
+  loop_control:
+    loop_var: point_release
   when: configure_older_updates is defined and configure_older_updates|bool
 
 - name: Enable OpenHPC updates repository
