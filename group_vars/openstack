@@ -16,6 +16,7 @@ openstack_auth:
   password: "{{ lookup('env', 'OS_PASSWORD') }}"
   auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
 
+cluster_image: centos-7-20190104
 cluster_deploy_user: centos
 cluster_delegate_role: _member_
 cluster_gw_group: gw
