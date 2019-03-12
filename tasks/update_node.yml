@@ -1,0 +1,23 @@
+- import_tasks: tasks/drain.yml
+  delegate_to: "{{ groups['login'] | first }}"
+  vars:
+    node_to_drain: "{{ ansible_hostname }}"
+  when: drain | default(false) | bool
+- import_tasks: tasks/openhpc-repos.yml
+- name: Upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+- name: Check if reboot is required
+  command: needs-restarting -r
+  changed_when: false
+  failed_when: false
+  register: reboot_required
+- name: Reboot
+  reboot:
+  when: reboot_required.rc != 0
+- import_tasks: tasks/resume.yml
+  delegate_to: "{{ groups['login'] | first }}"
+  vars:
+    node_to_resume: "{{ ansible_hostname }}"
+  when: drain | default(false) | bool

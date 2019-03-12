@@ -12,35 +12,13 @@
       cluster_deploy_user: "{{ slurm_deploy_user }}"
       cluster_net: "{{ slurm_net }}"
 
-- hosts: login
-  gather_facts: no
+- hosts:
+    - compute
+  serial: "{{ concurrent_compute_update | default(1) }}"
   tasks:
-  - import_tasks: tasks/drain.yml
-    vars:
-      nodes_to_drain: "{{ groups['compute'] }}"
+    - include: tasks/update_node.yml drain=true
 
 - hosts:
     - login
-    - compute
-  become: yes
   tasks:
-    - import_tasks: tasks/openhpc-repos.yml
-    - name: Upgrade all packages
-      yum:
-        name: '*'
-        state: latest
-    - name: Check if reboot is required
-      command: needs-restarting -r
-      changed_when: false
-      failed_when: false
-      register: reboot_required
-    - name: Rebooting
-      reboot:
-      when: reboot_required.rc != 0
-
-- hosts: login
-  gather_facts: no
-  tasks:
-  - import_tasks: tasks/resume.yml
-    vars:
-      nodes_to_resume: "{{ groups['compute'] }}"
+    - include: tasks/update_node.yml
