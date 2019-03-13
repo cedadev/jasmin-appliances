@@ -5,7 +5,7 @@
 #####
 
 # Set cluster variables
-- import_playbook: k8s-infra-variables.yml
+- import_playbook: pangeo-infra-variables.yml
   when: cluster_state | lower == 'present'
 
 # Provision the cluster infrastructure
@@ -13,7 +13,6 @@
   roles:
     - role: jasmin.cluster-infra
       cluster_groups:
-        - "{{ cluster_gw }}"
         - "{{ cluster_masters }}"
         - "{{ cluster_workers }}"
 
@@ -21,13 +20,9 @@
 - import_playbook: k8s-infra-configure.yml
   when: cluster_state | lower == 'present'
 
-# Delete the bastion
-- hosts: openstack
+# Install pangeo helm chart
+- hosts: kube-masters
   roles:
-    - role: jasmin.cluster-infra
-      cluster_stack_update_only: true
-      cluster_groups:
-        - "{{ cluster_gw | combine({ 'num_nodes': 0 }) }}"
-        - "{{ cluster_masters }}"
-        - "{{ cluster_workers }}"
-      when: cluster_state | lower == 'present'
+    - name: jasmin.pangeo-helm
+      become: yes
+...
