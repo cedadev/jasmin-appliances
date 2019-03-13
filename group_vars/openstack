@@ -18,7 +18,6 @@ openstack_auth:
 
 cluster_image: centos-7-20190104
 cluster_floating_network_id: NERCvSE
-
 cluster_deploy_user: centos
 cluster_delegate_role: _member_
 cluster_gw_group: ephemeral
@@ -33,3 +32,4 @@ cluster_gw:
   num_nodes: 1
   flavor: "j1.tiny"
   root_volume_size: 0
+...
