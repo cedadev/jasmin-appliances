@@ -17,6 +17,8 @@ openstack_auth:
   auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
 
 cluster_image: centos-7-20190104
+cluster_floating_network_id: 1f8bb866-346d-4aee-8ac6-8ff13dfabc5b
+
 cluster_deploy_user: centos
 cluster_delegate_role: _member_
 cluster_gw_group: gw
@@ -26,8 +28,8 @@ cluster_gw:
   node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP"
   nodenet_fips:
-    - uuid: "{{ cluster_fip_uuid }}"
-      ip: "{{ cluster_fip_ip }}"
+    - uuid: "{{ cluster_gw_fip_id }}"
+      ip: "{{ cluster_gw_fip_ip }}"
   num_nodes: 1
   flavor: "j1.tiny"
   root_volume_size: 0

@@ -4,6 +4,10 @@
 ## cluster on OpenStack
 #####
 
+# Do the configuration
+- import_playbook: discover-gateway-ip.yml
+  when: cluster_state | lower == 'present'
+
 # Provision the cluster infrastructure
 - hosts: openstack
   vars_files:
@@ -15,6 +19,7 @@
         - "{{ cluster_masters }}"
         - "{{ cluster_workers }}"
         - "{{ cluster_gw }}"
+  when: cluster_state | lower == 'present'
 
 # Do the configuration
 - import_playbook: k8s-infra-configure.yml
@@ -31,4 +36,3 @@
       cluster_groups:
         - "{{ cluster_masters }}"
         - "{{ cluster_workers }}"
-      when: cluster_state | lower == 'present'

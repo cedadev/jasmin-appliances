@@ -20,8 +20,8 @@
             openstack_project_id: "{{ result.project_id }}"
             openstack_trust_id: "{{ result.trust_id }}"
       when:
-        (openstack_trust_id is not defined or
-        openstack_project_id is not defined)
+        openstack_trust_id is not defined or
+        openstack_project_id is not defined
 
 # Do cluster setup for all hosts
 - hosts: kube-masters,kube-workers
@@ -29,6 +29,8 @@
     cloud_provider: openstack
     openstack_trust_id: "{{ hostvars[groups['openstack'] | first]['openstack_trust_id'] }}"
     openstack_project_id: "{{ hostvars[groups['openstack'] | first]['openstack_project_id'] }}"
+    kubernetes_version: "{{ cluster_version }}"
+    upgrade_system_packages: "{{ cluster_upgrade_system_packages | default(false) }}"
   roles:
     - role: jasmin.k8s/kubeadm
       kube_role: "{{ 'master' if inventory_hostname in groups['kube-masters'] else 'worker' }}"
