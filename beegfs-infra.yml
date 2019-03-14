@@ -14,7 +14,6 @@
       cluster_groups: "{{ beegfs_groups + [cluster_gw] }}"
       cluster_deploy_user: "{{ beegfs_deploy_user }}"
       cluster_tag: "{{ beegfs_tag }}"
-      #cluster_gw_group: "{{ cluster_gw_group }}"
   tasks:
     - name: add beegfs cluster to beegfs_servers group
       add_host:
@@ -39,13 +38,14 @@
       cluster_network: "caastest-U-internal"
       cluster_net: "{{ beegfs_net }}"
       cluster_name: "{{ beegfs_name }}"
-      #cluster_groups: "{{ [cluster_gw | combine({'num_nodes': 0})] + beegfs_groups }}"
       cluster_groups: "{{ beegfs_groups }}"
       cluster_deploy_user: "{{ beegfs_deploy_user }}"
       cluster_tag: "{{ beegfs_tag }}"
       cluster_stack_update_only: true
 
-  # Hack pending outcome of https://github.com/ansible/ansible/pull/53757
+  # Hack pending outcome of:
+  # - https://github.com/ansible/ansible/pull/53757
+  # - https://review.openstack.org/643195
   tasks:
     - name: Fixup stack tags
       command: "openstack stack update --existing --tags {{ beegfs_tag }} {{ beegfs_name }}"

@@ -43,7 +43,9 @@
       cluster_tag: "{{ nfs_tag }}"
       cluster_stack_update_only: true
 
-  # Hack pending outcome of https://github.com/ansible/ansible/pull/53757
+  # Hack pending outcome of:
+  # - https://github.com/ansible/ansible/pull/53757
+  # - https://review.openstack.org/643195
   tasks:
     - name: Fixup stack tags
       command: "openstack stack update --existing --tags {{ nfs_tag }} {{ nfs_name }}"
