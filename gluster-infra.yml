@@ -8,11 +8,17 @@
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
-      cluster_name: "{{ gluster_cluster_name }}"
-      cluster_groups: "{{ gluster_cluster_groups }}" 
-      cluster_deploy_user: "{{ gluster_cluster_deploy_user }}"
-      cluster_net: "{{ gluster_cluster_net }}"
-      cluster_gw_group: "{{ gluster_cluster_gw_group }}"
+      cluster_name: "{{ gluster_name }}"
+      cluster_groups: "{{ gluster_groups + [cluster_gw] }}" 
+      cluster_deploy_user: "{{ gluster_deploy_user }}"
+      cluster_net: "{{ gluster_net }}"
+      cluster_tag: "{{ gluster_tag }}"
+  tasks:
+    - name: add gluster cluster to gluster_servers group
+      add_host:
+        name: "{{ item }}"
+        groups: gluster_servers
+      loop: "{{ groups['server'] }}"
 
 - hosts:
     - cluster
@@ -27,4 +33,24 @@
   roles:
     - role: resmo.ntp
 
-- import_playbook: gluster-cluster.yml
+- import_playbook: gluster.yml
+
+# Reconfigure the stack to remove the gateway bastion
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_auth_type: "{{ openstack_auth_type }}"
+      cluster_auth: "{{ openstack_auth }}"
+      cluster_network: "caastest-U-internal"
+      cluster_name: "{{ gluster_name }}"
+      cluster_groups: "{{ gluster_groups }}" 
+      cluster_deploy_user: "{{ gluster_deploy_user }}"
+      cluster_net: "{{ gluster_net }}"
+      cluster_tag: "{{ gluster_tag }}"
+      cluster_stack_update_only: true
+
+  # Hack pending outcome of https://github.com/ansible/ansible/pull/53757
+  tasks:
+    - name: Fixup stack tags
+      command: "openstack stack update --existing --tags {{ gluster_tag }} {{ gluster_name }}"
+
