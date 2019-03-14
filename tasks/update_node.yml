@@ -1,23 +1,49 @@
-- import_tasks: tasks/drain.yml
-  delegate_to: "{{ groups['login'] | first }}"
-  vars:
-    node_to_drain: "{{ ansible_hostname }}"
-  when: drain | default(false) | bool
-- import_tasks: tasks/openhpc-repos.yml
-- name: Upgrade all packages
-  yum:
-    name: '*'
-    state: latest
-- name: Check if reboot is required
-  command: needs-restarting -r
-  changed_when: false
-  failed_when: false
-  register: reboot_required
-- name: Reboot
-  reboot:
-  when: reboot_required.rc != 0
-- import_tasks: tasks/resume.yml
-  delegate_to: "{{ groups['login'] | first }}"
-  vars:
-    node_to_resume: "{{ ansible_hostname }}"
-  when: drain | default(false) | bool
+# Ansible tasks to update a node and reboot if required. Compute nodes can be
+# drained prior to installing updates.
+
+# Check whether there are any available updates, so we don't drain compute nodes
+# uselessly.
+- name: Check for available updates
+  yum: list=updates update_cache=true
+  register: yumoutput
+
+- block:
+  - import_tasks: tasks/drain.yml
+    delegate_to: "{{ groups['login'] | first }}"
+    vars:
+      node_to_drain: "{{ ansible_hostname }}"
+    when: drain | default(false) | bool
+
+  - name: Upgrade all packages
+    yum:
+      name: '*'
+      state: latest
+
+
+  - name: Check if a reboot is required
+    command: needs-restarting -r
+    changed_when: false
+    failed_when: false
+    register: reboot_required
+  - name: Reboot if required
+    reboot:
+    when: reboot_required.rc != 0
+
+  - name: Check if any services need restarting
+    command: needs-restarting -s
+    register: service_restart_required
+  - name: Restart services
+    service:
+      name: "{{ item }}"
+      state: restarted
+    when: service_restart_required.stdout
+    with_items: "{{ service_restart_required.stdout.split() }}"
+
+  - import_tasks: tasks/resume.yml
+    delegate_to: "{{ groups['login'] | first }}"
+    vars:
+      node_to_resume: "{{ ansible_hostname }}"
+    when: drain | default(false) | bool
+  when:
+    - yumoutput.results|length > 0
+  become: true
