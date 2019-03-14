@@ -1,0 +1,10 @@
+---
+cluster_workers:
+  name: kube-workers
+  user: "{{ cluster_deploy_user }}"
+  node_resource: "Cluster::Node"
+  nodenet_resource: "Cluster::NodeNet1"
+  num_nodes: "{{ cluster_num_workers }}"
+  flavor: "{{ cluster_worker_flavor | default('j3.medium') }}"
+  root_volume_size: 0
+...
