@@ -1,8 +1,6 @@
 ---
 beegfs_deploy_user: 'centos'
 
-beegfs_net: "caastest-U-internal"
-
 beegfs_groups:
   - "{{ beegfs_group_mds }}"
   - "{{ beegfs_group_oss }}"

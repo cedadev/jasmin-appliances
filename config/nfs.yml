@@ -1,8 +1,6 @@
 ---
 nfs_deploy_user: 'centos'
 
-nfs_net: "caastest-U-internal"
-
 nfs_groups:
   - "{{ nfs_group_server }}"
 

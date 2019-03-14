@@ -1,8 +1,6 @@
 ---
 gluster_deploy_user: 'centos'
 
-gluster_net: "caastest-U-internal"
-
 gluster_tag: "storage"
 
 gluster_groups:

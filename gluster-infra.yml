@@ -7,10 +7,8 @@
     - role: jasmin.cluster-infra
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
-      cluster_network: "caastest-U-internal"
       cluster_groups: "{{ gluster_groups + [cluster_gw] }}" 
       cluster_deploy_user: "{{ gluster_deploy_user }}"
-      cluster_net: "{{ gluster_net }}"
       cluster_tag: "{{ gluster_tag }}"
   tasks:
     - name: add gluster cluster to gluster_servers group
@@ -40,10 +38,8 @@
     - role: jasmin.cluster-infra
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
-      cluster_network: "caastest-U-internal"
       cluster_groups: "{{ gluster_groups }}" 
       cluster_deploy_user: "{{ gluster_deploy_user }}"
-      cluster_net: "{{ gluster_net }}"
       cluster_tag: "{{ gluster_tag }}"
       cluster_stack_update_only: true
 
