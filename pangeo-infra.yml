@@ -4,12 +4,11 @@
 ## cluster on OpenStack
 #####
 
-# Set cluster variables
-- import_playbook: pangeo-infra-variables.yml
-  when: cluster_state | lower == 'present'
-
 # Provision the cluster infrastructure
 - hosts: openstack
+  vars_files:
+    - vars/kube-masters-with-fip.yml
+    - vars/kube-workers.yml
   roles:
     - role: jasmin.cluster-infra
       cluster_groups:
@@ -22,6 +21,9 @@
 
 # Install pangeo helm chart
 - hosts: kube-masters
+  vars_files:
+    - vars/kube-masters.yml
+    - vars/kube-workers.yml
   roles:
     - name: jasmin.pangeo-helm
       become: yes
