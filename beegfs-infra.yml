@@ -10,7 +10,6 @@
       cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
       cluster_net: "{{ beegfs_net }}"
-      cluster_name: "{{ beegfs_name }}"
       cluster_groups: "{{ beegfs_groups + [cluster_gw] }}"
       cluster_deploy_user: "{{ beegfs_deploy_user }}"
       cluster_tag: "{{ beegfs_tag }}"
@@ -21,10 +20,11 @@
        groups: beegfs_servers
       loop: "{{ groups['mds'] + groups['oss'] }}"
 
-- hosts:
-    - cluster
+- hosts: beegfs_servers
   become: true
   tasks:
+    - set_fact:
+        beegfs_name: "{{ cluster_name }}"
     - import_tasks: cluster-hosts.yml
     - import_tasks: cluster-firewalld.yml
 
@@ -37,7 +37,6 @@
       cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
       cluster_net: "{{ beegfs_net }}"
-      cluster_name: "{{ beegfs_name }}"
       cluster_groups: "{{ beegfs_groups }}"
       cluster_deploy_user: "{{ beegfs_deploy_user }}"
       cluster_tag: "{{ beegfs_tag }}"
@@ -48,4 +47,4 @@
   # - https://review.openstack.org/643195
   tasks:
     - name: Fixup stack tags
-      command: "openstack stack update --existing --tags {{ beegfs_tag }} {{ beegfs_name }}"
+      command: "openstack stack update --existing --tags {{ beegfs_tag }} {{ cluster_name }}"

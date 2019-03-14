@@ -1,8 +1,4 @@
 ---
-# This name is used for the Heat stack and as a prefix for the
-# cluster node hostnames.
-nfs_name: nfs
-
 nfs_deploy_user: 'centos'
 
 nfs_net: "caastest-U-internal"
@@ -19,7 +15,7 @@ nfs_group_server:
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: 1
-  root_volume_size: 20
+  root_volume_size: 10
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"
 

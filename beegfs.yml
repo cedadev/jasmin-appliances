@@ -6,7 +6,7 @@
     -  beegfs_servers
     -  beegfs_clients
   roles:
-    # Note: The NFS clients are likely to be drawn from across a multi-node
+    # Note: The BeeGFS clients are likely to be drawn from across a multi-stack
     # platform deployment. This playbook assumes the existence of a meta-group,
     # beegfs_clients, which contains all clients in the cluster.
     - role: stackhpc.beegfs

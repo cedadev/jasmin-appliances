@@ -5,7 +5,7 @@
   roles:
     - role: stackhpc.gluster-cluster
       become: true
-      gluster_cluster_volume_name: "{{ gluster_name }}"
+      gluster_cluster_volume_name: "{{ cluster_name }}"
       gluster_cluster_storage_group_name: gluster_servers
       gluster_cluster_block_devices: 
         - sdb

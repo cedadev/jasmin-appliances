@@ -8,7 +8,6 @@
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
-      cluster_name: "{{ gluster_name }}"
       cluster_groups: "{{ gluster_groups + [cluster_gw] }}" 
       cluster_deploy_user: "{{ gluster_deploy_user }}"
       cluster_net: "{{ gluster_net }}"
@@ -42,7 +41,6 @@
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
-      cluster_name: "{{ gluster_name }}"
       cluster_groups: "{{ gluster_groups }}" 
       cluster_deploy_user: "{{ gluster_deploy_user }}"
       cluster_net: "{{ gluster_net }}"
@@ -54,5 +52,5 @@
   # - https://review.openstack.org/643195
   tasks:
     - name: Fixup stack tags
-      command: "openstack stack update --existing --tags {{ gluster_tag }} {{ gluster_name }}"
+      command: "openstack stack update --existing --tags {{ gluster_tag }} {{ cluster_name }}"
 

@@ -9,7 +9,6 @@
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
-      cluster_name: "{{ nfs_name }}"
       cluster_groups: "{{ nfs_groups + [cluster_gw] }}"
       cluster_deploy_user: "{{ nfs_deploy_user }}"
       cluster_net: "{{ nfs_net }}"
@@ -36,7 +35,6 @@
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
       cluster_network: "caastest-U-internal"
-      cluster_name: "{{ nfs_name }}"
       cluster_groups: "{{ nfs_groups }}"
       cluster_deploy_user: "{{ nfs_deploy_user }}"
       cluster_net: "{{ nfs_net }}"
@@ -48,4 +46,4 @@
   # - https://review.openstack.org/643195
   tasks:
     - name: Fixup stack tags
-      command: "openstack stack update --existing --tags {{ nfs_tag }} {{ nfs_name }}"
+      command: "openstack stack update --existing --tags {{ nfs_tag }} {{ cluster_name }}"

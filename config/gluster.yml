@@ -1,8 +1,4 @@
 ---
-# This name is used for the Heat stack and as a prefix for the
-# cluster node hostnames.
-gluster_name: gluster
-
 gluster_deploy_user: 'centos'
 
 gluster_net: "caastest-U-internal"
@@ -18,6 +14,6 @@ gluster_group_servers:
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: 3
-  root_volume_size: 10
+  root_volume_size: 1
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"
