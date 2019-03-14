@@ -80,3 +80,14 @@
       openhpc_cluster_name: "{{ cluster_name }}"
       openhpc_slurm_partitions: "{{ openhpc_slurm_partitions }}"
       openhpc_slurm_control_host: "{{ groups['login'] | first }}"
+
+- hosts:
+    - compute
+  serial: "{{ concurrent_compute_update | default(1) }}"
+  tasks:
+    - include: tasks/update_node.yml drain=true
+
+- hosts:
+    - login
+  tasks:
+    - include: tasks/update_node.yml
