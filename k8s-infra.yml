@@ -10,16 +10,30 @@
 # Provision the cluster infrastructure
 - hosts: openstack
   vars_files:
-    - "vars/kube-masters{{ '-with-fip' if pangeo_infra_enable else '' }}.yml"
-    - "vars/kube-workers.yml"
+  pre_tasks:
+    - name: import cluster_masters
+      include_vars: "vars/kube-{{ item }}.yml"
+      with_items:
+        - "masters{{ '-with-fip' if cluster_gw_group == 'kube-masters' else '' }}"
+        - "workers"
   roles:
     - role: jasmin.cluster-infra
       cluster_groups:
         - "{{ cluster_masters }}"
         - "{{ cluster_workers }}"
-        - "{{ cluster_gw if pangeo_infra_enable else omit }}"
+        - "{{ cluster_gw if cluster_gw_group == 'kube-masters' else omit }}"
 
 # Do the configuration
 - import_playbook: k8s-infra-configure.yml
   when: cluster_state | lower == 'present'
+
+# Delete the bastion
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_stack_update_only: true
+      cluster_groups:
+        - "{{ cluster_masters }}"
+        - "{{ cluster_workers }}"
+      when: cluster_gw_group == 'gw'
 ...

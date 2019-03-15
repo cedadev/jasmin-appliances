@@ -1,5 +1,11 @@
 ---
 - import_playbook: k8s-infra.yml
   vars:
-    pangeo_infra_enable: true
+    cluster_gw_group: kube-masters
+
+# Install addons via the master
+- hosts: kube-masters
+  roles:
+    - role: jasmin.pangeo-helm
+  become: yes
 ...

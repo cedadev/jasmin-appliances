@@ -4,6 +4,7 @@
 ## the groups "kube-masters" and "kube-workers"
 #####
 
+# Generate keystone trust token
 - import_playbook: os-keystone-trust.yml
 
 # Do cluster setup for all hosts
@@ -25,19 +26,4 @@
     - role: jasmin.k8s/helm
     - role: jasmin.k8s/ingress_nginx
     - role: jasmin.k8s/kubernetes_dashboard
-    - role: jasmin.pangeo-helm
-      when: pangeo_infra_enable
   become: yes
-
-# Delete the bastion
-- hosts: openstack
-  vars_files:
-    - "vars/kube-masters{{ '-with-fip' if pangeo_infra_enable else '' }}.yml"
-    - "vars/kube-workers.yml"
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_stack_update_only: true
-      cluster_groups:
-        - "{{ cluster_masters }}"
-        - "{{ cluster_workers }}"
-      when: not pangeo_infra_enable
