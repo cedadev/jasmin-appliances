@@ -4,6 +4,10 @@
 ## cluster on OpenStack
 #####
 
+# Do the configuration
+- import_playbook: discover-gateway-ip.yml
+  when: cluster_state | lower == 'present'
+
 # Provision the cluster infrastructure
 - hosts: openstack
   vars_files:
@@ -27,4 +31,5 @@
   roles:
     - name: jasmin.pangeo-helm
       become: yes
+  when: cluster_state | lower == 'present'
 ...

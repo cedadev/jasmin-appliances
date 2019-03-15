@@ -20,8 +20,8 @@
             openstack_project_id: "{{ result.project_id }}"
             openstack_trust_id: "{{ result.trust_id }}"
       when:
-        openstack_trust_id is not defined or
-        openstack_project_id is not defined
+        (openstack_trust_id is not defined or
+        openstack_project_id is not defined)
 
 # Do cluster setup for all hosts
 - hosts: kube-masters,kube-workers
