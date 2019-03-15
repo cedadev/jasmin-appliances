@@ -1,13 +1,16 @@
 ---
 - hosts: openstack
   tasks:
-    - name: Find gateway floating IP
-      os_find_free_fip:
-        floating_network_id: "{{ cluster_floating_network_id }}"
-      register: result
+    - block:
+        - name: Find gateway floating IP
+          os_find_free_fip:
+            floating_network_id: "{{ cluster_floating_network_id }}"
+          register: result
+        - name: Set gateway IP facts
+          set_fact:
+            cluster_gw_fip_id: "{{ result.floating_ip_id }}"
+            cluster_gw_fip_ip: "{{ result.floating_ip_address }}"
+      when: cluster_gw_fip_id is not defined or
+            cluster_gw_fip_ip is not defined
 
-    - name: Set gateway IP facts
-      set_fact:
-        cluster_gw_fip_id: "{{ result.floating_ip_id }}"
-        cluster_gw_fip_ip: "{{ result.floating_ip_address }}"
 ...

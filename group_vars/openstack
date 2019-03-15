@@ -17,7 +17,7 @@ openstack_auth:
   auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
 
 cluster_image: centos-7-20190104
-cluster_floating_network_id: 1f8bb866-346d-4aee-8ac6-8ff13dfabc5b
+cluster_floating_network_id: NERCvSE
 
 cluster_deploy_user: centos
 cluster_delegate_role: _member_
