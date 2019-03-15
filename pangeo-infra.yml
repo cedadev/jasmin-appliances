@@ -7,28 +7,24 @@
 # Provision the cluster infrastructure
 - hosts: openstack
   vars_files:
-    - vars/kube-masters.yml
+    - vars/kube-masters-with-fip.yml
     - vars/kube-workers.yml
   roles:
     - role: jasmin.cluster-infra
       cluster_groups:
         - "{{ cluster_masters }}"
         - "{{ cluster_workers }}"
-        - "{{ cluster_gw }}"
 
 # Do the configuration
 - import_playbook: k8s-infra-configure.yml
   when: cluster_state | lower == 'present'
 
-# Delete the bastion
-- hosts: openstack
+# Install pangeo helm chart
+- hosts: kube-masters
   vars_files:
     - vars/kube-masters.yml
     - vars/kube-workers.yml
   roles:
-    - role: jasmin.cluster-infra
-      cluster_stack_update_only: true
-      cluster_groups:
-        - "{{ cluster_masters }}"
-        - "{{ cluster_workers }}"
-      when: cluster_state | lower == 'present'
+    - name: jasmin.pangeo-helm
+      become: yes
+...
