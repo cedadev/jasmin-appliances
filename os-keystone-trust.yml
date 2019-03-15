@@ -1,0 +1,20 @@
+---
+# Generate openstack trustee credentials
+- hosts: openstack
+  tasks:
+    - block:
+        - name: Authenticate to the cloud and retrieve current project_id and trust_id for the input openstack_trustee_id
+          os_keystone_trust:
+            trustee_user_id: "{{ openstack_trustee_id }}"
+            impersonation: true
+            roles:
+              - name: "{{ cluster_delegate_role }}"
+          register: result
+        - name: Set openstack_project_id and opestack_trust_id as fact
+          set_fact:
+            openstack_project_id: "{{ result.project_id }}"
+            openstack_trust_id: "{{ result.trust_id }}"
+      when:
+        (openstack_trust_id is not defined or
+        openstack_project_id is not defined)
+...
