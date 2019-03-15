@@ -14,7 +14,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: os_find_free_fip
+module: os_network_fip
 short_description: Finds (or allocates) and returns an unattached floating IP.
 version_added: "1.0"
 author: "Matt Pryor"
@@ -30,27 +30,33 @@ options:
         description:
           - The ID of the network that provides floating IPs
         required: true
+    ip:
+        type: str
+        description:
+          - The IP address that is required. If the IP is already attached, the
+            module will attempt to free it from the attached port.
+        required: false
 extends_documentation_fragment: openstack
 '''
 
 EXAMPLES = '''
 - name: Get a floating IP to use
-  os_find_free_fip:
+  os_network_free_fip:
     cloud: rax-dfw
     floating_network_id: netid
   register: result
 
 - name: Show output
-  debug: var=result.floating_ip_id
-- debug: var=result.floating_ip_address
+  debug: var=result.fip_id
+- debug: var=result.fip_ip
 '''
 
 RETURN = '''
-floating_ip_id:
+fip_id:
     description: The ID of the floating IP.
     returned: success
     type: str
-floating_ip_address:
+fip_ip:
     description: The IP address of the floating IP.
     returned: success
     type: str
@@ -65,25 +71,46 @@ from ansible.module_utils.openstack import openstack_full_argument_spec, opensta
 def main():
 
     argument_spec = openstack_full_argument_spec(
-        floating_network_id = dict(required=True)
+        floating_network_id = dict(required=True),
+        ip = dict(default=None)
     )
     module_kwargs = openstack_module_kwargs()
     module = AnsibleModule(argument_spec, **module_kwargs)
 
     sdk, cloud = openstack_cloud_from_module(module)
     try:
-        # First, try to find a free floating IP
-        fip = cloud.network.find_available_ip()
-        # If that failed, try to allocate one
-        if fip is None:
-            fip = cloud.network.create_ip(
-                floating_network_id = module.params['floating_network_id']
-            )
+        fip_ip = module.params['ip']
+        floating_network_id = cloud.network.find_network(module.params['floating_network_id']).id
+        changed = False
+        if fip_ip:
+            # This is when a specific floating IP is requested
+            fip = cloud.network.find_ip(fip_ip,
+                    floating_network_id=floating_network_id
+                )
+            if fip is None:
+                raise ValueError(
+                    "Requested floating IP {} not found on network {}.".format(fip_ip, floating_network_id))
+            else:
+                # Attemps to detach from existing port only if already assigned
+                if fip.port_id is not None:
+                    fip = cloud.network.remove_ip_from_port(fip)
+                    changed = True
+        else:
+            # First, try to find a free floating IP
+            fip = cloud.network.find_available_ip(
+                    floating_network_id=floating_network_id
+                )
+            # If that failed, try to allocate one
+            if fip is None:
+                fip = cloud.network.create_ip(
+                    floating_network_id=floating_network_id 
+                )
+                changed = True
         # Return the IP details
         module.exit_json(
-            changed = True,
-            floating_ip_id = fip.id,
-            floating_ip_address = fip.floating_ip_address
+            changed = changed,
+            fip_id = fip.id,
+            fip_ip = fip.floating_ip_address
         )
     except Exception as e:
         module.fail_json(msg=str(e), exception=traceback.format_exc())
