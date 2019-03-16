@@ -1,5 +1,4 @@
 ---
-cluster_gw_group: kube-masters
 cluster_masters:
   name: kube-masters
   user: "{{ cluster_deploy_user }}"

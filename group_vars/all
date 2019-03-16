@@ -1,3 +1,2 @@
 nfs_client_mnt_point: "/jasmin"
-pangeo_infra_enable: false
 cloud_provider: openstack

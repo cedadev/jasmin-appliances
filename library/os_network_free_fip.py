@@ -33,9 +33,14 @@ options:
     ip:
         type: str
         description:
-          - The IP address that is required. If the IP is already attached, the
-            module will attempt to free it from the attached port.
+          - The IP address that is required.
         required: false
+    force:
+        type: bool
+        description:
+          - If the IP is already attached, the module will attempt to free it
+            from the attached port.
+        default: false
 extends_documentation_fragment: openstack
 '''
 
@@ -71,16 +76,18 @@ from ansible.module_utils.openstack import openstack_full_argument_spec, opensta
 def main():
 
     argument_spec = openstack_full_argument_spec(
-        floating_network_id = dict(required=True),
-        ip = dict(default=None)
+        floating_network_id = dict(required=True, type='str'),
+        ip = dict(default=None, type='str'),
+        force = dict(default=False, type='bool'),
     )
     module_kwargs = openstack_module_kwargs()
     module = AnsibleModule(argument_spec, **module_kwargs)
 
     sdk, cloud = openstack_cloud_from_module(module)
     try:
-        fip_ip = module.params['ip']
         floating_network_id = cloud.network.find_network(module.params['floating_network_id']).id
+        fip_ip = module.params['ip']
+        force = module.params['force']
         changed = False
         if fip_ip:
             # This is when a specific floating IP is requested
@@ -92,7 +99,7 @@ def main():
                     "Requested floating IP {} not found on network {}.".format(fip_ip, floating_network_id))
             else:
                 # Attemps to detach from existing port only if already assigned
-                if fip.port_id is not None:
+                if fip.port_id is not None and force:
                     fip = cloud.network.remove_ip_from_port(fip)
                     changed = True
         else:
