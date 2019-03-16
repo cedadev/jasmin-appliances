@@ -21,7 +21,7 @@ cluster_floating_network_id: NERCvSE
 
 cluster_deploy_user: centos
 cluster_delegate_role: _member_
-cluster_gw_group: gw
+cluster_gw_group: ephemeral
 cluster_gw:
   name: "{{ cluster_gw_group }}"
   user: "{{ cluster_deploy_user }}"

@@ -35,5 +35,5 @@
       cluster_groups:
         - "{{ cluster_masters }}"
         - "{{ cluster_workers }}"
-      when: cluster_gw_group == 'gw'
+      when: cluster_gw_group == 'ephemeral'
 ...
