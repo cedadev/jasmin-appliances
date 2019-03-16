@@ -10,7 +10,6 @@
 # Do cluster setup for all hosts
 - hosts: kube-masters,kube-workers
   vars: 
-    cloud_provider: openstack
     openstack_trust_id: "{{ hostvars[groups['openstack'] | first]['openstack_trust_id'] }}"
     openstack_project_id: "{{ hostvars[groups['openstack'] | first]['openstack_project_id'] }}"
     kubernetes_version: "{{ cluster_version }}"
@@ -27,3 +26,4 @@
     - role: jasmin.k8s/ingress_nginx
     - role: jasmin.k8s/kubernetes_dashboard
   become: yes
+...
