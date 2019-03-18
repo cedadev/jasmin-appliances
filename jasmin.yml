@@ -85,9 +85,9 @@
     - compute
   serial: "{{ concurrent_compute_update | default(1) }}"
   tasks:
-    - include: tasks/update_node.yml drain=true
+    - include: tasks/update_compute.yml
 
 - hosts:
     - login
   tasks:
-    - include: tasks/update_node.yml
+    - include: tasks/update.yml
