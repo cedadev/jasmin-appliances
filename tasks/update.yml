@@ -1,0 +1,32 @@
+# Ansible tasks to update a host. If required, reboot the host or restart
+# services.
+
+- block:
+  - name: Upgrade all packages
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Check if a reboot is required
+    command: needs-restarting -r
+    changed_when: false
+    failed_when: false
+    register: reboot_required
+  - name: Reboot if required
+    reboot:
+    when: reboot_required.rc != 0
+
+  - name: Check if any services need restarting
+    command: needs-restarting -s
+    changed_when: false
+    failed_when: false
+    register: service_restart_required
+  - name: Restart services
+    service:
+      name: "{{ item }}"
+      state: restarted
+    when: service_restart_required.stdout
+    with_items: "{{ service_restart_required.stdout.split() }}"
+  when:
+    - cluster_upgrade_system_packages | default(false) | bool
+  become: true

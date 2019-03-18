@@ -24,6 +24,11 @@
 
 - import_playbook: nfs.yml
 
+- hosts:
+    - nfs_servers
+  tasks:
+    - include: tasks/update.yml
+
 - hosts: openstack
   roles:
     - role: jasmin.cluster-infra
