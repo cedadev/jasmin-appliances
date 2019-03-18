@@ -39,5 +39,3 @@ These playbooks may be invoked from an AWX context, or direct from the command l
 | `cluster_upgrade_system_packages` | Flag indicating whether system packages should be upgraded (i.e. the equivalent of yum update -y). Defaults to `false`. |
 | `cluster_fip_uuid` | The UUID of a floating IP (allocated to the project but currently unassociated).  This will be used for the bastion host, which could be transient. |
 | `cluster_fip_ip` | The IP address of the floating IP to use. |
-
-...
