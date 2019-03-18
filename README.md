@@ -30,7 +30,8 @@ stack). For example:
 
 These playbooks may be invoked from an AWX context, or direct from the command line.
 
-
+| Parameter | Notes |
+|:----------|:------|
 | `cluster_name` | The name of the cluster.  This is also the name of the Heat stack, and the stem for all instance names. |
 | `cluster_state` | Can be one of present or absent, defaulting to present if not given. Determines whether the cluster should be created/updated (present) or deleted (absent). |
 | `cluster_network` | The id or name of the network to which nodes should be attached. |
