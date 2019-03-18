@@ -1,1 +1,2 @@
 nfs_client_mnt_point: "/jasmin"
+cloud_provider: openstack

@@ -1,30 +1,11 @@
 ---
-#####
-## Playbook that provisions and then configures a Kubernetes
-## cluster on OpenStack
-#####
+- import_playbook: k8s-infra.yml
+  vars:
+    cluster_gw_group: kube-masters
 
-# Provision the cluster infrastructure
-- hosts: openstack
-  vars_files:
-    - vars/kube-masters-with-fip.yml
-    - vars/kube-workers.yml
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_groups:
-        - "{{ cluster_masters }}"
-        - "{{ cluster_workers }}"
-
-# Do the configuration
-- import_playbook: k8s-infra-configure.yml
-  when: cluster_state | lower == 'present'
-
-# Install pangeo helm chart
+# Install addons via the master
 - hosts: kube-masters
-  vars_files:
-    - vars/kube-masters.yml
-    - vars/kube-workers.yml
   roles:
-    - name: jasmin.pangeo-helm
-      become: yes
+    - role: jasmin.pangeo-helm
+  become: yes
 ...

@@ -1,13 +1,12 @@
 ---
-cluster_gw_group: kube-masters
 cluster_masters:
   name: kube-masters
   user: "{{ cluster_deploy_user }}"
   node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP"
   nodenet_fips:
-    - uuid: "{{ cluster_fip_uuid }}"
-      ip: "{{ cluster_fip_ip }}"
+    - uuid: "{{ cluster_gw_fip_id }}"
+      ip: "{{ cluster_gw_fip_ip }}"
   num_nodes: 1
   flavor: "{{ cluster_master_flavor | default('j3.medium') }}"
   root_volume_size: 0
