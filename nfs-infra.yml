@@ -9,8 +9,7 @@
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
       cluster_groups: "{{ nfs_groups + [cluster_gw] }}"
-      cluster_deploy_user: "{{ nfs_deploy_user }}"
-      cluster_tag: "{{ nfs_tag }}"
+      cluster_tag: "{{ cluster_type.storage }}"
   tasks:
     - name: add nfs cluster to nfs_servers group
       add_host:
@@ -33,8 +32,7 @@
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
       cluster_groups: "{{ nfs_groups }}"
-      cluster_deploy_user: "{{ nfs_deploy_user }}"
-      cluster_tag: "{{ nfs_tag }}"
+      cluster_tag: "{{ cluster_type.storage }}"
       cluster_stack_update_only: true
 
   # Hack pending outcome of:
@@ -42,4 +40,4 @@
   # - https://review.openstack.org/643195
   tasks:
     - name: Fixup stack tags
-      command: "openstack stack update --existing --tags {{ nfs_tag }} {{ cluster_name }}"
+      command: "openstack stack update --existing --tags {{ cluster_type.storage }} {{ cluster_name }}"

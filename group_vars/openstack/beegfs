@@ -1,0 +1,31 @@
+---
+
+# Storage capacity per node
+beegfs_mds_volume_size: 2       # Metadata
+beegfs_oss_volume_size: 10      # Object storage
+
+beegfs_groups:
+  - "{{ beegfs_group_mds }}"
+  - "{{ beegfs_group_oss }}"
+
+beegfs_group_mds:
+  name: "mds"
+  flavor: "j1.small"
+  image: "centos-7-20190104"
+  user: "centos"
+  num_nodes: 1
+  root_volume_size: "{{ beegfs_mds_volume_size }}"
+  node_resource: "Cluster::NodeWithVolume" 
+  nodenet_resource: "Cluster::NodeNet1"
+
+beegfs_group_oss:
+  name: "oss"
+  flavor: "j1.small"
+  image: "centos-7-20190104"
+  user: "centos"
+  num_nodes: 3
+  root_volume_size: "{{ beegfs_oss_volume_size }}"
+  node_resource: "Cluster::NodeWithVolume" 
+  nodenet_resource: "Cluster::NodeNet1"
+
+...
