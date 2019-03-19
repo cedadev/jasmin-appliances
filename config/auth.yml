@@ -3,12 +3,12 @@
 
 # Cloud authentication type. This should be a string compatible with the
 # 'auth_type' argument of most 'os_*' Ansible modules.
-openstack_auth_type: "password"
+cluster_auth_type: "password"
 
 # Cloud authentication parameters. This should be a dict providing items
 # compatible with the 'auth' argument of most 'os_*' Ansible modules.
 # By default we pull these from the environment of the shell executing Ansible.
-openstack_auth:
+cluster_auth:
   project_domain_name: "{{ lookup('env', 'OS_PROJECT_DOMAIN_NAME') }}"
   user_domain_name: "{{ lookup('env', 'OS_USER_DOMAIN_NAME') }}"
   project_name: "{{ lookup('env', 'OS_PROJECT_NAME') }}"

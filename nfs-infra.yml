@@ -6,8 +6,6 @@
 - hosts: openstack
   roles:
     - role: jasmin.cluster-infra
-      cluster_auth_type: "{{ openstack_auth_type }}"
-      cluster_auth: "{{ openstack_auth }}"
       cluster_groups: "{{ nfs_groups + [cluster_gw] }}"
       cluster_tag: "{{ cluster_type.storage }}"
   tasks:
@@ -29,8 +27,6 @@
 - hosts: openstack
   roles:
     - role: jasmin.cluster-infra
-      cluster_auth_type: "{{ openstack_auth_type }}"
-      cluster_auth: "{{ openstack_auth }}"
       cluster_groups: "{{ nfs_groups }}"
       cluster_tag: "{{ cluster_type.storage }}"
       cluster_stack_update_only: true
