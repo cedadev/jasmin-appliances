@@ -1,5 +1,5 @@
 ---
-cluster_masters:
+cluster_masters_with_fip:
   name: kube-masters
   user: "{{ cluster_deploy_user }}"
   node_resource: "Cluster::Node"
@@ -7,6 +7,15 @@ cluster_masters:
   nodenet_fips:
     - uuid: "{{ cluster_gw_fip_id }}"
       ip: "{{ cluster_gw_fip_ip }}"
+  num_nodes: 1
+  flavor: "{{ cluster_master_flavor | default('j3.medium') }}"
+  root_volume_size: 0
+
+cluster_masters:
+  name: kube-masters
+  user: "{{ cluster_deploy_user }}"
+  node_resource: "Cluster::Node"
+  nodenet_resource: "Cluster::NodeNet1"
   num_nodes: 1
   flavor: "{{ cluster_master_flavor | default('j3.medium') }}"
   root_volume_size: 0

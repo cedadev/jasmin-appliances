@@ -9,18 +9,12 @@
 
 # Provision the cluster infrastructure
 - hosts: openstack
-  pre_tasks:
-    - name: import cluster_masters
-      include_vars: "vars/kube-{{ item }}.yml"
-      with_items:
-        - "masters{{ '-with-fip' if cluster_gw_group == 'kube-masters' else '' }}"
-        - "workers"
   roles:
     - role: jasmin.cluster-infra
       cluster_groups:
-        - "{{ cluster_masters }}"
+        - "{{ cluster_masters_with_fip if cluster_gw_group == 'kube-masters' else cluster_masters }}"
         - "{{ cluster_workers }}"
-        - "{{ cluster_gw if cluster_gw_group == 'kube-masters' else omit }}"
+        - "{{ cluster_gw if cluster_gw_group == 'gw' else omit }}"
 
 # Do the configuration
 - import_playbook: k8s-infra-configure.yml
@@ -28,9 +22,6 @@
 
 # Delete the bastion
 - hosts: openstack
-  vars_files:
-    - vars/kube-masters.yml
-    - vars/kube-workers.yml
   roles:
     - role: jasmin.cluster-infra
       cluster_stack_update_only: true
