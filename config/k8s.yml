@@ -1,6 +1,7 @@
 ---
 # Common k8s cluster configuration used by k8s-infra.yml playbook
 cluster_name: k8s
+cluster_version: 1.13
 cluster_state: present
 cluster_network: caastest-U-internal
 cluster_keypair: brtknr-33236e18e6285585a7f58f1006f88349

@@ -9,9 +9,6 @@
 
 # Provision the cluster infrastructure
 - hosts: openstack
-  pre_tasks:
-    - debug: var=cluster_groups_without_gw
-    - debug: var=cluster_groups_with_gw
   roles:
     - role: jasmin.cluster-infra
       cluster_groups: "{{ cluster_groups_with_gw }}"
