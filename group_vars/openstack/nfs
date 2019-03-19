@@ -1,17 +1,10 @@
 ---
-# This name is used for the Heat stack and as a prefix for the
-# cluster node hostnames.
-nfs_name: nfs
 
-nfs_deploy_user: 'centos'
-
-nfs_net: "caastest-U-internal"
+# The storage size (in gigabytes) for the NFS export.
+nfs_volume_size: 10
 
 nfs_groups:
   - "{{ nfs_group_server }}"
-
-#cluster_gw_group: "login"
-nfs_tag: "storage"
 
 nfs_group_server:
   name: "server"
@@ -19,7 +12,8 @@ nfs_group_server:
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: 1
-  root_volume_size: 20
+  root_volume_size: "{{ nfs_volume_size }}"
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"
 
+...

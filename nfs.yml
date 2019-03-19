@@ -31,6 +31,6 @@
     - role: stackhpc.cluster-nfs
       become: true
       nfs_enable:
-        server: "{{ inventory_hostname in groups[nfs_name + '_server'] }}" 
-        clients:  "{{ 'nfs_clients' in groups and  inventory_hostname in groups['nfs_clients'] }}" 
-      nfs_server: "{{ groups[nfs_name + '_server'] | first }}"
+        server: "{{ 'nfs_servers' in groups and inventory_hostname in groups['nfs_servers'] }}" 
+        clients:  "{{ 'nfs_clients' in groups and inventory_hostname in groups['nfs_clients'] }}" 
+      nfs_server: "{{ groups['nfs_servers'] | first }}"

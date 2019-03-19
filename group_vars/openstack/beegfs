@@ -1,17 +1,12 @@
 ---
-# This name is used for the Heat stack and as a prefix for the
-# cluster node hostnames.
-beegfs_name: beegfs
 
-beegfs_deploy_user: 'centos'
-
-beegfs_net: "caastest-U-internal"
+# Storage capacity per node
+beegfs_mds_volume_size: 2       # Metadata
+beegfs_oss_volume_size: 10      # Object storage
 
 beegfs_groups:
   - "{{ beegfs_group_mds }}"
   - "{{ beegfs_group_oss }}"
-
-beegfs_tag: "storage"
 
 beegfs_group_mds:
   name: "mds"
@@ -19,7 +14,7 @@ beegfs_group_mds:
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: 1
-  root_volume_size: 10
+  root_volume_size: "{{ beegfs_mds_volume_size }}"
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"
 
@@ -29,7 +24,8 @@ beegfs_group_oss:
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: 3
-  root_volume_size: 10
+  root_volume_size: "{{ beegfs_oss_volume_size }}"
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"
 
+...

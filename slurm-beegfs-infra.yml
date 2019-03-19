@@ -7,21 +7,17 @@
     - role: jasmin.cluster-infra
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
-      cluster_network: "caastest-U-internal"
       cluster_name: "{{ slurm_name }}"
       cluster_groups: "{{ slurm_groups }}"
       cluster_deploy_user: "{{ slurm_deploy_user }}"
-      cluster_net: "{{ slurm_net }}"
       cluster_gw_group: "{{ slurm_gw_group }}"
 
     - role: jasmin.cluster-infra
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
-      cluster_network: "caastest-U-internal"
       cluster_name: "{{ beegfs_name }}"
       cluster_groups: "{{ beegfs_groups }}"
       cluster_deploy_user: "{{ beegfs_deploy_user }}"
-      cluster_net: "{{ beegfs_net }}"
       cluster_gw_group: "{{ slurm_gw_group }}"
       cluster_tag: "{{ beegfs_tag }}"
 

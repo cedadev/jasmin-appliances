@@ -1,18 +1,17 @@
 ---
 # This playbook uses the Ansible OpenStack modules to create a cluster
-# using a number of baremetal compute node instances, and configure it
-# for a NFS server 
-
+# using a number of compute node instances, and configure it
+# for a gluster cluster.
 - hosts: openstack
   roles:
     - role: jasmin.cluster-infra
-      cluster_groups: "{{ nfs_groups + [cluster_gw] }}"
+      cluster_groups: "{{ gluster_groups + [cluster_gw] }}" 
       cluster_tag: "{{ cluster_type.storage }}"
   tasks:
-    - name: add nfs cluster to nfs_servers group
+    - name: add gluster cluster to gluster_servers group
       add_host:
-       name: "{{ item }}"
-       groups: nfs_servers
+        name: "{{ item }}"
+        groups: gluster_servers
       loop: "{{ groups['server'] }}"
 
 - hosts:
@@ -20,14 +19,21 @@
   become: true
   tasks:
     - import_tasks: cluster-hosts.yml 
-    - import_tasks: cluster-firewalld.yml 
+    - import_tasks: cluster-firewalld.yml
 
-- import_playbook: nfs.yml
+- hosts:
+    - cluster
+  become: true  
+  roles:
+    - role: resmo.ntp
 
+- import_playbook: gluster.yml
+
+# Reconfigure the stack to remove the gateway bastion
 - hosts: openstack
   roles:
     - role: jasmin.cluster-infra
-      cluster_groups: "{{ nfs_groups }}"
+      cluster_groups: "{{ gluster_groups }}" 
       cluster_tag: "{{ cluster_type.storage }}"
       cluster_stack_update_only: true
 
@@ -37,3 +43,4 @@
   tasks:
     - name: Fixup stack tags
       command: "openstack stack update --existing --tags {{ cluster_type.storage }} {{ cluster_name }}"
+

@@ -7,11 +7,9 @@
     - role: jasmin.cluster-infra
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
-      cluster_network: "caastest-U-internal"
       cluster_name: "{{ slurm_name }}"
       cluster_groups: "{{ slurm_groups }}"
       cluster_deploy_user: "{{ slurm_deploy_user }}"
-      cluster_net: "{{ slurm_net }}"
       cluster_gw_group: "{{ slurm_gw_group }}"
   tasks:
     - name: add slurm cluster to nfs_clients group
@@ -25,11 +23,9 @@
     - role: jasmin.cluster-infra
       cluster_auth_type: "{{ openstack_auth_type }}"
       cluster_auth: "{{ openstack_auth }}"
-      cluster_network: "caastest-U-internal"
       cluster_name: "{{ nfs_name }}"
       cluster_groups: "{{ nfs_groups }}"
       cluster_deploy_user: "{{ nfs_deploy_user }}"
-      cluster_net: "{{ nfs_net }}"
       cluster_gw_group: "{{ slurm_gw_group }}"
       cluster_tag: "{{ nfs_tag }}"
 
