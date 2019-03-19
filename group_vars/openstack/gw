@@ -1,0 +1,18 @@
+---
+
+# cluster_fip_uuid and cluster_fip_ip are supplied parameters
+
+cluster_gw_group: ephemeral
+cluster_gw:
+  name: "{{ cluster_gw_group }}"
+  user: "{{ cluster_deploy_user }}"
+  node_resource: "Cluster::Node"
+  nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP"
+  nodenet_fips:
+    - uuid: "{{ cluster_gw_fip_id }}"
+      ip: "{{ cluster_gw_fip_ip }}"
+  num_nodes: 1
+  flavor: "j1.tiny"
+  root_volume_size: 0
+
+...

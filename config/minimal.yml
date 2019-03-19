@@ -5,7 +5,7 @@ cluster_name: test
 
 cluster_deploy_user: 'centos'
 
-cluster_net: "caastest-U-internal"
+cluster_network: "caastest-U-internal"
 
 cluster_groups:
   - "{{ slurm_login }}"

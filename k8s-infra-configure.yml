@@ -1,0 +1,29 @@
+---
+#####
+## Performs Kubernetes cluster configuration for any inventory that defines
+## the groups "kube-masters" and "kube-workers"
+#####
+
+# Generate keystone trust token
+- import_playbook: os-keystone-trust.yml
+
+# Do cluster setup for all hosts
+- hosts: kube-masters,kube-workers
+  vars: 
+    openstack_trust_id: "{{ hostvars[groups['openstack'] | first]['openstack_trust_id'] }}"
+    openstack_project_id: "{{ hostvars[groups['openstack'] | first]['openstack_project_id'] }}"
+    kubernetes_version: "{{ cluster_version }}"
+    upgrade_system_packages: "{{ cluster_upgrade_system_packages | default(false) }}"
+  roles:
+    - role: jasmin.k8s/kubeadm
+      kube_role: "{{ 'master' if inventory_hostname in groups['kube-masters'] else 'worker' }}"
+      become: yes
+
+# Install addons via the master
+- hosts: kube-masters
+  roles:
+    - role: jasmin.k8s/helm
+    - role: jasmin.k8s/ingress_nginx
+    - role: jasmin.k8s/kubernetes_dashboard
+  become: yes
+...

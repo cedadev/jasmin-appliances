@@ -1,1 +1,12 @@
+---
+# NFS mount path
 nfs_client_mnt_point: "/jasmin"
+
+# Cloud provider to use for Kubernetes clusters
+cloud_provider: openstack
+
+# Boolean (or any value convertible using the bool filter in Ansible)
+# indicating whether system packages should be upgraded (i.e. the equivalent
+# of yum update -y). Should default to false if not given.
+cluster_upgrade_system_packages: false
+...
