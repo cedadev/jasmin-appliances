@@ -1,0 +1,37 @@
+---
+cluster_masters_with_fip:
+  name: kube-masters
+  user: "{{ cluster_deploy_user }}"
+  node_resource: "Cluster::Node"
+  nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP"
+  nodenet_fips:
+    - uuid: "{{ cluster_gw_fip_id }}"
+      ip: "{{ cluster_gw_fip_ip }}"
+  num_nodes: 1
+  flavor: "{{ cluster_master_flavor | default('j3.medium') }}"
+  root_volume_size: 0
+
+cluster_masters:
+  name: kube-masters
+  user: "{{ cluster_deploy_user }}"
+  node_resource: "Cluster::Node"
+  nodenet_resource: "Cluster::NodeNet1"
+  num_nodes: 1
+  flavor: "{{ cluster_master_flavor | default('j3.medium') }}"
+  root_volume_size: 0
+
+cluster_workers:
+  name: kube-workers
+  user: "{{ cluster_deploy_user }}"
+  node_resource: "Cluster::Node"
+  nodenet_resource: "Cluster::NodeNet1"
+  num_nodes: "{{ cluster_num_workers }}"
+  flavor: "{{ cluster_worker_flavor | default('j3.medium') }}"
+  root_volume_size: 0
+
+cluster_groups_without_gw:
+  - "{{ (cluster_gw_group == 'kube-masters') | ternary(cluster_masters_with_fip, cluster_masters) }}"
+  - "{{ cluster_workers }}"
+
+cluster_groups_with_gw: "{{ (cluster_gw_group == 'ephemeral') | ternary(cluster_groups_without_gw + [cluster_gw], cluster_groups_without_gw) }}"
+...

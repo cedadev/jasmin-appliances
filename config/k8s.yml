@@ -1,0 +1,18 @@
+---
+# Common k8s cluster configuration used by k8s-infra.yml playbook
+cluster_name: k8s
+cluster_version: 1.13
+cluster_state: present
+cluster_network: caastest-U-internal
+cluster_keypair: brtknr-33236e18e6285585a7f58f1006f88349
+cluster_num_workers: 4
+cluster_gw_fip_ip: 192.171.139.249
+# openstack_trustee_id:
+# openstack_trustee_password:
+
+# Additional configuration used by pangeo-infra.yml playbook
+pangeo_hosts: [ "pangeo.kgz.sh" ]
+pangeo_users: [ "admin" ]
+pangeo_admin_users: [ "admin" ]
+pangeo_password: secretnomore
+...
