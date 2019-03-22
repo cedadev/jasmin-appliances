@@ -4,6 +4,11 @@
 ## cluster on OpenStack
 #####
 
+- hosts: openstack
+  tasks:
+    - setup:
+    - fail:
+
 # Provision the cluster infrastructure
 - hosts: openstack
   pre_tasks:
