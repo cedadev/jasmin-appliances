@@ -7,6 +7,7 @@
 - hosts: openstack
   tasks:
     - setup:
+        gather_timeout: 60
     - fail:
 
 # Provision the cluster infrastructure
