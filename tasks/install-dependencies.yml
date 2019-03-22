@@ -4,9 +4,8 @@
   set_fact:
     ansible_venv_path: "{{ lookup('env', 'ANSIBLE_VENV_PATH') }}"
 
-- block:
-    - name: Ensure Python dependencies are installed
-      pip:
-        requirements: "{{ playbook_dir }}/requirements.txt"
-        virtualenv: "{{ ansible_venv_path }}"
+- name: Ensure Python dependencies are installed
+  pip:
+    requirements: "{{ playbook_dir }}/requirements.txt"
+    virtualenv: "{{ ansible_venv_path }}"
   when: "ansible_venv_path | default(None, true)"
