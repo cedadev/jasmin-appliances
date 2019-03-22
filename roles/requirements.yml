@@ -5,7 +5,7 @@
   version: master
 - name: jasmin.k8s
   src: https://github.com/cedadev/k8s-ansible
-  version: issue/4/caas-compliance
+  version: master
 - name: jasmin.pangeo-helm
   src: https://github.com/cedadev/pangeo-helm-ansible
   version: first-pr
