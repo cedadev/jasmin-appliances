@@ -7,7 +7,6 @@
 # Provision the cluster infrastructure
 - hosts: openstack
   pre_tasks:
-    - import_tasks: tasks/install-dependencies.yml
     - import_tasks: tasks/discover-gateway-ip.yml
   roles:
     - role: jasmin.cluster-infra
