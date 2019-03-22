@@ -7,6 +7,8 @@
 # Provision the cluster infrastructure
 - hosts: openstack
   pre_tasks:
+    - name: Ensure dependencies are installed
+      command: "{{ ansible_python_interpreter }} -m pip install {{ playbook_dir }}/requirements.txt"
     - import_tasks: tasks/discover-gateway-ip.yml
   roles:
     - role: jasmin.cluster-infra
