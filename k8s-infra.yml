@@ -7,6 +7,7 @@
 # Do the configuration
 - hosts: openstack
   tasks:
+    - import_tasks: tasks/prerequisites.yml
     - import_tasks: tasks/discover-gateway-ip.yml
 
 # Provision the cluster infrastructure
