@@ -28,7 +28,7 @@ Ansible extra variables, providing a keypair to use to connect to the cluster,
 and assigning a unique name to the cluster (which will be used to name the
 stack). For example:
 
-    $ ansible-playbook -i hosts.ini jasmin.yml -e @config/minimal.yml -e cluster_keypair=<keypair_name> -e cluster_name=<stack_name>
+    $ ansible-playbook -i openstack.ini jasmin.yml -e @config/minimal.yml -e cluster_keypair=<keypair_name> -e cluster_name=<stack_name>
 
 ## Parameters to Provide
 
