@@ -7,8 +7,14 @@
 # Provision the cluster infrastructure
 - hosts: openstack
   pre_tasks:
-#    - name: Ensure dependencies are installed
-#      command: "{{ ansible_python_interpreter }} -m pip install {{ playbook_dir }}/requirements.txt"
+    - name: Get Ansible venv path
+      set_fact:
+        ansible_venv_path: "{{ lookup('env', 'ANSIBLE_VENV_PATH') }}"
+    - name: Ensure Python dependencies are installed
+      pip:
+        requirements: "{{ playbook_dir }}/requirements.txt"
+        virtualenv: "{{ ansible_venv_path }}"
+      when: "ansible_venv_path | default(None, true)"
     - import_tasks: tasks/discover-gateway-ip.yml
   roles:
     - role: jasmin.cluster-infra
