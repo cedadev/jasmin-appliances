@@ -7,7 +7,9 @@
 - block:
     - name: Ensure yum dependencies are installed
       yum:
-        name: gcc
+        name:
+          - gcc
+          - python2-devel
         state: latest
 
     - name: Ensure Python dependencies are installed
