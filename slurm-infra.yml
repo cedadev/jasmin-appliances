@@ -5,44 +5,55 @@
 - hosts: openstack
   roles:
     - role: jasmin.cluster-infra
-      cluster_auth_type: "{{ openstack_auth_type }}"
-      cluster_auth: "{{ openstack_auth }}"
-      cluster_name: "{{ slurm_name }}"
-      cluster_groups: "{{ slurm_groups }}"
-      cluster_deploy_user: "{{ slurm_deploy_user }}"
-      cluster_gw_group: "{{ slurm_gw_group }}"
+      cluster_groups: "{{ slurm_groups + [cluster_gw] }}"
+      cluster_tag: "{{ cluster_type.slurm }}"
   tasks:
     - name: add slurm cluster to nfs_clients group
       add_host:
         name: "{{ item }}"
-        groups: nfs_clients
+        groups: 
+          - nfs_clients
+          - beegfs_clients
+          - gluster_clients
       with_items: "{{ groups['cluster'] }}"
 
 - hosts: openstack
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_auth_type: "{{ openstack_auth_type }}"
-      cluster_auth: "{{ openstack_auth }}"
-      cluster_name: "{{ nfs_name }}"
-      cluster_groups: "{{ nfs_groups }}"
-      cluster_deploy_user: "{{ nfs_deploy_user }}"
-      cluster_gw_group: "{{ slurm_gw_group }}"
-      cluster_tag: "{{ nfs_tag }}"
+  tasks:
+    - block:
+        - name: Get stack outputs
+          os_stack_outputs:
+            stack_id: "{{ storage_name }}"
+        - name: Export storage information from stack outputs
+          set_fact:
+            storage_stack_info: "{{ stack_outputs['info'] | select('ne', '') | map('from_json') | selectattr('storage_type', '==', 'nfs') | first }}"
+        - debug:
+            msg: "{{ storage_stack_info }}"
+      when: storage_name is defined
 
 - hosts:
     - cluster
   become: true
-  tasks:
-    - import_tasks: cluster-hosts.yml 
+  pre_tasks:
+    - name: Define variable to access existing storage stack info
+      set_fact:
+        storage_stack: "{{ (hostvars[groups['openstack'][0]])['storage_stack_info'] }}"
+      when: storage_name is defined
+   #- import_tasks: cluster-hosts.yml 
     - import_tasks: cluster-firewalld.yml 
-
-- hosts:
-    - cluster
-  become: true  
   roles:
     - role: resmo.ntp
 
-- import_playbook: nfs.yml
+    # NFS
+    - role: stackhpc.cluster-nfs
+      nfs_enable:
+        server: false
+        clients: true
+      nfs_server: "{{ storage_stack['nfs_servers'] | first }}"
+      nfs_export: "{{ storage_stack['nfs_export'] }}"
+      when: storage_stack['storage_type'] == "nfs"
+
+    # BeeGFS
+    # Gluster
 
 - hosts:
     - "{{ slurm_name }}_login"
@@ -96,3 +107,17 @@
       openhpc_slurm_partitions: "{{ openhpc_slurm_partitions }}"
       openhpc_slurm_control_host: "{{ groups[slurm_name + '_login'] | first }}"
 
+
+- hosts: openstack
+  roles:
+    - role: jasmin.cluster-infra
+      cluster_groups: "{{ slurm_groups }}"
+      cluster_tag: "{{ cluster_type.slurm }}"
+      cluster_stack_update_only: true
+
+  # Hack pending outcome of:
+  # - https://github.com/ansible/ansible/pull/53757
+  # - https://review.openstack.org/643195
+  tasks:
+    - name: Fixup stack tags
+      command: "openstack stack update --existing --tags {{ cluster_type.slurm }} {{ cluster_name }}"
