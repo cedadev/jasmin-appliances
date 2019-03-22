@@ -1,0 +1,7 @@
+- yum:
+    name:
+      - python2-devel
+      - gcc
+  become: yes
+- pip:
+    requirements: "{{ playbook_dir }}/requirements.txt"
