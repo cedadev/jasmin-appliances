@@ -5,8 +5,12 @@ Appliances for use with JASMIN Cluster-as-a-Service Project
 ## How to use this repository
 
 Assuming that you are at the top of a checkout of this repository and a virtual
-environment is available at <venv>, install all the dependencies:
+environment is available at `<path/to/venv>` created using
+`--system-site-packages` flag to ensure `yum` dependencies are available to
+Ansible, install all the `pip` dependencies (which may require you to
+additionally install `python2-devel` and `gcc` packages through `yum`):
 
+    $ virtualenv --system-site-packages <path/to/venv>
     $ source <path/to/venv>/bin/activate
     $ pip install -r requirements.txt
     $ ansible-galaxy install -p roles -r roles/requirements.yml
@@ -24,7 +28,7 @@ Ansible extra variables, providing a keypair to use to connect to the cluster,
 and assigning a unique name to the cluster (which will be used to name the
 stack). For example:
 
-    $ ansible-playbook -i inventory jasmin.yml -e @config/minimal.yml -e cluster_keypair=<keypair_name> -e cluster_name=<stack_name>
+    $ ansible-playbook -i openstack.ini jasmin.yml -e @config/minimal.yml -e cluster_keypair=<keypair_name> -e cluster_name=<stack_name>
 
 ## Parameters to Provide
 

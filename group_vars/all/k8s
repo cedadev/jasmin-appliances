@@ -1,0 +1,4 @@
+---
+# Cloud provider to use for Kubernetes clusters
+cloud_provider: openstack
+...

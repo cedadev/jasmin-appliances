@@ -1,0 +1,9 @@
+- name: Install yum dependencies for the Appliances playbooks
+  yum:
+    name:
+      - python2-devel
+      - gcc
+  become: yes
+- name: Install pip requirements for the Appliances playbooks
+  pip:
+    requirements: "{{ playbook_dir }}/requirements.txt"
