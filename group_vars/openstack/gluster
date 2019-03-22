@@ -6,7 +6,8 @@ gluster_volume_size: 10
 gluster_cluster_info:
   storage_type: "gluster"
   gluster_servers: "$PRIMARY_IPS"
-  gluster_volume: "{{ cluster_name }}"
+  vars:
+    gluster_cluster_volume_name: "{{ cluster_name }}"
 
 gluster_groups:
   - "{{ gluster_group_servers }}"

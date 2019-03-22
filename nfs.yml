@@ -10,7 +10,10 @@
 # details. Unfortunately the Red Hat solution is incomplete, as dracut doesn't
 # include /etc/sysctl* by default, so we modify dracut.conf before rebuilding.
 - hosts:
-    - nfs_servers
+    # Intersect NFS servers with the cluster group so this runs when the main
+    # stack is an NFS cluster, but not when the group is defined from an
+    # external storage stack.
+    - nfs_servers:&cluster
   become: true
   tasks:
     - name: Add sysctl configuration to dracut.conf

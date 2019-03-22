@@ -6,7 +6,8 @@ nfs_volume_size: 10
 nfs_cluster_info:
   storage_type: "nfs"
   nfs_servers: "$PRIMARY_IPS"
-  nfs_export: "/srv/home"
+  vars:
+    nfs_export: "/srv/home"
 
 nfs_groups:
   - "{{ nfs_group_server }}"
