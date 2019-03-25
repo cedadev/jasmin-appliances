@@ -14,7 +14,6 @@
     - openstack_stack_outputs is defined
     - cluster_fixed_ip is not defined
 
-- debug: var=cluster_fixed_ip
 - name: Find gateway floating IP
   os_network_find_fip:
     floating_network: "{{ cluster_floating_network }}"
