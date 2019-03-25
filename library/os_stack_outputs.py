@@ -60,8 +60,11 @@ def main():
     try:
         result = dict()
         stack = cloud.get_stack(module.params['stack_id'])
-        for item in stack.outputs:
-            result[item['output_key']] = item['output_value']
+        if stack:
+            for item in stack.outputs:
+                result[item['output_key']] = item['output_value']
+        else:
+            raise sdk.exceptions.OpenStackCloudException('Stack not found.')
         module.exit_json(changed=False, ansible_facts=dict(openstack_stack_outputs=result))
 
     except sdk.exceptions.OpenStackCloudException as e:
