@@ -15,7 +15,7 @@
             stack: "{{ storage_name }}"
         - name: Export storage information from stack outputs
           set_fact:
-            storage_stack_info: "{{ stack_outputs['info'] | select('ne', '') | map('from_json') | selectattr('storage_type', '==', 'nfs') | first }}"
+            storage_stack_info: "{{ openstack_stack_outputs['info'] | select('ne', '') | map('from_json') | selectattr('storage_type', '==', 'nfs') | first }}"
         - debug:
             msg: "{{ storage_stack_info }}"
       when: storage_name is defined
