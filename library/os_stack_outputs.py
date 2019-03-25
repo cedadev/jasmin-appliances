@@ -29,7 +29,7 @@ options:
      description:
        - Cloud name inside cloud.yaml file.
      type: str
-   stack_id:
+   stack:
      description:
         - Heat stack name or uuid.
      type: str
@@ -37,10 +37,10 @@ extends_documentation_fragment: openstack
 '''
 
 EXAMPLES = '''
-# Gather outputs from <stack_id>:
+# Gather outputs from <stack> name or id:
 - os_stack_outputs:
     cloud: mycloud
-    stack_id: xxxxx-xxxxx-xxxx-xxxx
+    stack: xxxxx-xxxxx-xxxx-xxxx
 - debug:
     var: stack_outputs
 '''
@@ -51,7 +51,7 @@ from ansible.module_utils.openstack import openstack_full_argument_spec, opensta
 def main():
 
     argument_spec = openstack_full_argument_spec(
-        stack_id=dict(required=True),
+        stack=dict(required=True),
     )
     module_kwargs = openstack_module_kwargs()
     module = AnsibleModule(argument_spec, **module_kwargs)
@@ -59,7 +59,7 @@ def main():
     sdk, cloud = openstack_cloud_from_module(module)
     try:
         result = dict()
-        stack = cloud.get_stack(module.params['stack_id'])
+        stack = cloud.get_stack(module.params['stack'])
         if stack:
             for item in stack.outputs:
                 result[item['output_key']] = item['output_value']
