@@ -47,7 +47,6 @@ EXAMPLES = '''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.openstack import openstack_full_argument_spec, openstack_module_kwargs, openstack_cloud_from_module
-from ansible.module_utils._text import to_native
 
 def main():
 
