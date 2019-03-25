@@ -58,4 +58,4 @@ $ ansible-playbook -i inventory nfs-infra.yml \
     -e @config/auth.yml
 ```
 
-[caas]: https://github.com/cedadev/jasmin-cluster-as-a-service
+[caas]: https://github.com/cedadev/jasmin-cluster-as-a-service/projects/1
