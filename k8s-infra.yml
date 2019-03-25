@@ -4,40 +4,46 @@
 ## cluster on OpenStack
 #####
 
-# Do the configuration
-- import_playbook: discover-gateway-ip.yml
-
 # Provision the cluster infrastructure
 - hosts: openstack
   pre_tasks:
-    - name: import cluster_masters
-      include_vars: "vars/kube-{{ item }}.yml"
-      with_items:
-        - "masters{{ '-with-fip' if cluster_gw_group == 'kube-masters' else '' }}"
-        - "workers"
+    - import_tasks: tasks/install-dependencies.yml
+    - import_tasks: tasks/discover-gateway-ip.yml
   roles:
     - role: jasmin.cluster-infra
-      cluster_groups:
-        - "{{ cluster_masters }}"
-        - "{{ cluster_workers }}"
-        - "{{ cluster_gw if cluster_gw_group == 'kube-masters' else omit }}"
+      cluster_groups: "{{ cluster_groups_with_gw }}"
+  post_tasks:
+    # Generate keystone trust token
+    - import_tasks: tasks/os-keystone-trust.yml
+      when: cluster_state | default('present') | lower == 'present'
 
-# Do the configuration
-- import_playbook: k8s-infra-configure.yml
-  when: cluster_state | lower == 'present'
+# Do cluster setup for all hosts
+#   If cluster_state=absent, this play will be skipped as the inventory will be empty
+- hosts: kube-masters,kube-workers
+  roles:
+    - role: jasmin.k8s/kubeadm
+      kube_role: "{{ 'master' if inventory_hostname in groups['kube-masters'] else 'worker' }}"
+      openstack_trust_id: "{{ hostvars[groups['openstack'] | first]['openstack_trust_id'] }}"
+      openstack_project_id: "{{ hostvars[groups['openstack'] | first]['openstack_project_id'] }}"
+      kubernetes_version: "{{ cluster_version }}"
+      upgrade_system_packages: "{{ cluster_upgrade_system_packages | default(false) }}"
+  become: yes
+
+# Install addons via the master
+#   If cluster_state=absent, this play will be skipped as the inventory will be empty
+- hosts: kube-masters
+  roles:
+    - jasmin.k8s/helm
+    - jasmin.k8s/ingress_nginx
+    - jasmin.k8s/kubernetes_dashboard
+  become: yes
 
 # Delete the bastion
 - hosts: openstack
-  vars_files:
-    - vars/kube-masters.yml
-    - vars/kube-workers.yml
   roles:
     - role: jasmin.cluster-infra
       cluster_stack_update_only: true
-      cluster_groups:
-        - "{{ cluster_masters }}"
-        - "{{ cluster_workers }}"
+      cluster_groups: "{{ cluster_groups_without_gw }}"
       when:
         - cluster_gw_group == 'ephemeral'
-        - cluster_state | lower == 'present'
-...
+        - cluster_state | default('present') | lower == 'present'

@@ -1,0 +1,12 @@
+---
+
+- name: Find gateway floating IP
+  os_network_find_fip:
+    floating_network: "{{ cluster_floating_network }}"
+    ip: "{{ cluster_fixed_ip | default(omit) }}"
+  register: result
+
+- name: Set gateway IP facts
+  set_fact:
+    cluster_gw_fip_id: "{{ result.fip_id }}"
+    cluster_gw_fip_ip: "{{ result.fip_ip }}"
