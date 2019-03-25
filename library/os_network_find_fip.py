@@ -14,41 +14,37 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: os_network_fip
-short_description: Finds (or allocates) and returns an unattached floating IP.
+module: os_network_find_fip
+short_description: Finds (or allocates) and returns a floating IP.
 version_added: "1.0"
 author: "Matt Pryor"
 description:
-    - Attempts to find an unused floating IP from those already allocated.
-      If one cannot be found, attempts to allocate a new one.
+  - If ip is given, attempt to find and return that IP.
+  - If ip is not given, attempt to find an unused floating IP from those
+    already allocated to the project. If one cannot be found, attempt
+    to allocate a new one.
 requirements:
-    - "python >= 2.7"
-    - "openstacksdk"
+  - "python >= 2.7"
+  - "openstacksdk"
 options:
-    floating_network_id:
-        type: str
-        description:
-          - The ID of the network that provides floating IPs
-        required: true
-    ip:
-        type: str
-        description:
-          - The IP address that is required.
-        required: false
-    force:
-        type: bool
-        description:
-          - If the IP is already attached, the module will attempt to free it
-            from the attached port.
-        default: false
+  floating_network:
+    type: str
+    description:
+      - The ID or name of the network that provides floating IPs.
+    required: true
+  ip:
+    type: str
+    description:
+      - The IP address that is required.
+    required: false
 extends_documentation_fragment: openstack
 '''
 
 EXAMPLES = '''
 - name: Get a floating IP to use
-  os_network_free_fip:
+  os_network_find_fip:
     cloud: rax-dfw
-    floating_network_id: netid
+    floating_network: netname
   register: result
 
 - name: Show output
@@ -76,42 +72,31 @@ from ansible.module_utils.openstack import openstack_full_argument_spec, opensta
 def main():
 
     argument_spec = openstack_full_argument_spec(
-        floating_network_id = dict(required=True, type='str'),
+        floating_network = dict(required=True, type='str'),
         ip = dict(default=None, type='str'),
-        force = dict(default=False, type='bool'),
     )
     module_kwargs = openstack_module_kwargs()
     module = AnsibleModule(argument_spec, **module_kwargs)
 
     sdk, cloud = openstack_cloud_from_module(module)
     try:
-        floating_network_id = cloud.network.find_network(module.params['floating_network_id']).id
+        floating_network = module.params['floating_network']
+        floating_network_id = cloud.network.find_network(floating_network).id
         fip_ip = module.params['ip']
-        force = module.params['force']
         changed = False
         if fip_ip:
             # This is when a specific floating IP is requested
-            fip = cloud.network.find_ip(fip_ip,
-                    floating_network_id=floating_network_id
-                )
+            fip = cloud.network.find_ip(fip_ip, floating_network_id = floating_network_id)
             if fip is None:
                 raise ValueError(
-                    "Requested floating IP {} not found on network {}.".format(fip_ip, floating_network_id))
-            else:
-                # Attemps to detach from existing port only if already assigned
-                if fip.port_id is not None and force:
-                    fip = cloud.network.remove_ip_from_port(fip)
-                    changed = True
+                    "Floating IP {} not found on network {}.".format(fip_ip, floating_network)
+                )
         else:
             # First, try to find a free floating IP
-            fip = cloud.network.find_available_ip(
-                    floating_network_id=floating_network_id
-                )
+            fip = cloud.network.find_available_ip()
             # If that failed, try to allocate one
             if fip is None:
-                fip = cloud.network.create_ip(
-                    floating_network_id=floating_network_id 
-                )
+                fip = cloud.network.create_ip(floating_network_id = floating_network_id)
                 changed = True
         # Return the IP details
         module.exit_json(
@@ -125,4 +110,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

@@ -4,45 +4,38 @@
 ## cluster on OpenStack
 #####
 
-# Do the configuration
-- hosts: openstack
-  tasks:
-    - import_tasks: tasks/prerequisites.yml
-    - import_tasks: tasks/discover-gateway-ip.yml
-
 # Provision the cluster infrastructure
 - hosts: openstack
+  pre_tasks:
+    - import_tasks: tasks/install-dependencies.yml
+    - import_tasks: tasks/discover-gateway-ip.yml
   roles:
     - role: jasmin.cluster-infra
       cluster_groups: "{{ cluster_groups_with_gw }}"
-
-# Generate keystone trust token
-- hosts: openstack
-  tasks:
+  post_tasks:
+    # Generate keystone trust token
     - import_tasks: tasks/os-keystone-trust.yml
-      when: cluster_state | lower == 'present'
+      when: cluster_state | default('present') | lower == 'present'
 
 # Do cluster setup for all hosts
+#   If cluster_state=absent, this play will be skipped as the inventory will be empty
 - hosts: kube-masters,kube-workers
   roles:
     - role: jasmin.k8s/kubeadm
-      kube_role: "{{ (inventory_hostname in groups['kube-masters']) | ternary('master', 'worker') }}"
+      kube_role: "{{ 'master' if inventory_hostname in groups['kube-masters'] else 'worker' }}"
       openstack_trust_id: "{{ hostvars[groups['openstack'] | first]['openstack_trust_id'] }}"
       openstack_project_id: "{{ hostvars[groups['openstack'] | first]['openstack_project_id'] }}"
       kubernetes_version: "{{ cluster_version }}"
       upgrade_system_packages: "{{ cluster_upgrade_system_packages | default(false) }}"
-      when: cluster_state | lower == 'present'
   become: yes
 
 # Install addons via the master
+#   If cluster_state=absent, this play will be skipped as the inventory will be empty
 - hosts: kube-masters
   roles:
-    - role: jasmin.k8s/helm
-      when: cluster_state | lower == 'present'
-    - role: jasmin.k8s/ingress_nginx
-      when: cluster_state | lower == 'present'
-    - role: jasmin.k8s/kubernetes_dashboard
-      when: cluster_state | lower == 'present'
+    - jasmin.k8s/helm
+    - jasmin.k8s/ingress_nginx
+    - jasmin.k8s/kubernetes_dashboard
   become: yes
 
 # Delete the bastion
@@ -53,5 +46,4 @@
       cluster_groups: "{{ cluster_groups_without_gw }}"
       when:
         - cluster_gw_group == 'ephemeral'
-        - cluster_state | lower == 'present'
-...
+        - cluster_state | default('present') | lower == 'present'
