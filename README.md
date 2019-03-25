@@ -1,6 +1,6 @@
 # jasmin-appliances
 
-Appliances for use with JASMIN Cluster-as-a-Service Project
+Appliances for use with JASMIN [Cluster-as-a-Service][caas] Project
 
 ## How to use this repository
 
@@ -57,3 +57,5 @@ $ ansible-playbook -i inventory nfs-infra.yml \
     -e cluster_gw_fip_ip=192.171.139.120 \
     -e @config/auth.yml
 ```
+
+[caas]: https://github.com/cedadev/jasmin-cluster-as-a-service
