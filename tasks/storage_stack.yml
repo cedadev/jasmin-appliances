@@ -1,6 +1,6 @@
 - name: Get stack outputs
   os_stack_outputs:
-    stack_id: "{{ storage_name }}"
+    stack: "{{ storage_name }}"
 - name: Export storage information from stack outputs
   set_fact:
     storage_stack_info: "{{ stack_outputs['info'] | select('ne', '') | map('from_json') | selectattr('storage_type', 'defined') | first }}"
