@@ -6,7 +6,7 @@ cluster_state: present
 cluster_network: caastest-U-internal
 cluster_keypair: brtknr-33236e18e6285585a7f58f1006f88349
 cluster_num_workers: 3
-cluster_gw_fip_ip: "192.171.139.249"
+cluster_fixed_ip: "192.171.139.249"
 # openstack_trustee_id:
 # openstack_trustee_password:
 
