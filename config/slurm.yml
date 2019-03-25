@@ -23,12 +23,7 @@ slurm_login:
   node_resource: "Cluster::Node" 
   extra_groups:
     - "beegfs_clients"
-  nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP"
-  nodenet_fips:
-    - uuid: "8723c186-d15f-44d5-9421-e12bf2a03325"
-      ip: "192.171.139.249"
-#   - uuid: "fbd8781c-0917-41a3-8a66-ecaf0f05826a"
-#     ip: "192.171.139.250"
+  nodenet_resource: "Cluster::NodeNet1"
 
 slurm_compute:
   name: "compute"
