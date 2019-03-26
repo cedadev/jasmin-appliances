@@ -1,10 +1,13 @@
 [
   {
-    "credential_type": "JASMIN Cloud Token", 
     "inputs": {
       "token": "", 
       "project_name": "caastest-U"
     }, 
+    "name": "token caastest-U bharat", 
+    "asset_type": "credential", 
+    "credential_type": "JASMIN Cloud Token", 
+    "organization": "JASMIN CaaS", 
     "asset_relation": {
       "roles": [
         {
@@ -22,88 +25,18 @@
         {
           "team": [], 
           "name": "Use", 
-          "user": []
-        }
-      ]
-    }, 
-    "asset_type": "credential", 
-    "name": "brtknr token"
-  }, 
-  {
-    "inputs": {
-      "password": "", 
-      "trust_id": ""
-    }, 
-    "name": "brtknr trustee", 
-    "asset_type": "credential", 
-    "credential_type": "JASMIN Cloud Trustee", 
-    "organization": "Cluster-as-a-Service", 
-    "asset_relation": {
-      "roles": [
-        {
-          "team": [], 
-          "name": "Use", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Admin", 
-          "user": [
-            "admin"
-          ]
-        }, 
-        {
-          "team": [], 
-          "name": "Read", 
           "user": []
         }
       ]
     }
   }, 
   {
-    "credential_type": "OpenStack", 
+    "credential_type": "JASMIN Cloud Trustee", 
     "inputs": {
-      "project": "caascontrol-U", 
-      "username": "mpryor", 
-      "host": "https://kataifi.sweet.jasmin.ac.uk/v3", 
-      "password": "", 
-      "domain": "jasmin"
+      "openstack_trustee_id": "f8d4001b4e33ecdb24a11f3de1a9102275b3b39e7f1b3bad4caf33775d3f8c09", 
+      "openstack_trustee_password": "", 
+      "openstack_trustee_username": "caasctl"
     }, 
-    "asset_relation": {
-      "roles": [
-        {
-          "team": [], 
-          "name": "Admin", 
-          "user": [
-            "mpryor"
-          ]
-        }, 
-        {
-          "team": [], 
-          "name": "Read", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Use", 
-          "user": []
-        }
-      ]
-    }, 
-    "asset_type": "credential", 
-    "name": "caascontrol-U mpryor"
-  }, 
-  {
-    "inputs": {
-      "project": "caastest-U", 
-      "username": "brtknr", 
-      "host": "https://kataifi.sweet.jasmin.ac.uk/v3", 
-      "password": "", 
-      "domain": "jasmin"
-    }, 
-    "description": "Bharat's OpenStack Credentials", 
-    "asset_type": "credential", 
-    "credential_type": "OpenStack", 
     "asset_relation": {
       "roles": [
         {
@@ -115,25 +48,26 @@
         }, 
         {
           "team": [], 
-          "name": "Read", 
+          "name": "Use", 
           "user": []
         }, 
         {
           "team": [], 
-          "name": "Use", 
+          "name": "Read", 
           "user": []
         }
       ]
     }, 
-    "name": "caastest-U bharat"
+    "asset_type": "credential", 
+    "name": "trusteee caascontrol-U caasctl"
   }, 
   {
     "inputs": {
-      "username": "hsilk", 
       "password": "", 
+      "username": "brtknr", 
       "project_name": "caastest-U"
     }, 
-    "description": "Holly Silk", 
+    "description": "Bharat's JASMIN Cloud User Credentials", 
     "asset_relation": {
       "roles": [
         {
@@ -156,14 +90,14 @@
       ]
     }, 
     "credential_type": "JASMIN Cloud User", 
-    "organization": "Cluster-as-a-Service", 
+    "organization": "JASMIN CaaS", 
     "asset_type": "credential", 
-    "name": "caastest-U hsilk"
+    "name": "user caastest-U bharat"
   }, 
   {
     "inputs": {
-      "username": "oneswig", 
       "password": "", 
+      "username": "oneswig", 
       "project_name": "caastest-U"
     }, 
     "description": "Stig Telfer", 
@@ -189,17 +123,74 @@
       ]
     }, 
     "credential_type": "JASMIN Cloud User", 
-    "organization": "Cluster-as-a-Service", 
+    "organization": "JASMIN CaaS", 
     "asset_type": "credential", 
-    "name": "caastest-U stig"
+    "name": "user caastest-U stig"
+  }, 
+  {
+    "asset_relation": {
+      "extra_credentials": [
+        "user caastest-U bharat"
+      ], 
+      "notification_templates_error": [], 
+      "notification_templates_success": [], 
+      "roles": [
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Execute", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": []
+        }
+      ], 
+      "labels": [], 
+      "schedules": [], 
+      "survey_spec": {
+        "name": "", 
+        "description": "", 
+        "spec": [
+          {
+            "question_name": "Cluster name", 
+            "question_description": "", 
+            "required": true, 
+            "type": "text", 
+            "variable": "cluster_name", 
+            "min": 0, 
+            "max": 1024, 
+            "default": "", 
+            "choices": ""
+          }
+        ]
+      }
+    }, 
+    "description": "Deploy BeeGFS cluster", 
+    "ask_credential_on_launch": true, 
+    "extra_vars": "---\ncluster_name: \"bharat-beegfs\"\ncluster_network: \"caastest-U-internal\"\ncluster_keypair: \"brtknr-33236e18e6285585a7f58f1006f88349\"", 
+    "name": "BeeGFS", 
+    "project": "JASMIN Appliances", 
+    "inventory": "JASMIN OpenStack API", 
+    "asset_type": "job_template", 
+    "survey_enabled": true, 
+    "playbook": "beegfs-infra.yml"
   }, 
   {
     "diff_mode": true, 
     "name": "Kubernetes", 
     "ask_credential_on_launch": true, 
-    "extra_vars": "---\ncluster_keypair: brtknr-33236e18e6285585a7f58f1006f88349\ncluster_name: kubernetes\ncluster_network: caastest-U-internal\nmaster_flavor: j3.medium\nnum_workers: 3\nroot_volume_size: 40\nworker_flavor: j3.medium", 
+    "extra_vars": "---\ncluster_name: \"k8s\"\ncluster_state: \"present\"\ncluster_network: \"caastest-U-internal\"\ncluster_keypair: \"brtknr-33236e18e6285585a7f58f1006f88349\"\ncluster_upgrade_system_packages: no\ncluster_version: \"1.13\"\ncluster_num_workers: 3", 
     "asset_relation": {
-      "extra_credentials": [], 
+      "extra_credentials": [
+        "trusteee caascontrol-U caasctl", 
+        "user caastest-U bharat"
+      ], 
       "notification_templates_error": [], 
       "notification_templates_success": [], 
       "roles": [
@@ -218,75 +209,6 @@
           "name": "Admin", 
           "user": [
             "admin"
-          ]
-        }
-      ], 
-      "labels": [], 
-      "schedules": [], 
-      "survey_spec": {
-        "spec": [
-          {
-            "question_name": "Upgrade system packages?", 
-            "default": "no", 
-            "question_description": "If yes, system packages will be upgraded (including patch versions of Kubernetes).\n", 
-            "choices": "yes\nno\n", 
-            "variable": "upgrade_packages", 
-            "required": true, 
-            "type": "multiplechoice"
-          }, 
-          {
-            "question_name": "Upgrade Kubernetes?", 
-            "default": "no", 
-            "question_description": "If yes, Kubernetes will be upgraded to the latest version. System packages will be necessarily upgraded.\n", 
-            "choices": "yes\nno\n", 
-            "variable": "upgrade_kubernetes", 
-            "required": true, 
-            "type": "multiplechoice"
-          }, 
-          {
-            "question_name": "Cluster State", 
-            "default": "present", 
-            "question_description": "If set to present, the cluster will be created/updated. If set to absent, the cluster will be destroyed.\n", 
-            "choices": "present\nabsent\n", 
-            "variable": "cluster_state", 
-            "required": true, 
-            "type": "multiplechoice"
-          }
-        ], 
-        "description": "", 
-        "name": ""
-      }
-    }, 
-    "project": "Kubernetes", 
-    "ask_inventory_on_launch": true, 
-    "playbook": "cluster_openstack.yml", 
-    "asset_type": "job_template", 
-    "survey_enabled": true
-  }, 
-  {
-    "name": "Kubernetes Template", 
-    "ask_credential_on_launch": true, 
-    "ask_variables_on_launch": true, 
-    "asset_relation": {
-      "extra_credentials": [], 
-      "notification_templates_error": [], 
-      "notification_templates_success": [], 
-      "roles": [
-        {
-          "team": [], 
-          "name": "Read", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Execute", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Admin", 
-          "user": [
-            "mpryor"
           ]
         }
       ], 
@@ -294,17 +216,20 @@
       "schedules": [], 
       "survey_spec": {}
     }, 
-    "project": "Kubernetes", 
+    "project": "JASMIN Appliances", 
     "ask_inventory_on_launch": true, 
-    "playbook": "cluster_openstack.yml", 
-    "asset_type": "job_template"
+    "ask_verbosity_on_launch": true, 
+    "inventory": "JASMIN OpenStack API", 
+    "job_slice_count": 20, 
+    "asset_type": "job_template", 
+    "playbook": "k8s-infra.yml"
   }, 
   {
-    "name": "nfs", 
-    "ask_credential_on_launch": true, 
-    "extra_vars": "---\n#nfs_name: nfs\n\nnfs_deploy_user: 'centos'\n\nnfs_net: \"caastest-U-internal\"\n\nnfs_groups:\n  - \"{{ nfs_group_server }}\"\n\nnfs_gw_group: \"server\"\n\nnfs_group_server:\n  name: \"server\"\n  flavor: \"j1.small\"\n  image: \"centos-7-20190104\"\n  user: \"centos\"\n  num_nodes: 1\n  root_volume_size: 20\n  node_resource: \"Cluster::NodeWithVolume\"\n  nodenet_resource: \"Cluster::NodeNet1WithPreallocatedFIP\"\n  nodenet_fips:\n   - uuid: \"fbd8781c-0917-41a3-8a66-ecaf0f05826a\"\n     ip: \"192.171.139.250\"\n  extra_groups:\n    - \"nfs_server\"", 
+    "diff_mode": true, 
     "asset_relation": {
-      "extra_credentials": [], 
+      "extra_credentials": [
+        "user caastest-U bharat"
+      ], 
       "notification_templates_error": [], 
       "notification_templates_success": [], 
       "roles": [
@@ -328,51 +253,36 @@
       ], 
       "labels": [], 
       "schedules": [], 
-      "survey_spec": {
-        "spec": [
-          {
-            "required": true, 
-            "min": 0, 
-            "default": "", 
-            "max": 1024, 
-            "question_description": "SSH keypair name as listed in openstack keypair list", 
-            "choices": "", 
-            "variable": "cluster_keypair", 
-            "question_name": "SSH keypair", 
-            "type": "text"
-          }, 
-          {
-            "required": true, 
-            "min": 0, 
-            "default": "", 
-            "max": 1024, 
-            "question_description": "", 
-            "choices": "", 
-            "new_question": true, 
-            "variable": "nfs_name", 
-            "question_name": "NFS server name", 
-            "type": "text"
-          }
-        ], 
-        "description": "", 
-        "name": ""
-      }
+      "survey_spec": {}
     }, 
-    "project": "Appliances", 
+    "description": "Deploy nfs server", 
+    "ask_credential_on_launch": true, 
+    "extra_vars": "---\ncluster_name: \"bharat-nfs\"\ncluster_state: \"present\"\ncluster_network: \"caastest-U-internal\"\ncluster_keypair: \"brtknr-33236e18e6285585a7f58f1006f88349\"", 
+    "name": "NFS", 
+    "project": "JASMIN Appliances", 
+    "ask_inventory_on_launch": true, 
+    "ask_verbosity_on_launch": true, 
     "inventory": "JASMIN OpenStack API", 
+    "job_slice_count": 20, 
     "asset_type": "job_template", 
-    "survey_enabled": true, 
     "playbook": "nfs-infra.yml"
   }, 
   {
+    "diff_mode": true, 
+    "name": "Pangeo", 
+    "ask_credential_on_launch": true, 
+    "extra_vars": "---\ncluster_name: \"k8s\"\ncluster_state: \"present\"\ncluster_network: \"caastest-U-internal\"\ncluster_keypair: \"brtknr-33236e18e6285585a7f58f1006f88349\"\ncluster_upgrade_system_packages: no\ncluster_version: \"1.13\"\ncluster_num_workers: 3\ncluster_fixed_ip: 192.171.139.249\n# Pangeo config\npangeo_hosts: [ \"pangeo.kgz.sh\" ]\npangeo_users: [ \"admin\" ]\npangeo_admin_users: [ \"admin\" ]\npangeo_password: secretnomore", 
     "asset_relation": {
-      "extra_credentials": [], 
+      "extra_credentials": [
+        "trusteee caascontrol-U caasctl", 
+        "user caastest-U bharat"
+      ], 
       "notification_templates_error": [], 
       "notification_templates_success": [], 
       "roles": [
         {
           "team": [], 
-          "name": "Read", 
+          "name": "Admin", 
           "user": []
         }, 
         {
@@ -382,246 +292,123 @@
         }, 
         {
           "team": [], 
-          "name": "Admin", 
-          "user": [
-            "admin"
-          ]
+          "name": "Read", 
+          "user": []
         }
       ], 
       "labels": [], 
       "schedules": [], 
-      "survey_spec": {
-        "spec": [
-          {
-            "question_description": "SSH keypair name as listed in openstack keypair list", 
-            "min": 0, 
-            "default": "", 
-            "max": 1024, 
-            "required": true, 
-            "choices": "", 
-            "new_question": true, 
-            "variable": "cluster_keypair", 
-            "question_name": "SSH keypair", 
-            "type": "text"
-          }, 
-          {
-            "required": true, 
-            "min": 0, 
-            "default": "", 
-            "max": 1024, 
-            "question_description": "", 
-            "choices": "", 
-            "variable": "slurm_name", 
-            "question_name": "Name of Slurm cluster", 
-            "type": "text"
-          }, 
-          {
-            "required": true, 
-            "min": 0, 
-            "default": "", 
-            "max": 1024, 
-            "question_description": "", 
-            "choices": "", 
-            "new_question": true, 
-            "variable": "nfs_name", 
-            "question_name": "Name of NFS cluster", 
-            "type": "text"
-          }, 
-          {
-            "required": true, 
-            "min": 0, 
-            "default": 1, 
-            "max": 100, 
-            "question_description": "", 
-            "choices": "", 
-            "new_question": true, 
-            "variable": "num_compute_nodes", 
-            "question_name": "Number of slurm compute nodes", 
-            "type": "integer"
-          }, 
-          {
-            "required": true, 
-            "min": 0, 
-            "default": 20, 
-            "max": 100, 
-            "question_description": "", 
-            "choices": "", 
-            "new_question": true, 
-            "variable": "nfs_volume_size", 
-            "question_name": "NFS volume size", 
-            "type": "integer"
-          }, 
-          {
-            "required": true, 
-            "min": null, 
-            "default": "192.171.139.236", 
-            "max": null, 
-            "question_description": "", 
-            "choices": "192.171.139.236\n192.171.139.249\n192.171.139.250", 
-            "variable": "floating_ip", 
-            "question_name": "Floating IP", 
-            "type": "multiplechoice"
-          }, 
-          {
-            "required": true, 
-            "min": null, 
-            "default": "69832fbb-f4f1-4d88-b848-799a9c3fe695", 
-            "max": null, 
-            "question_description": "", 
-            "choices": "69832fbb-f4f1-4d88-b848-799a9c3fe695\n8723c186-d15f-44d5-9421-e12bf2a03325\nfbd8781c-0917-41a3-8a66-ecaf0f05826a", 
-            "variable": "floating_ip_uuid", 
-            "question_name": "Floating IP UUID", 
-            "type": "multiplechoice"
-          }
-        ], 
-        "description": "", 
-        "name": ""
-      }
+      "survey_spec": {}
     }, 
-    "description": "Slurm", 
-    "ask_credential_on_launch": true, 
-    "extra_vars": "---\n# This name is used for the Heat stack and as a prefix for the\n# cluster node hostnames.\n#nfs_name: nfs\n\nnfs_deploy_user: 'centos'\n\nnfs_net:\n  - { net: \"caastest-U-internal\", subnet: \"caastest-U-internal\" }\n\nnfs_groups:\n  - \"{{ nfs_group_server }}\"\n#cluster_gw_group: \"login\"\n\nnfs_group_server:\n  name: \"server\"\n  flavor: \"j1.small\"\n  image: \"centos-7-20190104\"\n  user: \"centos\"\n  num_nodes: 1\n  root_volume_size: \"{{ nfs_volume_size }}\"\n  node_resource: \"Cluster::NodeWithVolume\" \n  nodenet_resource: \"Cluster::NodeNet1\"\n  extra_groups:\n    - \"nfs_server\"\n\n# This name is used for the Heat stack and as a prefix for the\n# cluster node hostnames.\n#slurm_name: slurm\n\nslurm_deploy_user: 'centos'\n\nslurm_net:\n  - { net: \"caastest-U-internal\", subnet: \"caastest-U-internal\" }\n\nslurm_groups:\n  - \"{{ slurm_login }}\"\n  - \"{{ slurm_compute }}\"\n\nslurm_gw_group: \"login\"\n\nslurm_login:\n  name: \"login\"\n  flavor: \"j1.small\"\n  image: \"centos-7-20190104\"\n  user: \"centos\"\n  num_nodes: 1\n  root_volume_size: 0\n  node_resource: \"Cluster::Node\" \n  extra_groups:\n    - \"nfs_clients\"\n  nodenet_resource: \"Cluster::NodeNet1WithPreallocatedFIP\"\n  nodenet_fips:\n    - uuid: \"{{ floating_ip_uuid }}\"\n      ip: \"{{ floating_ip }}\"\n\nslurm_compute:\n  name: \"compute\"\n  flavor: \"j2.tiny\"\n  image: \"centos-7-20190104\"\n  user: \"centos\"\n  num_nodes: \"{{ num_compute_nodes }}\"\n  root_volume_size: 0\n  node_resource: \"Cluster::Node\" \n  nodenet_resource: \"Cluster::NodeNet1\"\n  extra_groups:\n    - \"nfs_clients\"\n\n# Define a list of SLURM partitions to create.\nopenhpc_slurm_partitions: \n  - name: caas\n    groups:\n      - \"{{ slurm_compute }}\"\n\n# A list of OpenHPC runtime libraries to install on compute and control nodes\nopenhpc_packages:\n  - strace\n  - flex\n  - bison\n  - cfitsio\n  - cfitsio-devel\n  - cfitsio-docs\n  - wcslib\n  - wcslib-utils\n  - wcslib-devel\n  - wcstools\n  - ncurses\n  - ncurses-devel\n  - readline\n  - readline-devel\n  - boost\n  - boost-devel\n  - boost-python\n  - boost-math\n  - boost-doc\n  # OpenHPC bits\n  - hdf5-gnu-ohpc\n  - phdf5-gnu-mvapich2-ohpc\n  - gnu-compilers-ohpc\n  - mvapich2-gnu-ohpc\n  - openmpi-gnu-ohpc\n  - imb-gnu-mvapich2-ohpc\n  - imb-gnu-openmpi-ohpc\n  - fftw-gnu-mvapich2-ohpc\n  - fftw-gnu-openmpi-ohpc\n  - openblas-gnu-ohpc\n  - scalapack-gnu-mvapich2-ohpc\n  - gsl-gnu-ohpc\n  - python-scipy-gnu-mvapich2-ohpc\n  - python-scipy-gnu-openmpi-ohpc\n  - python34\n  - python34-devel\n  - python-virtualenv\n  - infiniband-diags\n  - emacs\n  - vim\n\n# kdump not required\nkdump_enable: false\n\njasmin_homedir: \"/jasmin\"\njasmin_group_name: \"jasmin\"\njasmin_groups:\n  - name: \"{{ jasmin_group_name }}\"\n    gid: 2000\n\njasmin_users: \n  - username: \"hsilk\"\n    groups: [ \"{{ jasmin_group_name }}\" ]\n    name: \"Holly Silk <holly@stackhpc.com>\"\n    home: \"{{jasmin_homedir}}/hsilk\"\n    uid: 3390\n    ssh_key:\n      - \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsysvkkEbEDSx/xcgA9fEmd6KTD4wBlEEeo9dqM2TEbwxg3Pl5nuji44dXzl0+01fwDR7Zn8I79XYZMgVaAQl9wRK6x7jLnJWpLo2+jhC1gu2108P7yWWplpFS40LHRAU1SDMvNfDM2drNx3T3tmoNlr7HnO8URnBslWtjNCAbdY4B2p7jJmdCfQdtvxpzUDVMilihXxXZ8016WYQYdDQmUTyGWn+oHBDegpKPodFFswRhTavFO/OGbACTZ18W6Sv57ShzI0DrKPmU9uSs7PyZJuazn2ZDEWa330w2gpmG7+1GsKibsgxTNVGbp/FuSDv1G1FY8kDTbVNNH1gzUkbj hsilk@Hollys-MacBook-Air.local\"\n  - username: \"stig\"\n    groups: [ \"{{ jasmin_group_name }}\" ]\n    name: \"Stig Telfer <stig@stackhpc.com>\"\n    home: \"{{jasmin_homedir}}/stig\"\n    uid: 3391\n    ssh_key:\n      - \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDkXbp+OEyRoAtLPvmNJoLQJJKbjfWXVT3xyyLArzbKDNUkC8mdOUJDFPOJj91CEKKPd1x+6ys6EzJ8zFpfTQYkULClUE3XVx5q7ZMdQE3wROK+++z4RCcKrTgArd2wp5cfluMbwgp+HThuv+hdEvpEmltiALWk8wocPS6lHQmpq7AA+oB798ErNGITjfOdBbAmzcJ/Qba6y8J/ksShBDyn+dnhOT/M9wLsJaO5lh2wRqO6WxLZ6N5tlQZyyXAxBsphi+4u4gG1FiCdu7CClQr+zxEGHOnYxtbSa0X51zINxFKQAljI0IXYFJ3/7hmjkGhd1bGdXvVIqFOQdKGNFvXR stig@skellig.local\"", 
-    "name": "Slurm", 
-    "project": "Appliances", 
+    "project": "JASMIN Appliances", 
+    "ask_inventory_on_launch": true, 
+    "ask_verbosity_on_launch": true, 
     "inventory": "JASMIN OpenStack API", 
-    "forks": 2, 
+    "job_slice_count": 20, 
     "asset_type": "job_template", 
-    "survey_enabled": true, 
+    "playbook": "pangeo-infra.yml"
+  }, 
+  {
+    "name": "Slurm", 
+    "ask_credential_on_launch": true, 
+    "extra_vars": "---\ncluster_name: \"bharat-slurm\"\ncluster_network: \"caastest-U-internal\"\ncluster_keypair: \"brtknr-33236e18e6285585a7f58f1006f88349\"\nstorage_name: \"pierre-nfs\"", 
+    "asset_relation": {
+      "extra_credentials": [
+        "user caastest-U bharat"
+      ], 
+      "notification_templates_error": [], 
+      "notification_templates_success": [], 
+      "roles": [
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Execute", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }
+      ], 
+      "labels": [], 
+      "schedules": [], 
+      "survey_spec": {}
+    }, 
+    "project": "JASMIN Appliances", 
+    "ask_inventory_on_launch": true, 
+    "ask_verbosity_on_launch": true, 
+    "inventory": "JASMIN OpenStack API", 
+    "job_slice_count": 20, 
+    "asset_type": "job_template", 
     "playbook": "slurm-infra.yml"
   }, 
   {
-    "scm_branch": "project-name", 
+    "asset_relation": {
+      "notification_templates_error": [], 
+      "notification_templates_success": [], 
+      "roles": [
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Use", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Update", 
+          "user": []
+        }
+      ], 
+      "schedules": []
+    }, 
+    "scm_branch": "master", 
     "description": "Deployment, scaling and maintenance of Kubernetes clusters.", 
-    "scm_url": "https://github.com/brtknr/k8s-ansible.git", 
-    "asset_relation": {
-      "notification_templates_error": [], 
-      "notification_templates_success": [], 
-      "roles": [
-        {
-          "team": [], 
-          "name": "Admin", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Read", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Use", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Update", 
-          "user": []
-        }
-      ], 
-      "schedules": []
-    }, 
-    "scm_type": "git", 
-    "organization": "Cluster-as-a-Service", 
-    "asset_type": "project", 
-    "name": "Kubernetes"
-  }, 
-  {
-    "scm_branch": "awx", 
-    "name": "Appliances", 
     "scm_url": "https://github.com/cedadev/jasmin-appliances", 
-    "asset_relation": {
-      "notification_templates_error": [], 
-      "notification_templates_success": [], 
-      "roles": [
-        {
-          "team": [], 
-          "name": "Admin", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Read", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Use", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Update", 
-          "user": []
-        }
-      ], 
-      "schedules": []
-    }, 
-    "scm_type": "git", 
-    "scm_update_on_launch": true, 
-    "organization": "Cluster-as-a-Service", 
-    "asset_type": "project"
-  }, 
-  {
-    "asset_relation": {
-      "notification_templates_error": [], 
-      "notification_templates_success": [], 
-      "roles": [
-        {
-          "team": [], 
-          "name": "Admin", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Read", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Use", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Update", 
-          "user": []
-        }
-      ], 
-      "schedules": []
-    }, 
-    "scm_branch": "ukri-demo", 
-    "name": "Kubernetes", 
-    "scm_url": "https://github.com/cedadev/k8s-ansible.git", 
     "scm_delete_on_update": true, 
     "scm_type": "git", 
     "scm_update_on_launch": true, 
-    "organization": "UKRI Demo", 
-    "asset_type": "project"
+    "organization": "JASMIN CaaS", 
+    "asset_type": "project", 
+    "name": "JASMIN Appliances"
   }, 
   {
     "injectors": {
       "env": {
         "OS_TOKEN": "{{ token }}", 
-        "OS_IDENTITY_API_VERSION": "3", 
         "OS_AUTH_URL": "https://kataifi.sweet.jasmin.ac.uk/v3", 
-        "OS_PROJECT_DOMAIN_NAME": "jasmin", 
+        "OS_AUTH_TYPE": "token", 
         "OS_PROJECT_NAME": "{{ project_name }}", 
-        "OS_AUTH_TYPE": "token"
+        "OS_PROJECT_DOMAIN_NAME": "jasmin", 
+        "OS_IDENTITY_API_VERSION": "3"
       }
     }, 
     "inputs": {
       "fields": [
         {
-          "secret": true, 
-          "type": "string", 
           "id": "token", 
-          "label": "JASMIN token"
+          "type": "string", 
+          "label": "JASMIN token", 
+          "secret": true
         }, 
         {
-          "secret": false, 
-          "type": "string", 
           "id": "project_name", 
-          "label": "JASMIN project name"
+          "type": "string", 
+          "label": "JASMIN project name", 
+          "secret": false
         }
       ], 
       "required": [
@@ -635,33 +422,35 @@
   }, 
   {
     "injectors": {
-      "env": {
-        "OS_USERNAME": "caasctl", 
-        "OS_IDENTITY_API_VERSION": "3", 
-        "OS_USER_DOMAIN_NAME": "jasmin", 
-        "OS_AUTH_URL": "https://kataifi.sweet.jasmin.ac.uk/v3", 
-        "OS_TRUST_ID": "{{ trust_id }}", 
-        "OS_PASSWORD": "{{ password }}"
+      "extra_vars": {
+        "openstack_trustee_id": "{{ openstack_trustee_id }}", 
+        "openstack_trustee_password": "{{ openstack_trustee_password }}"
       }
     }, 
     "inputs": {
       "fields": [
         {
-          "secret": true, 
+          "id": "openstack_trustee_id", 
           "type": "string", 
-          "id": "trust_id", 
-          "label": "JASMIN trust-id"
+          "label": "JASMIN trustee user_id", 
+          "secret": false
         }, 
         {
-          "secret": true, 
+          "id": "openstack_trustee_username", 
           "type": "string", 
-          "id": "password", 
-          "label": "JASMIN password"
+          "label": "JASMIN trustee username", 
+          "secret": false
+        }, 
+        {
+          "id": "openstack_trustee_password", 
+          "type": "string", 
+          "label": "JASMIN password", 
+          "secret": true
         }
       ], 
       "required": [
-        "trust_id", 
-        "password"
+        "openstack_trustee_id", 
+        "openstack_trustee_password"
       ]
     }, 
     "kind": "cloud", 
@@ -671,31 +460,31 @@
   {
     "injectors": {
       "env": {
-        "OS_USERNAME": "{{ username }}", 
-        "OS_IDENTITY_API_VERSION": "3", 
         "OS_AUTH_URL": "https://kataifi.sweet.jasmin.ac.uk/v3", 
-        "OS_PROJECT_NAME": "{{ project_name }}", 
         "OS_PASSWORD": "{{ password }}", 
-        "OS_DOMAIN_NAME": "jasmin"
+        "OS_USERNAME": "{{ username }}", 
+        "OS_DOMAIN_NAME": "jasmin", 
+        "OS_PROJECT_NAME": "{{ project_name }}", 
+        "OS_IDENTITY_API_VERSION": "3"
       }
     }, 
     "inputs": {
       "fields": [
         {
-          "type": "string", 
           "id": "username", 
+          "type": "string", 
           "label": "JASMIN Username"
         }, 
         {
-          "type": "string", 
           "id": "project_name", 
+          "type": "string", 
           "label": "JASMIN Project Name"
         }, 
         {
-          "secret": true, 
-          "type": "string", 
           "id": "password", 
-          "label": "JASMIN Password"
+          "type": "string", 
+          "label": "JASMIN Password", 
+          "secret": true
         }
       ], 
       "required": [
@@ -709,19 +498,19 @@
     "name": "JASMIN Cloud User"
   }, 
   {
+    "username": "mpryor", 
+    "first_name": "Matthew", 
+    "last_name": "Pryor", 
+    "asset_type": "user", 
+    "email": "matt.pryor@stfc.ac.uk"
+  }, 
+  {
     "username": "admin", 
     "first_name": "", 
     "last_name": "", 
     "email": "root@localhost", 
     "is_superuser": true, 
     "asset_type": "user"
-  }, 
-  {
-    "username": "mpryor", 
-    "first_name": "Matthew", 
-    "last_name": "Pryor", 
-    "asset_type": "user", 
-    "email": "matt.pryor@stfc.ac.uk"
   }, 
   {
     "asset_relation": {
@@ -784,7 +573,7 @@
       ]
     }, 
     "asset_type": "organization", 
-    "name": "Cluster-as-a-Service"
+    "name": "JASMIN CaaS"
   }, 
   {
     "asset_relation": {
@@ -852,37 +641,26 @@
     "name": "UKRI Demo"
   }, 
   {
-    "description": "JASMIN OpenStack API access", 
-    "variables": "cluster_network: caastest-U-internal", 
+    "description": "JASMIN OpenStack API", 
+    "variables": "cloud_provider: openstack\ncluster_upgrade_system_packages: false\nnfs_client_mnt_point: /jasmin", 
     "asset_type": "inventory", 
-    "organization": "Cluster-as-a-Service", 
+    "organization": "JASMIN CaaS", 
     "asset_relation": {
-      "inventory_source": [], 
-      "host": [
+      "inventory_source": [
         {
-          "variables": "ansible_host: 127.0.0.1\nansible_connection: local\nhome_dir: '/root'", 
-          "name": "localhost"
-        }, 
-        {
-          "name": "test"
+          "source_vars": "SCM_EXCLUDE_EMPTY_GROUPS: false", 
+          "name": "openstack_awx.ini", 
+          "overwrite_vars": true, 
+          "source_project": "JASMIN Appliances", 
+          "source_path": "openstack_awx.ini", 
+          "source": "scm", 
+          "schedules": [], 
+          "overwrite": true, 
+          "update_on_launch": true
         }
       ], 
-      "group": [
-        {
-          "sub_groups": [], 
-          "hosts": [
-            "test"
-          ], 
-          "name": "nfs_clients"
-        }, 
-        {
-          "sub_groups": [], 
-          "hosts": [
-            "localhost"
-          ], 
-          "name": "openstack"
-        }
-      ], 
+      "host": [], 
+      "group": [], 
       "roles": [
         {
           "team": [], 
@@ -912,92 +690,5 @@
       ]
     }, 
     "name": "JASMIN OpenStack API"
-  }, 
-  {
-    "description": "Kubernetes cluster.", 
-    "variables": "---\ncluster_name: kubernetes\ncluster_network: caascontrol-U-internal\ncluster_keypair: mpryor-4f0b0434703f34080e04627d3f9c8eb2\nnum_workers: 1", 
-    "asset_type": "inventory", 
-    "organization": "UKRI Demo", 
-    "asset_relation": {
-      "inventory_source": [], 
-      "host": [
-        {
-          "variables": "---\nansible_connection: local\nansible_host: 127.0.0.1", 
-          "name": "openstack"
-        }
-      ], 
-      "group": [], 
-      "roles": [
-        {
-          "team": [], 
-          "name": "Ad Hoc", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Admin", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Read", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Use", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Update", 
-          "user": []
-        }
-      ]
-    }, 
-    "name": "kubernetes"
-  }, 
-  {
-    "organization": "Cluster-as-a-Service", 
-    "description": "Example inventory for a Kubernetes cluster. Copy and modify as required.", 
-    "asset_relation": {
-      "inventory_source": [], 
-      "host": [
-        {
-          "variables": "{'ansible_host': '127.0.0.1', 'ansible_connection': 'local'}", 
-          "name": "openstack"
-        }
-      ], 
-      "group": [], 
-      "roles": [
-        {
-          "team": [], 
-          "name": "Ad Hoc", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Admin", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Read", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Use", 
-          "user": []
-        }, 
-        {
-          "team": [], 
-          "name": "Update", 
-          "user": []
-        }
-      ]
-    }, 
-    "asset_type": "inventory", 
-    "name": "Kubernetes - Bharat"
   }
 ]
