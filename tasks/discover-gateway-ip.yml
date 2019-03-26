@@ -10,14 +10,14 @@
       vars:
         query: "node_groups[?name=='{{ cluster_gw_group }}'].nodes[0].ip"
       set_fact:
-        cluster_fixed_ip:  "{{ openstack_stack_outputs | json_query(query) | first or omit }}"
+        cluster_existing_gw_ip:  "{{ (openstack_stack_outputs | json_query(query) + [omit]) | first }}"
       when: openstack_stack_outputs is defined
   when: cluster_fixed_ip is not defined
 
 - name: Find gateway floating IP
   os_network_find_fip:
     floating_network: "{{ cluster_floating_network }}"
-    ip: "{{ cluster_fixed_ip | default(omit) }}"
+    ip: "{{ cluster_fixed_ip | default(cluster_existing_gw_ip) | default(omit) }}"
   register: fip_network
 
 - name: Set gateway IP facts
