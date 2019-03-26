@@ -86,7 +86,7 @@ def main():
         changed = False
         if fip_ip:
             # This is when a specific floating IP is requested
-            fip = cloud.network.find_ip(fip_ip, floating_network_id = floating_network_id)
+            fip = cloud.network.find_ip(fip_ip, floating_network_id=floating_network_id)
             if fip is None:
                 raise ValueError(
                     "Floating IP {} not available on network {}.".format(fip_ip, floating_network)
@@ -96,7 +96,7 @@ def main():
             fip = cloud.network.find_available_ip()
             # If that failed, try to allocate one
             if fip is None:
-                fip = cloud.network.create_ip(floating_network_id = floating_network_id)
+                fip = cloud.network.create_ip(floating_network_id=floating_network_id)
                 changed = True
         # Return the IP details
         module.exit_json(
