@@ -1,50 +1,12 @@
----
-# This name is used for the Heat stack and as a prefix for the
-# cluster node hostnames.
-slurm_name: slurm
-
-slurm_deploy_user: 'centos'
-
-slurm_net: "caastest-U-internal"
-
-slurm_groups:
-  - "{{ slurm_login }}"
-  - "{{ slurm_compute }}"
-
-slurm_gw_group: "login"
-
-slurm_login:
-  name: "login"
-  flavor: "j1.small"
-  image: "centos-7-20190104"
-  user: "centos"
-  num_nodes: 1
-  root_volume_size: 0
-  node_resource: "Cluster::Node" 
-  extra_groups:
-    - "beegfs_clients"
-  nodenet_resource: "Cluster::NodeNet1"
-
-slurm_compute:
-  name: "compute"
-  flavor: "j2.tiny"
-  image: "centos-7-20190104"
-  user: "centos"
-  num_nodes: 1
-  root_volume_size: 0
-  node_resource: "Cluster::Node" 
-  nodenet_resource: "Cluster::NodeNet1"
-  extra_groups:
-    - "beegfs_clients"
-
 # Define a list of SLURM partitions to create.
-openhpc_slurm_partitions: 
+slurm_partitions: 
   - name: caas
     groups:
-      - "{{ slurm_compute }}"
+      - name: "compute"        # Corresponds with group name in openstack/slurm
+        num_nodes: "{{ groups[cluster_name + '_compute'] | length }}"
 
 # A list of OpenHPC runtime libraries to install on compute and control nodes
-openhpc_packages:
+slurm_packages:
   - strace
   - flex
   - bison
@@ -90,13 +52,6 @@ jasmin_groups:
     gid: 2000
 
 jasmin_users: 
-  - username: "hsilk"
-    groups: [ "{{ jasmin_group_name }}" ]
-    name: "Holly Silk <holly@stackhpc.com>"
-    home: "{{jasmin_homedir}}/hsilk"
-    uid: 3390
-    ssh_key:
-      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsysvkkEbEDSx/xcgA9fEmd6KTD4wBlEEeo9dqM2TEbwxg3Pl5nuji44dXzl0+01fwDR7Zn8I79XYZMgVaAQl9wRK6x7jLnJWpLo2+jhC1gu2108P7yWWplpFS40LHRAU1SDMvNfDM2drNx3T3tmoNlr7HnO8URnBslWtjNCAbdY4B2p7jJmdCfQdtvxpzUDVMilihXxXZ8016WYQYdDQmUTyGWn+oHBDegpKPodFFswRhTavFO/OGbACTZ18W6Sv57ShzI0DrKPmU9uSs7PyZJuazn2ZDEWa330w2gpmG7+1GsKibsgxTNVGbp/FuSDv1G1FY8kDTbVNNH1gzUkbj hsilk@Hollys-MacBook-Air.local"
   - username: "stig"
     groups: [ "{{ jasmin_group_name }}" ]
     name: "Stig Telfer <stig@stackhpc.com>"
