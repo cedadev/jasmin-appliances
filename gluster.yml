@@ -1,4 +1,24 @@
 ---
+# Prevent Gluster servers from failing to start after reboot: IPv6 is disabled
+# via sysctl in the JASMIN CentOS 7 image, but initramfs doesn't include this
+# sysctl setting. This prevents rpcbind (on which gluster depends) from
+# starting on boot. See https://access.redhat.com/solutions/2798411 for more
+# details. Unfortunately the Red Hat solution is incomplete, as dracut doesn't
+# include /etc/sysctl* by default, so we modify dracut.conf before rebuilding.
+- hosts:
+    - gluster_servers
+  become: true
+  tasks:
+    - name: Add sysctl configuration to dracut.conf
+      lineinfile:
+        path: /etc/dracut.conf
+        line: install_items="/etc/sysctl.conf /etc/sysctl.d/*"
+      notify:
+        - Rebuild initramfs
+  handlers:
+    - name: Rebuild initramfs
+      command: dracut -f
+
 - hosts:
     - gluster_servers
     - gluster_clients
