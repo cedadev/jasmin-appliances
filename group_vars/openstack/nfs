@@ -3,6 +3,12 @@
 # The storage size (in gigabytes) for the NFS export.
 nfs_volume_size: 10
 
+nfs_cluster_info:
+  storage_type: "nfs"
+  nfs_servers: "$PRIMARY_IPS"
+  vars:
+    nfs_export: "/srv/home"
+
 nfs_groups:
   - "{{ nfs_group_server }}"
 
@@ -15,5 +21,6 @@ nfs_group_server:
   root_volume_size: "{{ nfs_volume_size }}"
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"
+  info: "{{ nfs_cluster_info | to_json }}"
 
 ...
