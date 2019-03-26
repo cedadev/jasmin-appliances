@@ -24,13 +24,12 @@ notes:
 requirements:
     - "python >= 2.6"
     - "openstacksdk"
-    - "python-heatclient"
 options:
    cloud:
      description:
        - Cloud name inside cloud.yaml file.
      type: str
-   stack_id:
+   stack:
      description:
         - Heat stack name or uuid.
      type: str
@@ -38,63 +37,43 @@ extends_documentation_fragment: openstack
 '''
 
 EXAMPLES = '''
-# Gather outputs from <stack_id>:
+# Gather outputs from <stack> name or id:
 - os_stack_outputs:
     cloud: mycloud
-    stack_id: xxxxx-xxxxx-xxxx-xxxx
+    stack: xxxxx-xxxxx-xxxx-xxxx
 - debug:
     var: stack_outputs
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.utils.display import Display
-from heatclient.client import Client
-import openstack
+from ansible.module_utils.openstack import (openstack_full_argument_spec,
+                                            openstack_module_kwargs,
+                                            openstack_cloud_from_module)
 
-display = Display()
+def main():
 
-class OpenStackAuthConfig(Exception):
-    pass
+    argument_spec = openstack_full_argument_spec(
+        stack=dict(required=True),
+    )
+    module_kwargs = openstack_module_kwargs()
+    module = AnsibleModule(argument_spec, **module_kwargs)
 
-class StackOutputs(object):
-    def __init__(self, **kwargs):
-        self.stack_id = kwargs['stack_id']
-        self.connect(**kwargs)
-
-    def connect(self, **kwargs):
-        if kwargs['auth_type'] == 'environment':
-            self.cloud = openstack.connect()
-        elif kwargs['auth_type'] == 'cloud':
-            self.cloud = openstack.connect(cloud=kwargs['cloud'])
-        elif kwargs['auth_type'] == 'password':
-            self.cloud = openstack.connect(**kwargs['auth'])
-        else:
-            raise OpenStackAuthConfig('Provided auth_type must be one of [environment, cloud, password].')
-
-        self.client = Client('1', session=self.cloud.session)
-
-    def get(self):
+    sdk, cloud = openstack_cloud_from_module(module)
+    try:
         result = dict()
-        stack = self.client.stacks.get(self.stack_id)
-        for item in stack.outputs:
-            result[item['output_key']] = item['output_value']
-        return result
+        stack = cloud.get_stack(module.params['stack'])
+        if stack:
+            for item in stack.outputs:
+                result[item['output_key']] = item['output_value']
+        else:
+            raise sdk.exceptions.OpenStackCloudException(
+                'Stack {} not found.'.format(module.params['stack']))
+        module.exit_json(changed=False,
+            ansible_facts=dict(openstack_stack_outputs=result))
+
+    except sdk.exceptions.OpenStackCloudException as e:
+        module.fail_json(msg=str(e))
+
 
 if __name__ == '__main__':
-    module = AnsibleModule(
-        argument_spec = dict(
-            cloud=dict(required=False, type='str'),
-            auth=dict(required=False, type='dict'),
-            auth_type=dict(default='environment', required=False, type='str'),
-            stack_id=dict(required=True, type='str'),
-        ),
-        supports_check_mode=False
-    )
-
-    display = Display()
-
-    try:
-        stack_outputs = StackOutputs(**module.params)
-    except Exception as e:
-        module.fail_json(repr(e))
-    module.exit_json(changed=False,ansible_facts=dict(stack_outputs=stack_outputs.get()))
+    main()

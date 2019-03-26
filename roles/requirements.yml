@@ -8,7 +8,7 @@
   version: master
 - name: jasmin.pangeo-helm
   src: https://github.com/cedadev/pangeo-helm-ansible
-  version: first-pr
+  version: master
 - src: mrlesmithjr.squid
 - src: oasis_roles.kdump
 - src: resmo.ntp

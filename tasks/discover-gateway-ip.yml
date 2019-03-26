@@ -1,12 +1,26 @@
 ---
 
+- block:
+    - name: Query existing stack for its output
+      os_stack_outputs:
+        stack: "{{ cluster_name }}"
+      ignore_errors: true
+
+    - name: Extract output of existing ephemeral bastion
+      vars:
+        query: "node_groups[?name=='{{ cluster_gw_group }}'].nodes[0].ip"
+      set_fact:
+        cluster_fixed_ip:  "{{ openstack_stack_outputs | json_query(query) | first or omit }}"
+      when: openstack_stack_outputs is defined
+  when: cluster_fixed_ip is not defined
+
 - name: Find gateway floating IP
   os_network_find_fip:
     floating_network: "{{ cluster_floating_network }}"
     ip: "{{ cluster_fixed_ip | default(omit) }}"
-  register: result
+  register: fip_network
 
 - name: Set gateway IP facts
   set_fact:
-    cluster_gw_fip_id: "{{ result.fip_id }}"
-    cluster_gw_fip_ip: "{{ result.fip_ip }}"
+    cluster_gw_fip_id: "{{ fip_network.id }}"
+    cluster_gw_fip_ip: "{{ fip_network.ip }}"
