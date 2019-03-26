@@ -41,8 +41,7 @@ These playbooks may be invoked from an AWX context, or direct from the command l
 | `cluster_network` | The id or name of the network to which nodes should be attached. |
 | `cluster_keypair` | The name of the keypair to inject into nodes. |
 | `cluster_upgrade_system_packages` | Flag indicating whether system packages should be upgraded (i.e. the equivalent of yum update -y). Defaults to `false`. |
-| `cluster_fip_uuid` | The UUID of a floating IP (allocated to the project but currently unassociated).  This will be used for the bastion host, which could be transient. |
-| `cluster_fip_ip` | The IP address of the floating IP to use. |
+| `cluster_fixed_ip` | The fixed IP address of the floating IP to use when not using an ephemeral bastion. |
 
 When invoked via AWX, OpenStack configuration parameters are supplied.
 From the command line these can be drawn in from the user environment by sourcing
@@ -53,8 +52,7 @@ $ ansible-playbook -i inventory nfs-infra.yml \
     -e cluster_name=stig-nfs \
     -e cluster_keypair=oneswig \
     -e cluster_network="caastest-U-internal" \
-    -e cluster_gw_fip_id=534d70a7-1630-4cb5-b9da-5c8da9a82b2d \
-    -e cluster_gw_fip_ip=192.171.139.120 \
+    -e cluster_fixed_ip=192.171.139.120 \
     -e @config/auth.yml
 ```
 
