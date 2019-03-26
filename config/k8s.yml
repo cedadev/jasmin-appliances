@@ -3,10 +3,10 @@
 cluster_name: k8s
 cluster_version: "1.13"
 cluster_state: present
-cluster_network: caastest-U-internal
-cluster_keypair: brtknr-33236e18e6285585a7f58f1006f88349
 cluster_num_workers: 3
-cluster_fixed_ip: "192.171.139.249"
+cluster_fixed_ip: 192.171.139.249
+# cluster_network
+# cluster_keypair:
 # openstack_trustee_id:
 # openstack_trustee_password:
 

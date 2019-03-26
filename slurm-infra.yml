@@ -3,11 +3,14 @@
 # using a number of baremetal compute node instances, and configure it
 # for a SLURM partition
 - hosts: openstack
+  pre_tasks:
+    - name: Import discover-gateway-ip.yml
+      import_tasks: tasks/discover-gateway-ip.yml
   roles:
     - role: jasmin.cluster-infra
       cluster_groups: "{{ slurm_groups + [cluster_gw] }}"
       cluster_tag: "{{ cluster_type.slurm }}"
-  tasks:
+  post_tasks:
     - name: Add provisioned nodes to groups for their cluster roles
       add_host:
         name: "{{ item }}"
