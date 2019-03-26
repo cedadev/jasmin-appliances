@@ -4,6 +4,8 @@
 # for a SLURM partition
 - hosts: openstack
   pre_tasks:
+    - name: Install dependencies
+      import_tasks: tasks/install-dependencies.yml
     - name: Import discover-gateway-ip.yml
       import_tasks: tasks/discover-gateway-ip.yml
   roles:
@@ -107,7 +109,7 @@
         batch: "{{ inventory_hostname in groups[cluster_name + '_compute'] }}"
         runtime: true
       openhpc_cluster_name: "{{ cluster_name }}"
-      openhpc_slurm_partitions: "{{ openhpc_slurm_partitions }}"
+      openhpc_slurm_partitions: "{{ slurm_partitions }}"
       openhpc_slurm_control_host: "{{ groups[cluster_name + '_login'] | first }}"
 
 - hosts: openstack
