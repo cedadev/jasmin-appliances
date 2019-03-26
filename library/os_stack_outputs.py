@@ -46,7 +46,9 @@ EXAMPLES = '''
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.openstack import openstack_full_argument_spec, openstack_module_kwargs, openstack_cloud_from_module
+from ansible.module_utils.openstack import (openstack_full_argument_spec,
+                                            openstack_module_kwargs,
+                                            openstack_cloud_from_module)
 
 def main():
 
@@ -64,8 +66,10 @@ def main():
             for item in stack.outputs:
                 result[item['output_key']] = item['output_value']
         else:
-            raise sdk.exceptions.OpenStackCloudException('Stack not found.')
-        module.exit_json(changed=False, ansible_facts=dict(openstack_stack_outputs=result))
+            raise sdk.exceptions.OpenStackCloudException(
+                'Stack {} not found.'.format(module.params['stack']))
+        module.exit_json(changed=False,
+            ansible_facts=dict(openstack_stack_outputs=result))
 
     except sdk.exceptions.OpenStackCloudException as e:
         module.fail_json(msg=str(e))
