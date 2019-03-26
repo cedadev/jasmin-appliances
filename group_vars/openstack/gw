@@ -2,7 +2,7 @@
 
 # cluster_fip_uuid and cluster_fip_ip are supplied parameters
 
-cluster_gw_group: "{{ cluster_gw.name }}"
+cluster_gw_group: deploy-gw
 
 cluster_gw:
   name: deploy-gw
