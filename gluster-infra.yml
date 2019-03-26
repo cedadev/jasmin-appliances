@@ -29,6 +29,11 @@
 
 - import_playbook: gluster.yml
 
+- hosts:
+    - gluster_servers
+  tasks:
+    - include: tasks/update.yml
+
 # Reconfigure the stack to remove the gateway bastion
 - hosts: openstack
   roles:

@@ -1,0 +1,27 @@
+# Ansible tasks to update a Slurm compute node after draining jobs.
+
+# Check whether there are any available updates, so we don't drain compute
+# nodes uselessly.
+- name: Check for available updates
+  yum: list=updates update_cache=true
+  register: yumoutput
+  when: cluster_upgrade_system_packages | default(false) | bool
+
+- block:
+  - import_tasks: tasks/drain.yml
+    delegate_to: "{{ groups['login'] | first }}"
+    vars:
+      node_to_drain: "{{ ansible_hostname }}"
+    when: drain | default(true) | bool
+
+  - import_tasks: tasks/update.yml
+
+  - import_tasks: tasks/resume.yml
+    delegate_to: "{{ groups['login'] | first }}"
+    vars:
+      node_to_resume: "{{ ansible_hostname }}"
+    when: drain | default(true) | bool
+  when:
+    - cluster_upgrade_system_packages | default(false) | bool
+    - yumoutput.results|length > 0
+  become: true

@@ -86,6 +86,8 @@
         name: "https://github.com/openhpc/ohpc/releases/download/v1.3.GA/ohpc-release-1.3-1.el7.x86_64.rpm"
         state: present
 
+    - import_tasks: tasks/openhpc-repos.yml
+
     - name: Ensure latest python is present
       yum:
         name: python
@@ -100,3 +102,14 @@
       openhpc_cluster_name: "{{ cluster_name }}"
       openhpc_slurm_partitions: "{{ openhpc_slurm_partitions }}"
       openhpc_slurm_control_host: "{{ groups['login'] | first }}"
+
+- hosts:
+    - compute
+  serial: "{{ concurrent_compute_update | default(1) }}"
+  tasks:
+    - include: tasks/update_compute.yml
+
+- hosts:
+    - login
+  tasks:
+    - include: tasks/update.yml
