@@ -4,6 +4,9 @@
 # for a BeeGFS server
 
 - hosts: openstack
+  pre_tasks:
+    - name: Import discover-gateway-ip.yml
+      import_tasks: tasks/discover-gateway-ip.yml
   roles:
     - role: jasmin.cluster-infra
       cluster_groups: "{{ beegfs_groups + [cluster_gw] }}"

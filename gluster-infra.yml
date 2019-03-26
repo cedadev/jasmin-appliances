@@ -3,6 +3,9 @@
 # using a number of compute node instances, and configure it
 # for a gluster cluster.
 - hosts: openstack
+  pre_tasks:
+    - name: Import discover-gateway-ip.yml
+      import_tasks: tasks/discover-gateway-ip.yml
   roles:
     - role: jasmin.cluster-infra
       cluster_groups: "{{ gluster_groups + [cluster_gw] }}" 
