@@ -1,6 +1,6 @@
 ---
 
-# cluster_gw_fip_id and cluster_gw_fip_ip are supplied parameters
+# cluster_gw_fip_id and cluster_gw_fip_ip are determined by `tasks/discover-gateway-ip.yml` task which takes into account `cluster_fixed_ip` if defined.
 
 cluster_gw_group: ephemeral
 cluster_gw:
