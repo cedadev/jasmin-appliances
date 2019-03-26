@@ -44,11 +44,12 @@ parameters:
     immutable: true
     default: 40
 
-- name: "cluster_fixed_ip"
-  label: "Cluster external IP"
-  description: >
-    The external IP to attach to the master node.
-    If not selected, an IP will be selected to use for deployment and released afterwards.
-  kind: "cloud.ip"
-  required: false
-  immutable: true
+  - name: "cluster_fixed_ip"
+    label: "External IP"
+    description: >
+      The external IP to attach to the master node.
+      If not selected, the cluster will have no permanent external IP.
+      However, an IP must still be available to use for deployment and will be released afterwards.
+    kind: "cloud.ip"
+    required: false
+    immutable: true
