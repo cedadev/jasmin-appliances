@@ -4,6 +4,10 @@
 beegfs_mds_volume_size: 2       # Metadata
 beegfs_oss_volume_size: 10      # Object storage
 
+beegfs_cluster_info:
+  storage_type: "beegfs"
+  beegfs_servers: "$PRIMARY_IPS"
+
 beegfs_groups:
   - "{{ beegfs_group_mds }}"
   - "{{ beegfs_group_oss }}"
@@ -17,13 +21,14 @@ beegfs_group_mds:
   root_volume_size: "{{ beegfs_mds_volume_size }}"
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"
+  info: "{{ beegfs_cluster_info | to_json }}"
 
 beegfs_group_oss:
   name: "oss"
   flavor: "j1.small"
   image: "centos-7-20190104"
   user: "centos"
-  num_nodes: 3
+  num_nodes: "{{ cluster_num_workers }}"
   root_volume_size: "{{ beegfs_oss_volume_size }}"
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"

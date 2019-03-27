@@ -1,0 +1,23 @@
+---
+
+slurm_groups:
+  - "{{ slurm_login }}"
+  - "{{ slurm_compute }}"
+
+slurm_login:
+  name: "login"
+  flavor: "j1.small"
+  num_nodes: 1
+  root_volume_size: 0
+  node_resource: "Cluster::Node" 
+  nodenet_resource: "Cluster::NodeNet1"
+
+slurm_compute:
+  name: "compute"
+  flavor: "j2.tiny"
+  num_nodes: "{{ cluster_num_workers }}"
+  root_volume_size: 0
+  node_resource: "Cluster::Node" 
+  nodenet_resource: "Cluster::NodeNet1"
+
+...

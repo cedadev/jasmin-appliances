@@ -4,6 +4,9 @@
 # for a NFS server 
 
 - hosts: openstack
+  pre_tasks:
+    - name: Import discover-gateway-ip.yml
+      import_tasks: tasks/discover-gateway-ip.yml
   roles:
     - role: jasmin.cluster-infra
       cluster_groups: "{{ nfs_groups + [cluster_gw] }}"
@@ -23,6 +26,11 @@
     - import_tasks: cluster-firewalld.yml 
 
 - import_playbook: nfs.yml
+
+- hosts:
+    - nfs_servers
+  tasks:
+    - include: tasks/update.yml
 
 - hosts: openstack
   roles:

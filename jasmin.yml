@@ -7,6 +7,19 @@
     - role: jasmin.cluster-infra
       cluster_network: "caastest-U-internal"
 
+- hosts: openstack
+  tasks:
+    - block:
+        - name: Get stack outputs
+          os_stack_outputs:
+            stack: "{{ storage_name }}"
+        - name: Export storage information from stack outputs
+          set_fact:
+            storage_stack_info: "{{ openstack_stack_outputs['info'] | select('ne', '') | map('from_json') | selectattr('storage_type', '==', 'nfs') | first }}"
+        - debug:
+            msg: "{{ storage_stack_info }}"
+      when: storage_name is defined
+
 - hosts:
     - cluster
   become: true
@@ -17,15 +30,24 @@
 - hosts:
     - cluster
   become: true  
+  pre_tasks:
+    - block:
+      - name: Define variable to access existing storage stack info
+        set_fact:
+          nfs_stack: "{{ (hostvars[groups['openstack'][0]])['storage_stack_info'] }}"
+      - name: Define variables for NFS role
+        set_fact:
+          nfs_servers: "{{ nfs_stack['nfs_servers'] }}"
+          nfs_export: "{{ nfs_stack['nfs_export'] }}"
+      when: storage_name is defined
   roles:
     - role: resmo.ntp
 
     - role: stackhpc.cluster-nfs
       nfs_enable:
-        server: "{{ inventory_hostname in groups['nfs'] }}"
+        server: "{{ inventory_hostname in (groups['nfs'] | default([])) }}"
         clients: "{{ inventory_hostname in groups['compute'] or inventory_hostname in groups['login'] }}"
-      nfs_server: "{{ groups['nfs'] | first }}"
-
+      nfs_server: "{{ (groups['nfs'] | default(nfs_servers)) | first }}"
 
 - hosts:
     - login
@@ -64,6 +86,8 @@
         name: "https://github.com/openhpc/ohpc/releases/download/v1.3.GA/ohpc-release-1.3-1.el7.x86_64.rpm"
         state: present
 
+    - import_tasks: tasks/openhpc-repos.yml
+
     - name: Ensure latest python is present
       yum:
         name: python
@@ -78,3 +102,14 @@
       openhpc_cluster_name: "{{ cluster_name }}"
       openhpc_slurm_partitions: "{{ openhpc_slurm_partitions }}"
       openhpc_slurm_control_host: "{{ groups['login'] | first }}"
+
+- hosts:
+    - compute
+  serial: "{{ concurrent_compute_update | default(1) }}"
+  tasks:
+    - include: tasks/update_compute.yml
+
+- hosts:
+    - login
+  tasks:
+    - include: tasks/update.yml

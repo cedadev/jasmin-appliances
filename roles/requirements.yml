@@ -14,11 +14,10 @@
 - src: resmo.ntp
 - src: singleplatform-eng.users
 - src: stackhpc.beegfs
-# Temporary location
 - name: stackhpc.gluster-cluster
   src: https://github.com/stackhpc/ansible-role-gluster-cluster.git
-  version: gluster-clients
-- src: stackhpc.openhpc
+- name: stackhpc.openhpc
+  version: v0.3.0
 - src: stackhpc.os-container-infra
 - src: stackhpc.os-config
 - name: stackhpc.cluster-nfs

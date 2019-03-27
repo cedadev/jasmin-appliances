@@ -1,0 +1,694 @@
+[
+  {
+    "inputs": {
+      "token": "", 
+      "project_name": "caastest-U"
+    }, 
+    "name": "token caastest-U bharat", 
+    "asset_type": "credential", 
+    "credential_type": "JASMIN Cloud Token", 
+    "organization": "JASMIN CaaS", 
+    "asset_relation": {
+      "roles": [
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": [
+            "admin"
+          ]
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Use", 
+          "user": []
+        }
+      ]
+    }
+  }, 
+  {
+    "credential_type": "JASMIN Cloud Trustee", 
+    "inputs": {
+      "openstack_trustee_id": "f8d4001b4e33ecdb24a11f3de1a9102275b3b39e7f1b3bad4caf33775d3f8c09", 
+      "openstack_trustee_password": "", 
+      "openstack_trustee_username": "caasctl"
+    }, 
+    "asset_relation": {
+      "roles": [
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": [
+            "admin"
+          ]
+        }, 
+        {
+          "team": [], 
+          "name": "Use", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }
+      ]
+    }, 
+    "asset_type": "credential", 
+    "name": "trusteee caascontrol-U caasctl"
+  }, 
+  {
+    "inputs": {
+      "password": "", 
+      "username": "brtknr", 
+      "project_name": "caastest-U"
+    }, 
+    "description": "Bharat's JASMIN Cloud User Credentials", 
+    "asset_relation": {
+      "roles": [
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": [
+            "admin"
+          ]
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Use", 
+          "user": []
+        }
+      ]
+    }, 
+    "credential_type": "JASMIN Cloud User", 
+    "organization": "JASMIN CaaS", 
+    "asset_type": "credential", 
+    "name": "user caastest-U bharat"
+  }, 
+  {
+    "inputs": {
+      "password": "", 
+      "username": "oneswig", 
+      "project_name": "caastest-U"
+    }, 
+    "description": "Stig Telfer", 
+    "asset_relation": {
+      "roles": [
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": [
+            "admin"
+          ]
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Use", 
+          "user": []
+        }
+      ]
+    }, 
+    "credential_type": "JASMIN Cloud User", 
+    "organization": "JASMIN CaaS", 
+    "asset_type": "credential", 
+    "name": "user caastest-U stig"
+  }, 
+  {
+    "asset_relation": {
+      "extra_credentials": [
+        "user caastest-U bharat"
+      ], 
+      "notification_templates_error": [], 
+      "notification_templates_success": [], 
+      "roles": [
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Execute", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": []
+        }
+      ], 
+      "labels": [], 
+      "schedules": [], 
+      "survey_spec": {
+        "name": "", 
+        "description": "", 
+        "spec": [
+          {
+            "question_name": "Cluster name", 
+            "question_description": "", 
+            "required": true, 
+            "type": "text", 
+            "variable": "cluster_name", 
+            "min": 0, 
+            "max": 1024, 
+            "default": "", 
+            "choices": ""
+          }
+        ]
+      }
+    }, 
+    "description": "Deploy BeeGFS cluster", 
+    "ask_credential_on_launch": true, 
+    "extra_vars": "---\ncluster_name: \"bharat-beegfs\"\ncluster_network: \"caastest-U-internal\"\ncluster_keypair: \"brtknr-33236e18e6285585a7f58f1006f88349\"", 
+    "name": "BeeGFS", 
+    "project": "JASMIN Appliances", 
+    "inventory": "JASMIN OpenStack API", 
+    "asset_type": "job_template", 
+    "survey_enabled": true, 
+    "playbook": "beegfs-infra.yml"
+  }, 
+  {
+    "diff_mode": true, 
+    "name": "Kubernetes", 
+    "ask_credential_on_launch": true, 
+    "extra_vars": "---\ncluster_name: \"k8s\"\ncluster_state: \"present\"\ncluster_network: \"caastest-U-internal\"\ncluster_keypair: \"brtknr-33236e18e6285585a7f58f1006f88349\"\ncluster_upgrade_system_packages: no\ncluster_version: \"1.13\"\ncluster_num_workers: 3", 
+    "asset_relation": {
+      "extra_credentials": [
+        "trusteee caascontrol-U caasctl", 
+        "user caastest-U bharat"
+      ], 
+      "notification_templates_error": [], 
+      "notification_templates_success": [], 
+      "roles": [
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Execute", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": [
+            "admin"
+          ]
+        }
+      ], 
+      "labels": [], 
+      "schedules": [], 
+      "survey_spec": {}
+    }, 
+    "project": "JASMIN Appliances", 
+    "ask_inventory_on_launch": true, 
+    "ask_verbosity_on_launch": true, 
+    "inventory": "JASMIN OpenStack API", 
+    "job_slice_count": 20, 
+    "asset_type": "job_template", 
+    "playbook": "k8s-infra.yml"
+  }, 
+  {
+    "diff_mode": true, 
+    "asset_relation": {
+      "extra_credentials": [
+        "user caastest-U bharat"
+      ], 
+      "notification_templates_error": [], 
+      "notification_templates_success": [], 
+      "roles": [
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Execute", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": [
+            "admin"
+          ]
+        }
+      ], 
+      "labels": [], 
+      "schedules": [], 
+      "survey_spec": {}
+    }, 
+    "description": "Deploy nfs server", 
+    "ask_credential_on_launch": true, 
+    "extra_vars": "---\ncluster_name: \"bharat-nfs\"\ncluster_state: \"present\"\ncluster_network: \"caastest-U-internal\"\ncluster_keypair: \"brtknr-33236e18e6285585a7f58f1006f88349\"", 
+    "name": "NFS", 
+    "project": "JASMIN Appliances", 
+    "ask_inventory_on_launch": true, 
+    "ask_verbosity_on_launch": true, 
+    "inventory": "JASMIN OpenStack API", 
+    "job_slice_count": 20, 
+    "asset_type": "job_template", 
+    "playbook": "nfs-infra.yml"
+  }, 
+  {
+    "diff_mode": true, 
+    "name": "Pangeo", 
+    "ask_credential_on_launch": true, 
+    "extra_vars": "---\ncluster_name: \"k8s\"\ncluster_state: \"present\"\ncluster_network: \"caastest-U-internal\"\ncluster_keypair: \"brtknr-33236e18e6285585a7f58f1006f88349\"\ncluster_upgrade_system_packages: no\ncluster_version: \"1.13\"\ncluster_num_workers: 3\ncluster_fixed_ip: 192.171.139.249\n# Pangeo config\npangeo_hosts: [ \"pangeo.kgz.sh\" ]\npangeo_users: [ \"admin\" ]\npangeo_admin_users: [ \"admin\" ]\npangeo_password: secretnomore", 
+    "asset_relation": {
+      "extra_credentials": [
+        "trusteee caascontrol-U caasctl", 
+        "user caastest-U bharat"
+      ], 
+      "notification_templates_error": [], 
+      "notification_templates_success": [], 
+      "roles": [
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Execute", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }
+      ], 
+      "labels": [], 
+      "schedules": [], 
+      "survey_spec": {}
+    }, 
+    "project": "JASMIN Appliances", 
+    "ask_inventory_on_launch": true, 
+    "ask_verbosity_on_launch": true, 
+    "inventory": "JASMIN OpenStack API", 
+    "job_slice_count": 20, 
+    "asset_type": "job_template", 
+    "playbook": "pangeo-infra.yml"
+  }, 
+  {
+    "name": "Slurm", 
+    "ask_credential_on_launch": true, 
+    "extra_vars": "---\ncluster_name: \"bharat-slurm\"\ncluster_network: \"caastest-U-internal\"\ncluster_keypair: \"brtknr-33236e18e6285585a7f58f1006f88349\"\nstorage_name: \"pierre-nfs\"", 
+    "asset_relation": {
+      "extra_credentials": [
+        "user caastest-U bharat"
+      ], 
+      "notification_templates_error": [], 
+      "notification_templates_success": [], 
+      "roles": [
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Execute", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }
+      ], 
+      "labels": [], 
+      "schedules": [], 
+      "survey_spec": {}
+    }, 
+    "project": "JASMIN Appliances", 
+    "ask_inventory_on_launch": true, 
+    "ask_verbosity_on_launch": true, 
+    "inventory": "JASMIN OpenStack API", 
+    "job_slice_count": 20, 
+    "asset_type": "job_template", 
+    "playbook": "slurm-infra.yml"
+  }, 
+  {
+    "asset_relation": {
+      "notification_templates_error": [], 
+      "notification_templates_success": [], 
+      "roles": [
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Use", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Update", 
+          "user": []
+        }
+      ], 
+      "schedules": []
+    }, 
+    "scm_branch": "master", 
+    "description": "Deployment, scaling and maintenance of Kubernetes clusters.", 
+    "scm_url": "https://github.com/cedadev/jasmin-appliances", 
+    "scm_delete_on_update": true, 
+    "scm_type": "git", 
+    "scm_update_on_launch": true, 
+    "organization": "JASMIN CaaS", 
+    "asset_type": "project", 
+    "name": "JASMIN Appliances"
+  }, 
+  {
+    "injectors": {
+      "env": {
+        "OS_TOKEN": "{{ token }}", 
+        "OS_AUTH_URL": "https://kataifi.sweet.jasmin.ac.uk/v3", 
+        "OS_AUTH_TYPE": "token", 
+        "OS_PROJECT_NAME": "{{ project_name }}", 
+        "OS_PROJECT_DOMAIN_NAME": "jasmin", 
+        "OS_IDENTITY_API_VERSION": "3"
+      }
+    }, 
+    "inputs": {
+      "fields": [
+        {
+          "id": "token", 
+          "type": "string", 
+          "label": "JASMIN token", 
+          "secret": true
+        }, 
+        {
+          "id": "project_name", 
+          "type": "string", 
+          "label": "JASMIN project name", 
+          "secret": false
+        }
+      ], 
+      "required": [
+        "token", 
+        "project_name"
+      ]
+    }, 
+    "kind": "cloud", 
+    "asset_type": "credential_type", 
+    "name": "JASMIN Cloud Token"
+  }, 
+  {
+    "injectors": {
+      "extra_vars": {
+        "openstack_trustee_id": "{{ openstack_trustee_id }}", 
+        "openstack_trustee_password": "{{ openstack_trustee_password }}"
+      }
+    }, 
+    "inputs": {
+      "fields": [
+        {
+          "id": "openstack_trustee_id", 
+          "type": "string", 
+          "label": "JASMIN trustee user_id", 
+          "secret": false
+        }, 
+        {
+          "id": "openstack_trustee_username", 
+          "type": "string", 
+          "label": "JASMIN trustee username", 
+          "secret": false
+        }, 
+        {
+          "id": "openstack_trustee_password", 
+          "type": "string", 
+          "label": "JASMIN password", 
+          "secret": true
+        }
+      ], 
+      "required": [
+        "openstack_trustee_id", 
+        "openstack_trustee_password"
+      ]
+    }, 
+    "kind": "cloud", 
+    "asset_type": "credential_type", 
+    "name": "JASMIN Cloud Trustee"
+  }, 
+  {
+    "injectors": {
+      "env": {
+        "OS_AUTH_URL": "https://kataifi.sweet.jasmin.ac.uk/v3", 
+        "OS_PASSWORD": "{{ password }}", 
+        "OS_USERNAME": "{{ username }}", 
+        "OS_DOMAIN_NAME": "jasmin", 
+        "OS_PROJECT_NAME": "{{ project_name }}", 
+        "OS_IDENTITY_API_VERSION": "3"
+      }
+    }, 
+    "inputs": {
+      "fields": [
+        {
+          "id": "username", 
+          "type": "string", 
+          "label": "JASMIN Username"
+        }, 
+        {
+          "id": "project_name", 
+          "type": "string", 
+          "label": "JASMIN Project Name"
+        }, 
+        {
+          "id": "password", 
+          "type": "string", 
+          "label": "JASMIN Password", 
+          "secret": true
+        }
+      ], 
+      "required": [
+        "username", 
+        "password", 
+        "project_name"
+      ]
+    }, 
+    "kind": "cloud", 
+    "asset_type": "credential_type", 
+    "name": "JASMIN Cloud User"
+  }, 
+  {
+    "username": "mpryor", 
+    "first_name": "Matthew", 
+    "last_name": "Pryor", 
+    "asset_type": "user", 
+    "email": "matt.pryor@stfc.ac.uk"
+  }, 
+  {
+    "username": "admin", 
+    "first_name": "", 
+    "last_name": "", 
+    "email": "root@localhost", 
+    "is_superuser": true, 
+    "asset_type": "user"
+  }, 
+  {
+    "asset_relation": {
+      "roles": [
+        {
+          "team": [], 
+          "name": "Credential Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Member", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Execute", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Notification Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Workflow Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Job Template Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Project Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Auditor", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Inventory Admin", 
+          "user": []
+        }
+      ]
+    }, 
+    "asset_type": "organization", 
+    "name": "JASMIN CaaS"
+  }, 
+  {
+    "asset_relation": {
+      "roles": [
+        {
+          "team": [], 
+          "name": "Credential Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Member", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Execute", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": [
+            "mpryor"
+          ]
+        }, 
+        {
+          "team": [], 
+          "name": "Notification Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Workflow Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Job Template Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Project Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Auditor", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Inventory Admin", 
+          "user": []
+        }
+      ]
+    }, 
+    "asset_type": "organization", 
+    "name": "UKRI Demo"
+  }, 
+  {
+    "description": "JASMIN OpenStack API", 
+    "variables": "cloud_provider: openstack\ncluster_upgrade_system_packages: false\nnfs_client_mnt_point: /jasmin", 
+    "asset_type": "inventory", 
+    "organization": "JASMIN CaaS", 
+    "asset_relation": {
+      "inventory_source": [
+        {
+          "source_vars": "SCM_EXCLUDE_EMPTY_GROUPS: false", 
+          "name": "openstack_awx.ini", 
+          "overwrite_vars": true, 
+          "source_project": "JASMIN Appliances", 
+          "source_path": "openstack_awx.ini", 
+          "source": "scm", 
+          "schedules": [], 
+          "overwrite": true, 
+          "update_on_launch": true
+        }
+      ], 
+      "host": [], 
+      "group": [], 
+      "roles": [
+        {
+          "team": [], 
+          "name": "Ad Hoc", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Admin", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Read", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Use", 
+          "user": []
+        }, 
+        {
+          "team": [], 
+          "name": "Update", 
+          "user": []
+        }
+      ]
+    }, 
+    "name": "JASMIN OpenStack API"
+  }
+]
