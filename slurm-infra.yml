@@ -23,7 +23,7 @@
           - nfs_clients                 # Make this conditional?
           - beegfs_clients              # Make this conditional?
           - gluster_clients             # Make this conditional?
-      with_items: "{{ groups['cluster'] }}"
+      with_items: "{{ groups['login'] + groups['compute'] }}"
 
 - hosts: openstack
   tasks:
