@@ -22,7 +22,6 @@
   tasks:
     - set_fact:
         beegfs_name: "{{ cluster_name }}"
-    - import_tasks: tasks/cluster-hosts.yml
     - import_tasks: tasks/cluster-firewalld.yml
 
 - import_playbook: playbooks/beegfs.yml
