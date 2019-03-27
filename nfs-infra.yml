@@ -1,47 +1,37 @@
 ---
+
 # This playbook uses the Ansible OpenStack modules to create a cluster
 # using a number of baremetal compute node instances, and configure it
-# for a NFS server 
+# for a NFS server
 
 - hosts: openstack
-  pre_tasks:
-    - name: Import discover-gateway-ip.yml
-      import_tasks: tasks/discover-gateway-ip.yml
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_groups: "{{ nfs_groups + [cluster_gw] }}"
-      cluster_tag: "{{ cluster_type.storage }}"
   tasks:
+    - import_tasks: tasks/install-dependencies.yml
+    - import_tasks: tasks/infra/provision.yml
+      vars:
+        cluster_groups: "{{ nfs_groups }}"
+        cluster_tag: "{{ cluster_type.storage }}"
     - name: add nfs cluster to nfs_servers group
       add_host:
-       name: "{{ item }}"
-       groups: nfs_servers
+        name: "{{ item }}"
+        groups: nfs_servers
       loop: "{{ groups['server'] }}"
 
-- hosts:
-    - cluster
+- hosts: cluster
   become: true
   tasks:
-    - import_tasks: cluster-hosts.yml 
-    - import_tasks: cluster-firewalld.yml 
+    - import_tasks: cluster-hosts.yml
+    - import_tasks: cluster-firewalld.yml
 
 - import_playbook: nfs.yml
 
-- hosts:
-    - nfs_servers
+- hosts: nfs_servers
   tasks:
     - include: tasks/update.yml
 
 - hosts: openstack
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_groups: "{{ nfs_groups }}"
-      cluster_tag: "{{ cluster_type.storage }}"
-      cluster_stack_update_only: true
-
-  # Hack pending outcome of:
-  # - https://github.com/ansible/ansible/pull/53757
-  # - https://review.openstack.org/643195
   tasks:
-    - name: Fixup stack tags
-      command: "openstack stack update --existing --tags {{ cluster_type.storage }} {{ cluster_name }}"
+    - import_tasks: tasks/infra/cleanup-gateway.yml
+      vars:
+        cluster_groups: "{{ nfs_groups }}"
+        cluster_tag: "{{ cluster_type.storage }}"
