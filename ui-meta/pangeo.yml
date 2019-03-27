@@ -44,23 +44,11 @@ parameters:
     immutable: true
     default: 40
 
-  - name: "pangeo_hosts"
-    label: "Pangeo DNS name"
-    description: "List of DNS names to resolve to Pangeo service via cluster fixed IP."
-    kind: "list"
-    default: [""]
-
-  - name: "pangeo_users"
-    label: "Pangeo users"
-    description: "List of users to initially white-list for access."
-    kind: "list"
-    default: ["admin"]
-    
-  - name: "pangeo_admin_users"
-    label: "Pangeo admin users"
-    description: "List of admin users for the Pangeo cluster."
-    kind: "list"
-    default: ["admin"]
+  - name: "pangeo_username"
+    label: "Pangeo cluster initial user with admin privileges"
+    description: "Username of the Pangeo cluster adminstrator."
+    kind: "string"
+    default: "admin"
     
   - name: "pangeo_password"
     label: "Pangeo cluster password"
