@@ -1,0 +1,11 @@
+name: "nfs"
+label: "NFS"
+description: "NFS storage server."
+
+parameters:
+  - name: "nfs_volume_size"
+    label: "Volume size"
+    description: "NFS storage server volume size."
+    kind: "integer"
+    options:
+      min: 10
