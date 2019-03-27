@@ -3,8 +3,8 @@
 # for a BeeGFS server 
 
 - hosts:
-    -  beegfs_servers
-    -  beegfs_clients
+    -  beegfs_servers:&cluster
+    -  beegfs_clients:&cluster
   roles:
     # Note: The BeeGFS clients are likely to be drawn from across a multi-stack
     # platform deployment. This playbook assumes the existence of a meta-group,
@@ -12,16 +12,15 @@
     - role: stackhpc.beegfs
       beegfs_enable:
         admon: false
-        mgmt: "{{ cluster_name+'_mds' in groups and inventory_hostname in groups[cluster_name + '_mds'] }}"
-        meta: "{{ cluster_name+'_mds' in groups and inventory_hostname in groups[cluster_name + '_mds'] }}"
-        oss: "{{ cluster_name+'_oss' in groups and inventory_hostname in groups[cluster_name + '_oss'] }}"
-        tuning: "{{ cluster_name+'_oss' in groups and inventory_hostname in groups[cluster_name + '_oss'] }}"
+        mgmt: "{{ 'mds' in groups and inventory_hostname in groups['mds'] }}"
+        meta: "{{ 'mds' in groups and inventory_hostname in groups['mds'] }}"
+        oss: "{{ 'oss' in groups and inventory_hostname in groups['oss'] }}"
+        tuning: "{{ 'oss' in groups and inventory_hostname in groups['oss'] }}"
         client: "{{ 'beegfs_clients' in groups and inventory_hostname in groups['beegfs_clients'] }}"
       beegfs_oss:
       - dev: "/dev/sdb"
         port: 8003
-      # FIXME: doesn't work yet...
-      beegfs_mgmt_host: "{{ cluster_name+'_mds' in groups | ternary (groups[cluster_name + '_mds'], hostvars[groups['openstack'][0]].storage_stack_info[storage_servers_group]) | first }}"
+      beegfs_mgmt_host: "{{ groups['mds'] | first }}"
       beegfs_client:
       - path: "{{ jasmin_homedir }}"
         port: 8004
