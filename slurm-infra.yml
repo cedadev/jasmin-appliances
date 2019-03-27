@@ -34,7 +34,6 @@
 - hosts: cluster
   become: true
   tasks:
-    - import_tasks: tasks/cluster-hosts.yml 
     - import_tasks: tasks/cluster-firewalld.yml 
 
 - hosts: cluster
@@ -51,6 +50,11 @@
   when:
     - hostvars.localhost.storage_type is defined
     - hostvars.localhost.storage_type == 'gluster'
+
+- import_playbook: beegfs.yml
+  when:
+    - hostvars.localhost.storage_type is defined
+    - hostvars.localhost.storage_type == 'beegfs'
 
 - hosts:
     - "login"
