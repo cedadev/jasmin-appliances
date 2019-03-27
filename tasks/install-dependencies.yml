@@ -5,11 +5,6 @@
     ansible_venv_path: "{{ lookup('env', 'ANSIBLE_VENV_PATH') }}"
 
 - block:
-    - name: Ensure python-jinja2 is removed from system since this conflicts with pip installed version.
-      yum:
-        name: python-jinja2
-        state: absent
-
     - name: Ensure yum dependencies are installed
       yum:
         name:
