@@ -3,7 +3,7 @@
     stack: "{{ storage_name }}"
 - name: Export storage information from stack outputs
   set_fact:
-    storage_stack_info: "{{ openstack_stack_outputs['info'] | select('ne', '') | map('from_json') | selectattr('storage_type', 'defined') | first }}"
+    storage_stack_info: "{{ openstack_stack_outputs['info'] | reject('equalto', '') | map('from_json') | selectattr('storage_type', 'defined') | first }}"
 - set_fact:
     storage_servers_group: "{{ storage_stack_info['storage_type'] }}_servers"
 - set_fact:
