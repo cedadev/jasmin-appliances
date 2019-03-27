@@ -28,6 +28,10 @@
 
 - import_playbook: beegfs.yml
 
+- hosts: beegfs_servers
+  tasks:
+    - include: tasks/update.yml
+
 - hosts: openstack
   roles:
     - role: jasmin.cluster-infra

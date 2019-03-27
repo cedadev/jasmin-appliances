@@ -1,25 +1,25 @@
 name: "kubernetes"
 label: "Kubernetes"
-description: "Single-master Kubernetes cluster using kubeadm"
+description: "Single-master Kubernetes cluster using kubeadm."
 
 parameters:
   - name: "cluster_version"
     label: "Version"
-    description: "The Kubernetes version to use"
+    description: "The Kubernetes version to use."
     kind: "choice"
     options:
       choices: ["1.12", "1.13"]
 
   - name: "cluster_num_workers"
     label: "Worker nodes"
-    description: "The number of worker nodes in the cluster"
+    description: "The number of worker nodes in the cluster."
     kind: "integer"
     options:
       min: 1
 
   - name: "cluster_master_flavor"
     label: "Master size"
-    description: "The size to use for the master node"
+    description: "The size to use for the master node."
     kind: "cloud.size"
     options:
       min_cpus: 2
@@ -28,7 +28,7 @@ parameters:
 
   - name: "cluster_worker_flavor"
     label: "Worker size"
-    description: "The size to use for the worker nodes"
+    description: "The size to use for the worker nodes."
     kind: "cloud.size"
     options:
       min_cpus: 2
@@ -37,9 +37,19 @@ parameters:
 
   - name: "cluster_root_volume_size"
     label: "Root volume size (GB)"
-    description: "The size of the root volume of cluster nodes"
+    description: "The size of the root volume of cluster nodes."
     kind: "integer"
     options:
       min: 10
     immutable: true
     default: 40
+
+  - name: "cluster_fixed_ip"
+    label: "External IP"
+    description: >
+      The external IP to attach to the master node.
+      If not selected, the cluster will have no permanent external IP.
+      However, an IP must still be available to use for deployment and will be released afterwards.
+    kind: "cloud.ip"
+    required: false
+    immutable: true

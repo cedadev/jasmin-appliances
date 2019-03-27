@@ -27,7 +27,7 @@ beegfs_group_mds:
 
 beegfs_group_oss:
   name: "oss"
-  flavor: "j1.small"
+  flavor: "j2.small"
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: "{{ beegfs_oss_num_nodes }}"
