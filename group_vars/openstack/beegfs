@@ -28,7 +28,7 @@ beegfs_group_oss:
   flavor: "j1.small"
   image: "centos-7-20190104"
   user: "centos"
-  num_nodes: 3
+  num_nodes: "{{ cluster_num_workers }}"
   root_volume_size: "{{ beegfs_oss_volume_size }}"
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"
