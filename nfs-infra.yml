@@ -16,6 +16,7 @@
         name: "{{ item }}"
         groups: nfs_servers
       loop: "{{ groups['server'] }}"
+      when: "'server' in groups"
 
 - hosts: cluster
   become: true
