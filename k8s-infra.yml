@@ -6,14 +6,16 @@
 
 # Provision the cluster infrastructure
 - hosts: openstack
-  pre_tasks:
+  tasks:
     - import_tasks: tasks/install-dependencies.yml
-    - import_tasks: tasks/discover-gateway-ip.yml
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_gw_group: "{{ k8s_gw_group if cluster_fixed_ip is defined else cluster_gw.name }}"
-      cluster_groups: "{{ k8s_groups_fip if cluster_fixed_ip is defined else k8s_groups_no_fip + [cluster_gw] }}"
-  post_tasks:
+    - import_tasks: tasks/infra/provision.yml
+      vars:
+        # These are the groups to use when no fixed IP is given
+        cluster_groups: "{{ k8s_groups_no_ip }}"
+        # This is the gateway group to use when a fixed IP is given
+        cluster_gw_group_fixed_ip: "{{ k8s_gw_group_name }}"
+        # These are the groups to use when a fixed IP is given
+        cluster_groups_fixed_ip: "{{ k8s_groups_fixed_ip }}"
     # Generate keystone trust token
     - import_tasks: tasks/os-keystone-trust.yml
       when: cluster_state | default('present') | lower == 'present'
@@ -39,12 +41,9 @@
     - jasmin.k8s/kubernetes_dashboard
   become: yes
 
-# Delete the bastion
+# Delete the gateway if required
 - hosts: openstack
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_stack_update_only: true
-      cluster_groups: "{{ k8s_groups_no_fip }}"
-      when:
-        - cluster_fixed_ip is not defined
-        - cluster_state | default('present') | lower == 'present'
+  tasks:
+    - import_tasks: tasks/infra/cleanup-gateway.yml
+      vars:
+        cluster_groups: "{{ k8s_groups_no_ip }}"

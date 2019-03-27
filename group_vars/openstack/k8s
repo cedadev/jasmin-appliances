@@ -18,12 +18,12 @@ k8s_group_workers:
   flavor: "{{ cluster_worker_flavor | default('j3.medium') }}"
   root_volume_size: 0
 
-k8s_groups_fip:
+k8s_groups_fixed_ip:
   - "{{ k8s_group_masters | combine(cluster_gw_fip_mixin) }}"
   - "{{ k8s_group_workers }}"
 
-k8s_groups_no_fip:
+k8s_groups_no_ip:
   - "{{ k8s_group_masters }}"
   - "{{ k8s_group_workers }}"
 
-k8s_gw_group: kube-masters
+k8s_gw_group_name: kube-masters

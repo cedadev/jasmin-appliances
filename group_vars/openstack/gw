@@ -1,11 +1,9 @@
 ---
 
-# cluster_fip_uuid and cluster_fip_ip are supplied parameters
+deploy_gw_group_name: "deploy-gw"
 
-cluster_gw_group: deploy-gw
-
-cluster_gw:
-  name: deploy-gw
+deploy_gw_group:
+  name: "{{ deploy_gw_group_name }}"
   user: "{{ cluster_deploy_user }}"
   node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP"
