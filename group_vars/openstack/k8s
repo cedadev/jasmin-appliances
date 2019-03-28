@@ -1,7 +1,9 @@
 ---
 
+k8s_gw_group_name: "kube-masters"
+
 k8s_group_masters:
-  name: kube-masters
+  name: "{{ k8s_gw_group_name }}"
   user: "{{ cluster_deploy_user }}"
   node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
@@ -10,7 +12,7 @@ k8s_group_masters:
   root_volume_size: 0
 
 k8s_group_workers:
-  name: kube-workers
+  name: "kube-workers"
   user: "{{ cluster_deploy_user }}"
   node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
@@ -25,5 +27,3 @@ k8s_groups_fixed_ip:
 k8s_groups_no_ip:
   - "{{ k8s_group_masters }}"
   - "{{ k8s_group_workers }}"
-
-k8s_gw_group_name: kube-masters

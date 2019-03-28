@@ -16,6 +16,8 @@
         cluster_gw_group_fixed_ip: "{{ k8s_gw_group_name }}"
         # These are the groups to use when a fixed IP is given
         cluster_groups_fixed_ip: "{{ k8s_groups_fixed_ip }}"
+        # Tag to assign to the cluster
+        cluster_tag: "{{ cluster_type.kubernetes }}"
     # Generate keystone trust token
     - import_tasks: tasks/os-keystone-trust.yml
       when: cluster_state | default('present') | lower == 'present'
@@ -47,3 +49,4 @@
     - import_tasks: tasks/infra/cleanup-gateway.yml
       vars:
         cluster_groups: "{{ k8s_groups_no_ip }}"
+        cluster_tag: "{{ cluster_type.kubernetes }}"
