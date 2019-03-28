@@ -1,22 +1,21 @@
 ---
+
 # This playbook uses the Ansible OpenStack modules to create a cluster
 # using a number of compute node instances, and configure it
 # for a BeeGFS server
 
 - hosts: openstack
-  pre_tasks:
-    - name: Import discover-gateway-ip.yml
-      import_tasks: tasks/discover-gateway-ip.yml
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_groups: "{{ beegfs_groups + [cluster_gw] }}"
-      cluster_tag: "{{ cluster_type.storage }}"
   tasks:
-    - name: add beegfs cluster to beegfs_servers group
+    - import_tasks: tasks/install-dependencies.yml
+    - import_tasks: tasks/infra/provision.yml
+      vars:
+        cluster_groups: "{{ beegfs_groups }}"
+        cluster_tag: "{{ cluster_type.storage }}"
+    - name: Add servers to beegfs_servers group
       add_host:
-       name: "{{ item }}"
-       groups: beegfs_servers
-      loop: "{{ groups['mds'] + groups['oss'] }}"
+        name: "{{ item }}"
+        groups: beegfs_servers
+      loop: "{{ groups.get('mds', []) + groups.get('oss', []) }}"
 
 - hosts: beegfs_servers
   become: true
@@ -33,8 +32,8 @@
     - include: tasks/update.yml
 
 - hosts: openstack
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_groups: "{{ beegfs_groups }}"
-      cluster_tag: "{{ cluster_type.storage }}"
-      cluster_stack_update_only: true
+  tasks:
+    - import_tasks: tasks/infra/cleanup-gateway.yml
+      vars:
+        cluster_groups: "{{ beegfs_groups }}"
+        cluster_tag: "{{ cluster_type.storage }}"
