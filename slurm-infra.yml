@@ -30,14 +30,6 @@
     - name: Import configuration from storage stack
       import_tasks: tasks/storage_stack.yml
       when: storage_name is defined
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_name: "{{ nfs_name }}"
-      cluster_groups: "{{ nfs_groups }}"
-      cluster_deploy_user: "{{ nfs_deploy_user }}"
-      cluster_gw_group: "{{ slurm_gw_group_name }}"
-      cluster_tag: "{{ nfs_tag }}"
-      when: storage_name is not defined
 
 - hosts: cluster
   become: true
