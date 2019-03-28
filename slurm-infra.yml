@@ -39,15 +39,13 @@
       cluster_tag: "{{ nfs_tag }}"
       when: storage_name is not defined
 
-- hosts:
-    - cluster
+- hosts: cluster
   become: true
   tasks:
     - import_tasks: cluster-hosts.yml 
     - import_tasks: cluster-firewalld.yml 
 
-- hosts:
-    - cluster
+- hosts: cluster
   become: true  
   roles:
     - role: resmo.ntp
@@ -65,7 +63,7 @@
 - hosts:
     - "login"
     - "compute"
-  become: yes
+  become: true
   pre_tasks:
 
     - name: Ensure user home dir root exists
@@ -91,7 +89,7 @@
 - hosts:
     - "{{ cluster_name }}_login"
     - "{{ cluster_name }}_compute"
-  become: yes
+  become: true
   pre_tasks:
 
     - name: Ensure the OpenHPC package repo rpm is present
@@ -114,10 +112,16 @@
       openhpc_slurm_partitions: "{{ slurm_partitions }}"
       openhpc_slurm_control_host: "{{ groups[cluster_name + '_login'] | first }}"
 
+# Add user creation tool `sladduser` to the login node for admin users
+- hosts: "{{ cluster_name }}_login"
+  become: true
+  tasks:
+    - import_tasks: tasks/slurm/install-sladduser.yml
+
 # Delete the gateway if required
 - hosts: openstack
   tasks:
     - import_tasks: tasks/infra/cleanup-gateway.yml
       vars:
         cluster_tag: "{{ cluster_type.slurm }}"
-        cluster_groups: "{{ slrum_groups_no_ip }}"
+        cluster_groups: "{{ slurm_groups_no_ip }}"

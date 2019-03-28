@@ -44,11 +44,3 @@
       cluster_groups: "{{ gluster_groups }}" 
       cluster_tag: "{{ cluster_type.storage }}"
       cluster_stack_update_only: true
-
-  # Hack pending outcome of:
-  # - https://github.com/ansible/ansible/pull/53757
-  # - https://review.openstack.org/643195
-  tasks:
-    - name: Fixup stack tags
-      command: "openstack stack update --existing --tags {{ cluster_type.storage }} {{ cluster_name }}"
-
