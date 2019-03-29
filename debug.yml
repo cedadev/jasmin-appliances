@@ -1,7 +1,0 @@
-- hosts:
-    - openstack
-  tasks:
-    - debug:
-        var: groups
-    - debug:
-        var: hostvars[groups['nfs_servers'] | first]
