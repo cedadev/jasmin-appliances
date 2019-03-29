@@ -1,5 +1,5 @@
 - hosts:
-    - nfs_servers
+    - openstack
   tasks:
     - debug:
         var: groups
