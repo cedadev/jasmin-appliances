@@ -16,6 +16,8 @@
         name: "{{ item }}"
         groups: nfs_servers
       loop: "{{ groups.get('server', []) }}"
+    - name: Load nfs_servers variables
+      include_vars: group_vars/nfs_servers
 
 - hosts: cluster
   become: true
