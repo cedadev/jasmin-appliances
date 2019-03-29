@@ -56,8 +56,14 @@ $ ansible-playbook -i inventory nfs-infra.yml \
     -e @config/auth.yml
 ```
 
-## Backing up tower-cli
+## Backing up and restoring AWX configuration using tower-cli
+
+To backup:
 
     tower-cli receive --all > awx/backup.json
+
+To restore:
+
+    tower-cli send awx/backup.json
 
 [caas]: https://github.com/cedadev/jasmin-cluster-as-a-service/projects/1

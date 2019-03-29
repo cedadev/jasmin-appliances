@@ -1,54 +1,42 @@
 ---
+
 # This playbook uses the Ansible OpenStack modules to create a cluster
 # using a number of compute node instances, and configure it
 # for a gluster cluster.
+
 - hosts: openstack
-  pre_tasks:
-    - name: Import discover-gateway-ip.yml
-      import_tasks: tasks/discover-gateway-ip.yml
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_groups: "{{ gluster_groups + [cluster_gw] }}" 
-      cluster_tag: "{{ cluster_type.storage }}"
   tasks:
-    - name: add gluster cluster to gluster_servers group
+    - import_tasks: tasks/install-dependencies.yml
+    - import_tasks: tasks/infra/provision.yml
+      vars:
+        cluster_groups: "{{ gluster_groups }}"
+        cluster_tag: "{{ cluster_type.storage }}"
+    - name: Add servers to gluster_servers group
       add_host:
         name: "{{ item }}"
         groups: gluster_servers
-      loop: "{{ groups['server'] }}"
+      loop: "{{ groups.get('server', []) }}"
 
-- hosts:
-    - cluster
+- hosts: cluster
   become: true
   tasks:
     - import_tasks: cluster-hosts.yml 
     - import_tasks: cluster-firewalld.yml
 
-- hosts:
-    - cluster
+- hosts: cluster
   become: true  
   roles:
     - role: resmo.ntp
 
-- import_playbook: gluster.yml
+- import_playbook: playbooks/gluster.yml
 
-- hosts:
-    - gluster_servers
+- hosts: gluster_servers
   tasks:
     - include: tasks/update.yml
 
-# Reconfigure the stack to remove the gateway bastion
 - hosts: openstack
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_groups: "{{ gluster_groups }}" 
-      cluster_tag: "{{ cluster_type.storage }}"
-      cluster_stack_update_only: true
-
-  # Hack pending outcome of:
-  # - https://github.com/ansible/ansible/pull/53757
-  # - https://review.openstack.org/643195
   tasks:
-    - name: Fixup stack tags
-      command: "openstack stack update --existing --tags {{ cluster_type.storage }} {{ cluster_name }}"
-
+    - import_tasks: tasks/infra/cleanup-gateway.yml
+      vars:
+        cluster_groups: "{{ gluster_groups }}"
+        cluster_tag: "{{ cluster_type.storage }}"
