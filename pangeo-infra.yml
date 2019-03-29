@@ -6,5 +6,7 @@
 - hosts: kube-masters
   roles:
     - role: jasmin.pangeo-helm
+      pangeo_admin_users: ["{{ pangeo_username }}"]
+      pangeo_users: ["{{ pangeo_username }}"]
   become: yes
 ...

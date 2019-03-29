@@ -1,0 +1,17 @@
+name: "slurm"
+label: "Slurm"
+description: "Slurm OpenHPC cluster."
+
+parameters:
+  - name: "cluster_num_workers"
+    label: "Worker nodes"
+    description: "The number of worker nodes in the cluster."
+    kind: "integer"
+    options:
+      min: 1
+
+  - name: "storage_name"
+    label: "Storage service name"
+    description: "Name of the storage server attach to this cluster"
+    kind: "string"
+    default: ""
