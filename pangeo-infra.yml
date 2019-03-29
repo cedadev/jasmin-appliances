@@ -1,7 +1,6 @@
 ---
+# Reuse Kubernetes playbook to create a cluster
 - import_playbook: k8s-infra.yml
-  vars:
-    cluster_gw_group: kube-masters
 
 # Install addons via the master
 - hosts: kube-masters

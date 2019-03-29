@@ -3,16 +3,18 @@
 # using a number of baremetal compute node instances, and configure it
 # for a SLURM partition
 - hosts: openstack
-  pre_tasks:
-    - name: Install dependencies
-      import_tasks: tasks/install-dependencies.yml
-    - name: Import discover-gateway-ip.yml
-      import_tasks: tasks/discover-gateway-ip.yml
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_groups: "{{ slurm_groups + [cluster_gw] }}"
-      cluster_tag: "{{ cluster_type.slurm }}"
-  post_tasks:
+  tasks:
+    - import_tasks: tasks/install-dependencies.yml
+    - import_tasks: tasks/infra/provision.yml
+      vars:
+        # These are the groups to use when no fixed IP is given
+        cluster_groups: "{{ slurm_groups_no_ip }}"
+        # This is the gateway group to use when a fixed IP is given
+        cluster_gw_group_fixed_ip: "{{ slurm_gw_group_name }}"
+        # These are the groups to use when a fixed IP is given
+        cluster_groups_fixed_ip: "{{ slurm_groups_fixed_ip }}"
+        # Tag to assign to  the cluster
+        cluster_tag: "{{ cluster_type.slurm }}"
     - name: Add provisioned nodes to groups for their cluster roles
       add_host:
         name: "{{ item }}"
@@ -28,14 +30,6 @@
     - name: Import configuration from storage stack
       import_tasks: tasks/storage_stack.yml
       when: storage_name is defined
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_name: "{{ nfs_name }}"
-      cluster_groups: "{{ nfs_groups }}"
-      cluster_deploy_user: "{{ nfs_deploy_user }}"
-      cluster_gw_group: "{{ slurm_gw_group }}"
-      cluster_tag: "{{ nfs_tag }}"
-      when: storage_name is not defined
 
 - hosts: cluster
   become: true
@@ -110,14 +104,16 @@
       openhpc_slurm_partitions: "{{ slurm_partitions }}"
       openhpc_slurm_control_host: "{{ groups[cluster_name + '_login'] | first }}"
 
+# Add user creation tool `sladduser` to the login node for admin users
 - hosts: "{{ cluster_name }}_login"
   become: true
   tasks:
     - import_tasks: tasks/slurm/install-sladduser.yml
 
+# Delete the gateway if required
 - hosts: openstack
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_groups: "{{ slurm_groups }}"
-      cluster_tag: "{{ cluster_type.slurm }}"
-      cluster_stack_update_only: true
+  tasks:
+    - import_tasks: tasks/infra/cleanup-gateway.yml
+      vars:
+        cluster_tag: "{{ cluster_type.slurm }}"
+        cluster_groups: "{{ slurm_groups_no_ip }}"
