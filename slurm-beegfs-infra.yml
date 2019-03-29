@@ -25,8 +25,8 @@
     - cluster
   become: true
   tasks:
-    - import_tasks: cluster-hosts.yml 
-    - import_tasks: cluster-firewalld.yml 
+    - import_tasks: tasks/cluster-hosts.yml 
+    - import_tasks: tasks/cluster-firewalld.yml 
 
 - hosts:
     - cluster
