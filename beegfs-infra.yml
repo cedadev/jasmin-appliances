@@ -25,7 +25,7 @@
     - import_tasks: cluster-hosts.yml
     - import_tasks: cluster-firewalld.yml
 
-- import_playbook: beegfs.yml
+- import_playbook: playbooks/beegfs.yml
 
 - hosts: beegfs_servers
   tasks:
