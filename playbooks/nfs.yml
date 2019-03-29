@@ -26,6 +26,14 @@
     - name: Rebuild initramfs
       command: dracut -f
 
+- hosts:
+    - nfs_servers:&cluster
+  tasks:
+    - debug:
+        var: groups
+    - debug:
+        var: hostvars[groups['nfs_servers'] | first]
+
 - hosts: cluster
   roles:
     # Note: The NFS clients are likely to be drawn from across a multi-node
