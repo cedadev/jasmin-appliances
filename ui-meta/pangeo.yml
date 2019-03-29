@@ -45,13 +45,13 @@ parameters:
     default: 40
 
   - name: "pangeo_username"
-    label: "Pangeo cluster initial user with admin privileges"
+    label: "Admin username"
     description: "Username of the Pangeo cluster adminstrator."
     kind: "string"
     default: "admin"
     
   - name: "pangeo_password"
-    label: "Pangeo cluster password"
+    label: "Cluster password"
     description: "Default password for the Pangeo cluster for all users."
-    kind: "string"
+    kind: "secret"
     default: "secretnomore"
