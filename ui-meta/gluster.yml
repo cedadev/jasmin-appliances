@@ -1,0 +1,18 @@
+name: "gluster"
+label: "Gluster"
+description: "Gluster storage cluster."
+
+parameters:
+  - name: "gluster_volume_size"
+    label: "Volume size"
+    description: "Gluster storage server volume size per node."
+    kind: "integer"
+    options:
+      min: 10
+
+  - name: "gluster_num_nodes"
+    label: "Number of storage nodes"
+    description: "Number of Gluster storage server nodes."
+    kind: "integer"
+    options:
+      min: 3

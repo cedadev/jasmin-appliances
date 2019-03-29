@@ -17,7 +17,7 @@ gluster_group_servers:
   flavor: "j1.small"
   image: "centos-7-20190104"
   user: "centos"
-  num_nodes: 3
+  num_nodes: "{{ gluster_num_nodes }}"
   root_volume_size: "{{ gluster_volume_size }}"
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"

@@ -22,6 +22,7 @@
 - src: stackhpc.os-config
 - name: stackhpc.cluster-nfs
   src: https://github.com/stackhpc/ansible-role-cluster-nfs
+  version: v19.1.1
 - name: stackhpc.cluster-infra
   src: https://github.com/stackhpc/ansible-role-cluster-infra
   version: newton-backport
