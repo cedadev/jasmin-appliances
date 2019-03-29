@@ -15,5 +15,4 @@ parameters:
     description: "Number of Gluster storage server nodes."
     kind: "integer"
     options:
-      min: 3
-      max: 3
+      min: 1
