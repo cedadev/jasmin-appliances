@@ -1,0 +1,7 @@
+- hosts:
+    - nfs_servers
+  tasks:
+    - debug:
+        var: groups
+    - debug:
+        var: hostvars[groups['nfs_servers'] | first]
