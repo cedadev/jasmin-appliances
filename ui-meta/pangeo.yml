@@ -1,7 +1,7 @@
 name: "Pangeo"
 label: "Pangeo"
 description: "The Pangeo software stack running on Kubernetes."
-logo: "https://raw.githubusercontent.com/pangeo-data/branding/master/logo/pangeo_card_green.png"
+logo: "https://github.com/pangeo-data/branding/blob/master/logo/pangeo_simple_logo.png"
 
 parameters:
   - name: "cluster_version"
