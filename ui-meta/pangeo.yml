@@ -1,10 +1,11 @@
 name: "Pangeo"
 label: "Pangeo"
-description: "Single-master Kubernetes cluster with Pangeo."
+description: "The Pangeo software stack running on Kubernetes."
+logo: "https://raw.githubusercontent.com/pangeo-data/branding/master/logo/pangeo_card_green.png"
 
 parameters:
   - name: "cluster_version"
-    label: "Version"
+    label: "Kubernetes version"
     description: "The Kubernetes version to use."
     kind: "choice"
     options:
@@ -31,8 +32,8 @@ parameters:
     description: "The size to use for the worker nodes."
     kind: "cloud.size"
     options:
-      min_cpus: 2
-      min_ram: 2048
+      min_cpus: 4
+      min_ram: 8192
     immutable: true
 
   - name: "cluster_root_volume_size"
@@ -44,14 +45,24 @@ parameters:
     immutable: true
     default: 40
 
+  - name: "cluster_fixed_ip"
+    label: "External IP"
+    description: |
+      The external IP to attach to the master node.
+
+      On successful deployment, the Pangeo interface will be available at this IP.
+    kind: "cloud.ip"
+    immutable: true
+
   - name: "pangeo_username"
-    label: "Pangeo cluster initial user with admin privileges"
+    label: "Admin username"
     description: "Username of the Pangeo cluster adminstrator."
     kind: "string"
     default: "admin"
-    
+
   - name: "pangeo_password"
-    label: "Pangeo cluster password"
-    description: "Default password for the Pangeo cluster for all users."
+    label: "Admin password"
+    description: "Password for the Pangeo cluster."
     kind: "string"
-    default: "secretnomore"
+    options:
+      secret: true

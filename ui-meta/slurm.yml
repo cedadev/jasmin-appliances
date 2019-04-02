@@ -1,6 +1,7 @@
 name: "slurm"
 label: "Slurm"
-description: "Slurm OpenHPC cluster."
+description: "Batch cluster running the Slurm workload manager."
+logo: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Slurm_logo.svg/158px-Slurm_logo.svg.png
 
 parameters:
   - name: "cluster_num_workers"
@@ -11,7 +12,10 @@ parameters:
       min: 1
 
   - name: "storage_name"
-    label: "Storage service name"
-    description: "Name of the storage server attach to this cluster"
-    kind: "string"
-    default: ""
+    label: "Shared storage"
+    description: |
+      The storage cluster to use for shared storage.
+
+      This storage is mounted at `/jasmin`, and is used for home directories.
+    kind: "cloud.cluster"
+    immutable: true
