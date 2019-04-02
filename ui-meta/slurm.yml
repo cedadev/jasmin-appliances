@@ -18,4 +18,6 @@ parameters:
 
       This storage is mounted at `/jasmin`, and is used for home directories.
     kind: "cloud.cluster"
+    options:
+      tag: storage
     immutable: true
