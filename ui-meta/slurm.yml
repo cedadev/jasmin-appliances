@@ -21,3 +21,14 @@ parameters:
     options:
       tag: storage
     immutable: true
+
+  - name: "cluster_fixed_ip"
+    label: "External IP"
+    description: |
+      The external IP to attach to the login node.
+
+      If not selected, the cluster will have no permanent external IP.
+      However, an IP must still be available to use for deployment and will be released afterwards.
+    kind: "cloud.ip"
+    required: false
+    immutable: true
