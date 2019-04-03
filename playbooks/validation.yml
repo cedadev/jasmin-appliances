@@ -4,11 +4,6 @@
 # different stages of the deployment.
 # Login and compute groups of slurm cluster have been used as hosts for now.
 
-- hosts: openstack
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_network: "caastest-U-internal"
-
 - hosts:
   - login
   - compute
