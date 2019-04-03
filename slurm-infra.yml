@@ -24,12 +24,15 @@
           - beegfs_clients              # Make this conditional?
           - gluster_clients             # Make this conditional?
       with_items: "{{ groups['cluster'] }}"
+      when: cluster_state | default('present') | lower == 'present'
 
 - hosts: openstack
   tasks:
     - name: Import configuration from storage stack
       import_tasks: tasks/storage_stack.yml
-      when: storage_name is defined
+      when:
+        - storage_name is defined
+        - cluster_state | default('present') | lower == 'present'
 
 - hosts: cluster
   become: true
