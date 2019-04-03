@@ -1,0 +1,4 @@
+---
+cluster_name: "gluster"
+gluster_volume_size: 10
+gluster_num_nodes: 3

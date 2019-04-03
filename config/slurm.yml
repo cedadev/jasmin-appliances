@@ -1,0 +1,4 @@
+---
+cluster_name: "slurm"
+cluster_num_workers: 3
+storage_name: bharat-nfs

@@ -1,5 +1,4 @@
 ---
-
 # The storage size (in gigabytes) for the NFS export.
 nfs_volume_size: 10
 
@@ -15,12 +14,10 @@ nfs_groups:
 nfs_group_server:
   name: "server"
   flavor: "j1.small"
-  image: "centos-7-20190104"
-  user: "centos"
+  image: "{{ cluster_image }}"
+  user: "{{ cluster_deploy_user }}"
   num_nodes: 1
   root_volume_size: "{{ nfs_volume_size }}"
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"
   info: "{{ nfs_cluster_info | to_json }}"
-
-...

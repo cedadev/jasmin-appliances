@@ -1,18 +1,6 @@
 ---
-# Common k8s cluster configuration used by k8s-infra.yml playbook
-cluster_name: k8s
+cluster_name: "k8s"
 cluster_version: "1.13"
-cluster_state: present
 cluster_num_workers: 3
-cluster_fixed_ip: 192.171.139.249
-# cluster_network
-# cluster_keypair:
 # openstack_trustee_id:
 # openstack_trustee_password:
-
-# Additional configuration used by pangeo-infra.yml playbook
-pangeo_hosts: [ "pangeo.kgz.sh" ]
-pangeo_users: [ "admin" ]
-pangeo_admin_users: [ "admin" ]
-pangeo_password: secretnomore
-...
