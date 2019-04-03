@@ -27,11 +27,6 @@
       command: dracut -f
 
 - hosts: cluster
-  pre_tasks:
-    - debug: msg="{{ groups['nfs_servers'] }}"
-    - debug: msg="{{ groups['nfs_servers'] | first }}"
-    - debug: msg="{{ hostvars }}"
-    - debug: msg="{{ hostvars.keys() }}"
   roles:
     # Note: The NFS clients are likely to be drawn from across a multi-node
     # platform deployment. This playbook assumes the existence of a meta-group,
