@@ -11,3 +11,11 @@ parameters:
     options:
       min: 10
     immutable: true
+
+  - name: "nfs_server_flavor"
+    label: "Size"
+    description: "The size to use for the NFS server."
+    kind: "cloud.size"
+    options:
+      min_ram: 1024
+    immutable: true

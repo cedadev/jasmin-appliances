@@ -11,7 +11,7 @@ nfs_groups:
 
 nfs_group_server:
   name: "nfs_servers"
-  flavor: "j1.small"
+  flavor: "{{ nfs_server_flavor | default('j1.small') }}"
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: 1
