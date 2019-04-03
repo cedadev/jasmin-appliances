@@ -63,7 +63,7 @@
 
     - name: running IMB-MPI1 through Slurm
       shell: |
-        module load gnu openmpi imb 
+        module load gnu7 openmpi3 imb
         salloc -N 2 mpirun IMB-MPI1 PingPong
       register: mpi
       run_once: true
