@@ -1,8 +1,5 @@
 ---
 
-# The storage size per node/brick (in gigabytes) for the Gluster export.
-gluster_volume_size: 10
-
 gluster_cluster_info:
   storage_type: "gluster"
   gluster_servers: "$PRIMARY_IPS"
@@ -18,7 +15,7 @@ gluster_group_servers:
   image: "centos-7-20190104"
   user: "centos"
   num_nodes: "{{ gluster_num_nodes }}"
-  root_volume_size: "{{ gluster_volume_size }}"
+  root_volume_size: "{{ gluster_volume_size | default(10) }}"
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"
   info: "{{ gluster_cluster_info | to_json }}"
