@@ -15,7 +15,6 @@
       add_host:
         name: "{{ item }}"
         groups: nfs_servers
-        nfs_export: "{{ nfs_export }}"
       loop: "{{ groups.get('server', []) }}"
 
 - hosts: cluster
