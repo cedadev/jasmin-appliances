@@ -1,3 +1,0 @@
-nfs_fstype: "xfs"
-nfs_disk_location: "/dev/sdb"
-nfs_export: "/srv/home"

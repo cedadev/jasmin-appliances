@@ -1,3 +1,18 @@
+---
+# Jasmin Homedir
+jasmin_homedir: "/jasmin"
+
+# Cloud provider to use for Kubernetes clusters
+cloud_provider: openstack
+nfs_fstype: "xfs"
+nfs_disk_location: "/dev/sdb"
+nfs_export: "/srv/home"
+cluster_state: present
+# Boolean (or any value convertible using the bool filter in Ansible)
+# indicating whether system packages should be upgraded (i.e. the equivalent
+# of yum update -y). Should default to false if not given.
+cluster_upgrade_system_packages: false
+
 # Define a list of SLURM partitions to create.
 slurm_partitions: 
   - name: caas
@@ -45,12 +60,11 @@ slurm_packages:
 # kdump not required
 kdump_enable: false
 
-jasmin_homedir: "/jasmin"
+# Groups and users
 jasmin_group_name: "jasmin"
 jasmin_groups:
   - name: "{{ jasmin_group_name }}"
     gid: 2000
-
 jasmin_users: 
   - username: "stig"
     groups: [ "{{ jasmin_group_name }}" ]
