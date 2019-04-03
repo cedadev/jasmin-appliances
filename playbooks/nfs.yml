@@ -38,3 +38,4 @@
         clients:  "{{ 'nfs_clients' in groups and inventory_hostname in groups['nfs_clients'] }}" 
       nfs_server: "{{ groups['nfs_servers'] | first }}"
       nfs_export: "{{ hostvars[groups['nfs_servers'] | first]['nfs_export'] }}"
+      nfs_client_mnt_point: "{{ nfs_client_mnt_point }}"
