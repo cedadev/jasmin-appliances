@@ -101,6 +101,7 @@
         batch: "{{ inventory_hostname in groups[cluster_name + '_compute'] }}"
         runtime: true
       openhpc_cluster_name: "{{ cluster_name }}"
+      openhpc_packages: "{{ slurm_packages }}"
       openhpc_slurm_partitions: "{{ slurm_partitions }}"
       openhpc_slurm_control_host: "{{ groups[cluster_name + '_login'] | first }}"
 
