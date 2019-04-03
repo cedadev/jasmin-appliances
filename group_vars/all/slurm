@@ -3,7 +3,7 @@ slurm_partitions:
   - name: caas
     groups:
       - name: "compute"        # Corresponds with group name in openstack/slurm
-        num_nodes: "{{ groups[cluster_name + '_compute'] | length }}"
+        num_nodes: "{{ groups['compute'] | length }}"
 
 # A list of OpenHPC runtime libraries to install on compute and control nodes
 slurm_packages:
