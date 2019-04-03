@@ -15,17 +15,8 @@
       add_host:
         name: "{{ item }}"
         groups: nfs_servers
+        nfs_export: "{{ nfs_export }}"
       loop: "{{ groups.get('server', []) }}"
-
-- hosts: cluster
-  pre_tasks:
-    - debug: var=cloud_provider
-    - debug: var=nfs_export
-    - debug: msg="{{ groups['nfs_servers'] }}"
-    - debug: msg="{{ groups['nfs_servers'] | first }}"
-    - debug: msg="{{ hostvars }}"
-    - debug: msg="{{ hostvars.keys() }}"
-    - debug: msg="{{ hostvars[groups['nfs_servers'] | first].nfs_export }}"
 
 - hosts: cluster
   become: true
