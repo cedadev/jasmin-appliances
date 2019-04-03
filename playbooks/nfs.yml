@@ -27,11 +27,6 @@
       command: dracut -f
 
 - hosts: cluster
-  tasks:
-    - debug: var=nfs_export
-    - fail:
-
-- hosts: cluster
   roles:
     # Note: The NFS clients are likely to be drawn from across a multi-node
     # platform deployment. This playbook assumes the existence of a meta-group,
