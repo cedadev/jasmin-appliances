@@ -8,7 +8,7 @@ k8s_group_masters:
   node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: 1
-  flavor: "{{ cluster_master_flavor | default('j3.medium') }}"
+  flavor: "{{ cluster_master_flavor }}"
   root_volume_size: 0
 
 k8s_group_workers:
@@ -17,7 +17,7 @@ k8s_group_workers:
   node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: "{{ cluster_num_workers }}"
-  flavor: "{{ cluster_worker_flavor | default('j3.medium') }}"
+  flavor: "{{ cluster_worker_flavor }}"
   root_volume_size: 0
 
 k8s_groups_fixed_ip:
