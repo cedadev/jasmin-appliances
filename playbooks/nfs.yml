@@ -27,16 +27,6 @@
       command: dracut -f
 
 - hosts: cluster
-  tasks:
-    - debug: var=to_debug
-      vars:
-        to_debug: "{{ groups['nfs_servers'] | first }}"
-    - debug: var=to_debug
-      vars:
-        to_debug: "{{ hostvars[groups['nfs_servers'] | first] }}"
-    - fail:
-
-- hosts: cluster
   roles:
     # Note: The NFS clients are likely to be drawn from across a multi-node
     # platform deployment. This playbook assumes the existence of a meta-group,
@@ -44,7 +34,6 @@
     - role: stackhpc.cluster-nfs
       become: true
       nfs_enable:
-        server: "{{ 'nfs_servers' in groups and inventory_hostname in groups['nfs_servers'] }}" 
-        clients:  "{{ 'nfs_clients' in groups and inventory_hostname in groups['nfs_clients'] }}" 
+        server: "{{ 'nfs_servers' in groups and inventory_hostname in groups['nfs_servers'] }}"
+        clients:  "{{ 'nfs_clients' in groups and inventory_hostname in groups['nfs_clients'] }}"
       nfs_server: "{{ groups['nfs_servers'] | first }}"
-      nfs_export: "{{ hostvars[groups['nfs_servers'] | first]['nfs_export'] }}"
