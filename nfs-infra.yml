@@ -18,6 +18,16 @@
       loop: "{{ groups.get('server', []) }}"
 
 - hosts: cluster
+  tasks:
+    - debug: var=cloud_provider
+    - debug: var=nfs_export
+
+- hosts: nfs_servers
+  tasks:
+    - debug: var=cloud_provider
+    - debug: var=nfs_export
+
+- hosts: cluster
   become: true
   tasks:
     - import_tasks: tasks/cluster-hosts.yml
