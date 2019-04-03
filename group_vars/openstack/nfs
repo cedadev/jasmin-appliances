@@ -13,7 +13,7 @@ nfs_groups:
   - "{{ nfs_group_server }}"
 
 nfs_group_server:
-  name: "server"
+  name: "nfs_servers"
   flavor: "j1.small"
   image: "centos-7-20190104"
   user: "centos"
