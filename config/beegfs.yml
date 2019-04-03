@@ -1,5 +1,5 @@
 ---
 cluster_name: "beegfs"
 beegfs_mds_volume_size: 2
-beegfs_oss_num_nodes: 3
+beegfs_oss_num_nodes: 2
 beegfs_oss_volume_size: 10

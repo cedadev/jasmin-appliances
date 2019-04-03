@@ -1,9 +1,9 @@
 ---
 cluster_name: "pangeo"
-cluster_version: "1.13"
+cluster_version: "1.14"
 cluster_num_workers: 3
-cluster_fixed_ip: 192.171.139.249
-pangeo_username: admin
-pangeo_password: secretnomore
-# openstack_trustee_id:
-# openstack_trustee_password:
+cluster_fixed_ip: "192.171.139.249"
+pangeo_username: "admin"
+pangeo_password: "secretnomore"
+# openstack_trustee_id: "xxxx-xxxx-xxxx-xxx"
+# openstack_trustee_password: "iwonttellyou"
