@@ -22,6 +22,22 @@ parameters:
       tag: storage
     immutable: true
 
+  - name: "cluster_login_flavor"
+    label: "Login node size"
+    description: "The size to use for the login node."
+    kind: "cloud.size"
+    options:
+      min_ram: 1024
+    immutable: true
+
+  - name: "cluster_compute_flavor"
+    label: "Compute node size"
+    description: "The size to use for the compute nodes."
+    kind: "cloud.size"
+    options:
+      min_ram: 1024
+    immutable: true
+
   - name: "cluster_fixed_ip"
     label: "External IP"
     description: |
