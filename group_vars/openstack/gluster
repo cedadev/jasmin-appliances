@@ -2,6 +2,8 @@
 
 # The storage size per node/brick (in gigabytes) for the Gluster export.
 gluster_volume_size: 10
+# Number of gluster bricks to create
+gluster_num_nodes: 3
 
 gluster_cluster_info:
   storage_type: "gluster"

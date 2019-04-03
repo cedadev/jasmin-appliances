@@ -4,22 +4,22 @@ description: "BeeGFS storage cluster."
 
 parameters:
   - name: "beegfs_mds_volume_size"
-    label: "Metadata volume size"
+    label: "Metadata volume size (GB)"
     description: "BeeGFS metadata server volume size."
     kind: "integer"
     options:
-      min: 2
+      min: 1
 
   - name: "beegfs_oss_volume_size"
-    label: "Storage volume size per node"
-    description: "BeeGFS object storage server volume size."
+    label: "Storage volume size (GB)"
+    description: "Size of the BeeGFS object storage volume per node."
     kind: "integer"
     options:
-      min: 10
+      min: 5
 
   - name: "beegfs_oss_num_nodes"
     label: "Number of storage nodes"
     description: "Number of BeeGFS object storage server nodes."
     kind: "integer"
     options:
-      min: 3
+      min: 1
