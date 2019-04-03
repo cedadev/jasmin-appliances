@@ -1,20 +1,15 @@
+---
+
+# This playbook uses the Ansible OpenStack modules to create a cluster
+# using a number of baremetal compute node instances, and configure it
+# for a NFS server
+
 - hosts: openstack
   tasks:
-    - add_host:
+    - name: Add servers to nfs_servers group
+      add_host:
         name: another_host
-        groups: another_group
-        ansible_host: 127.0.0.1
-        ansible_connection: local
-        testvar: value
+        groups:
+          - nfs_servers
 
-- hosts: another_group
-  tasks:
-    - debug: var=testvar
-
-- hosts: openstack
-  tasks:
-    - debug: var=testvar
-    - debug: msg="{{ groups['another_group'] }}"
-    - debug: msg="{{ groups['another_group'] | first }}"
-    - debug: msg="{{ hostvars.keys() }}"
-    - debug: msg="{{ hostvars[groups['another_group'] | first]['nfs_export'] }}"
+- import_playbook: another_playbook.yml

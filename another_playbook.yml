@@ -1,0 +1,6 @@
+---
+- hosts: openstack 
+  roles:
+    - role: stackhpc.cluster-nfs
+      become: true
+      nfs_export: "{{ hostvars[groups['nfs_servers'] | first]['nfs_export'] }}"
