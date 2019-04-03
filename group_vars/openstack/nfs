@@ -12,7 +12,7 @@ nfs_groups:
   - "{{ nfs_group_server }}"
 
 nfs_group_server:
-  name: "server"
+  name: "nfs_servers"
   flavor: "j1.small"
   image: "{{ cluster_image }}"
   user: "{{ cluster_deploy_user }}"
