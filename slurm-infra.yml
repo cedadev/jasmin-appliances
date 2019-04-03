@@ -79,8 +79,8 @@
 
         
 - hosts:
-    - "{{ cluster_name }}_login"
-    - "{{ cluster_name }}_compute"
+    - "login"
+    - "compute"
   become: true
   pre_tasks:
 
@@ -105,7 +105,7 @@
       openhpc_slurm_control_host: "{{ groups[cluster_name + '_login'] | first }}"
 
 # Add user creation tool `sladduser` to the login node for admin users
-- hosts: "{{ cluster_name }}_login"
+- hosts: "login"
   become: true
   tasks:
     - import_tasks: tasks/slurm/install-sladduser.yml
