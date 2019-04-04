@@ -28,7 +28,10 @@
 
     - fail:
         msg: "filesystem not mounted on NFS clients"
-      when: not check_mount
+      when:
+        - hostvars.localhost.storage_type is defined
+        - hostvars.localhost.storage_type == 'nfs'
+        - not check_mount
 
     - name: check status of munge process
       shell: "systemctl status munge"
