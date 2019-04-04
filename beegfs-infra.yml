@@ -11,11 +11,6 @@
       vars:
         cluster_groups: "{{ beegfs_groups }}"
         cluster_tag: "{{ cluster_type.storage }}"
-    - name: Add servers to beegfs_servers group
-      add_host:
-        name: "{{ item }}"
-        groups: beegfs_servers
-      loop: "{{ groups.get('mds', []) + groups.get('oss', []) }}"
 
 - hosts: beegfs_servers
   become: true

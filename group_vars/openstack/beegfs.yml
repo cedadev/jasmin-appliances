@@ -19,6 +19,8 @@ beegfs_group_mds:
   node_resource: "Cluster::NodeWithVolume"
   nodenet_resource: "Cluster::NodeNet1"
   info: "{{ beegfs_cluster_info | to_json }}"
+  extra_groups:
+    - beegfs_servers
 
 beegfs_group_oss:
   name: "oss"
@@ -28,3 +30,5 @@ beegfs_group_oss:
   root_volume_size: "{{ beegfs_oss_volume_size | default(10) }}"
   node_resource: "Cluster::NodeWithVolume"
   nodenet_resource: "Cluster::NodeNet1"
+  extra_groups:
+    - beegfs_servers

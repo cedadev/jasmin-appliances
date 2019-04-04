@@ -3,3 +3,4 @@ roles/*/
 .python-version
 group_vars/all/secret
 *_ssh_private_key
+inventory.*

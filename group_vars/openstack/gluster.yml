@@ -18,3 +18,5 @@ gluster_group_servers:
   node_resource: "Cluster::NodeWithVolume"
   nodenet_resource: "Cluster::NodeNet1"
   info: "{{ gluster_cluster_info | to_json }}"
+  extra_groups:
+    - gluster_servers

@@ -15,16 +15,6 @@
         cluster_groups_fixed_ip: "{{ slurm_groups_fixed_ip }}"
         # Tag to assign to  the cluster
         cluster_tag: "{{ cluster_type.slurm }}"
-    - name: Add provisioned nodes to groups for their cluster roles
-      add_host:
-        name: "{{ item }}"
-        groups:
-          - slurm
-          - nfs_clients                 # Make this conditional?
-          - beegfs_clients              # Make this conditional?
-          - gluster_clients             # Make this conditional?
-      with_items: "{{ groups['login'] + groups['compute'] }}"
-      when: cluster_state | default('present') | lower == 'present'
 
 - hosts: openstack
   tasks:
