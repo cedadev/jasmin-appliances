@@ -6,7 +6,7 @@
 # details. Unfortunately the Red Hat solution is incomplete, as dracut doesn't
 # include /etc/sysctl* by default, so we modify dracut.conf before rebuilding.
 - hosts:
-    - gluster_servers
+    - gluster_servers:&cluster
   become: true
   tasks:
     - name: Add sysctl configuration to dracut.conf
