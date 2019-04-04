@@ -24,6 +24,8 @@
       become: yes
     - name: Install sonobuoy
       command: go get -u -v github.com/heptio/sonobuoy
+    - name: Cleanup sonobuoy in case a previous run already exists
+      command: sonobuoy delete --wait
     - name: Run sonobuoy 
       command: >
         sonobuoy run --wait --mode {{ "quick" if sonobuoy_quick_test | bool else "conformance" }}
@@ -34,27 +36,16 @@
       command: >
         sonobuoy e2e {{ result_path.stdout }}
       register: status
-    - name: Has the test passed?
-      set_fact:
-        test_passed: >
-          "failed tests: 0" == status.stdout
-    - name: Get logs
-      command: sonobuoy logs
-      register: logs
-    - block:
-        - name: Cleanup sonobuoy
-          command: sonobuoy delete --wait
-        - name: Delete result file
-          file:
-            path: >
-              {{ ansible_env.PWD }}/{{ result_path.stdout }}
-            state: absent
-        - debug:
-            msg: >
-              {{ ansible_env.PWD }}/{{ result_path.stdout_lines[0] }}
-      when: test_passed
-    - name: Fail and dump logs if status is errorenous
+    - name: Fail and dump status if errorenous
       fail:
         msg: >
-          {{ logs.stdout }}
-      when: not test_passed
+          {{ status.stdout }}
+      when: >
+        "failed tests: 0" != status.stdout
+    - name: Cleanup sonobuoy
+      command: sonobuoy delete --wait
+    - name: Delete result file
+      file:
+        path: >-
+          {{ ansible_env.PWD }}/{{ result_path.stdout }}
+        state: absent
