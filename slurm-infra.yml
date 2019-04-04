@@ -23,7 +23,7 @@
           - nfs_clients                 # Make this conditional?
           - beegfs_clients              # Make this conditional?
           - gluster_clients             # Make this conditional?
-      with_items: "{{ groups['cluster'] }}"
+      with_items: "{{ groups['login'] + groups['compute'] }}"
 
 - hosts: openstack
   tasks:
@@ -51,6 +51,11 @@
   when:
     - hostvars.localhost.storage_type is defined
     - hostvars.localhost.storage_type == 'gluster'
+
+- import_playbook: beegfs.yml
+  when:
+    - hostvars.localhost.storage_type is defined
+    - hostvars.localhost.storage_type == 'beegfs'
 
 - hosts:
     - "login"
@@ -110,6 +115,11 @@
   become: true
   tasks:
     - import_tasks: tasks/slurm/install-sladduser.yml
+
+- import_playbook: playbooks/validation.yml
+  when:
+    - validation is defined
+    - validation | bool
 
 # Delete the gateway if required
 - hosts: openstack

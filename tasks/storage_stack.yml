@@ -5,17 +5,22 @@
   set_fact:
     storage_stack_info: "{{ openstack_stack_outputs['info'] | reject('equalto', '') | map('from_json') | selectattr('storage_type', 'defined') | first }}"
 - set_fact:
-    storage_servers_group: "{{ storage_stack_info['storage_type'] }}_servers"
+    server_list: "{{ storage_stack_info[storage_stack_info['storage_type'] + '_servers'] }}"
+- set_fact:
+    group_name: "{{ storage_stack_info['group'] }}"
+  when: "'group' in storage_stack_info"
+- set_fact:
+    group_name: "{{ storage_stack_info['storage_type'] + '_servers' }}"
+  when: "'group' not in storage_stack_info"
 - set_fact:
     storage_type: "{{ storage_stack_info['storage_type'] }}"
-    storage_servers_group: "{{ storage_stack_info['storage_type'] }}_servers"
   delegate_facts: yes
   delegate_to: localhost
 - name: Create storage server group and hosts
   add_host:
     name: "{{ item }}"
-    groups: "{{ storage_servers_group }}"
-  with_items: "{{ storage_stack_info[storage_servers_group] }}"
+    groups: "{{ group_name }}"
+  with_items: "{{ server_list }}"
 - name: Set Ansible facts on storage server hosts
   set_fact:
     ansible_eth0:
@@ -24,12 +29,12 @@
   delegate_facts: yes
   delegate_to: "{{ item }}"
   with_items:
-    - "{{ storage_stack_info[storage_servers_group] }}"
+    - "{{ server_list }}"
 - name: Set Ansible variables from stack on storage server hosts
   set_fact:
     "{{ item[1].key }}": "{{ item[1].value }}"
   delegate_facts: yes
   delegate_to: "{{ item[0] }}"
   with_nested:
-    - "{{ storage_stack_info[storage_servers_group] }}"
+    - "{{ server_list }}"
     - "{{ storage_stack_info['vars'] | dict2items }}"

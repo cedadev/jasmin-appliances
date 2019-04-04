@@ -9,6 +9,7 @@ slurm_login:
   root_volume_size: 0
   node_resource: "Cluster::Node" 
   nodenet_resource: "Cluster::NodeNet1"
+  user: "{{ cluster_deploy_user }}"
 
 slurm_compute:
   name: "compute"
@@ -17,6 +18,7 @@ slurm_compute:
   root_volume_size: 0
   node_resource: "Cluster::Node" 
   nodenet_resource: "Cluster::NodeNet1"
+  user: "{{ cluster_deploy_user }}"
 
 slurm_groups_fixed_ip:
   - "{{ slurm_login | combine(cluster_gw_fip_mixin) }}"
