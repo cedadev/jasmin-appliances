@@ -28,7 +28,7 @@
   roles:
     - role: resmo.ntp
 
-- import_playbook: playbooks/gluster.yml
+- import_playbook: gluster.yml
 
 - hosts: gluster_servers
   tasks:
