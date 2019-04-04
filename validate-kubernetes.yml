@@ -1,0 +1,60 @@
+# End to end test using Heptio Sonobuoy: 
+# https://github.com/heptio/sonobuoy
+- hosts: kube-masters
+  vars:
+    sonobuoy_quick_test: true
+  environment:
+    PATH: >
+      {{ ansible_env.HOME }}/go/bin:{{ ansible_env.PATH }}
+  tasks:
+    - name: Install golang repo
+      yum_repository:
+        name: go-repo-CentOS
+        description: >
+          Golang CentOS repository
+        baseurl: https://mirror.go-repo.io/centos/$releasever/$basearch/
+        gpgkey: https://mirror.go-repo.io/centos/RPM-GPG-KEY-GO-REPO
+        gpgcheck: yes
+        enabled: yes
+      become: yes
+    - name: Install golang
+      yum:
+        name: golang
+        state: latest
+      become: yes
+    - name: Install sonobuoy
+      command: go get -u -v github.com/heptio/sonobuoy
+    - name: Run sonobuoy 
+      command: >
+        sonobuoy run --wait --mode {{ "quick" if sonobuoy_quick_test | bool else "conformance" }}
+    - name: Retrieve results
+      command: sonobuoy retrieve
+      register: result_path
+    - name: Get e2e status
+      command: >
+        sonobuoy e2e {{ result_path.stdout }}
+      register: status
+    - name: Has the test passed?
+      set_fact:
+        test_passed: >
+          "failed tests: 0" == status.stdout
+    - name: Get logs
+      command: sonobuoy logs
+      register: logs
+    - block:
+        - name: Cleanup sonobuoy
+          command: sonobuoy delete --wait
+        - name: Delete result file
+          file:
+            path: >
+              {{ ansible_env.PWD }}/{{ result_path.stdout }}
+            state: absent
+        - debug:
+            msg: >
+              {{ ansible_env.PWD }}/{{ result_path.stdout_lines[0] }}
+      when: test_passed
+    - name: Fail and dump logs if status is errorenous
+      fail:
+        msg: >
+          {{ logs.stdout }}
+      when: not test_passed

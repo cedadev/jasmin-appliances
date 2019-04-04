@@ -43,6 +43,8 @@
     - jasmin.k8s/kubernetes_dashboard
   become: yes
 
+- import_playbook: validate-kubernetes.yml
+
 # Delete the gateway if required
 - hosts: openstack
   tasks:
