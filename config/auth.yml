@@ -15,5 +15,3 @@ cluster_auth:
   username: "{{ lookup('env', 'OS_USERNAME') }}"
   password: "{{ lookup('env', 'OS_PASSWORD') }}"
   auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
-
-...
