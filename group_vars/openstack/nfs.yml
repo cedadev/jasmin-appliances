@@ -10,11 +10,13 @@ nfs_groups:
   - "{{ nfs_group_server }}"
 
 nfs_group_server:
-  name: "nfs_servers"
+  name: "server"
   flavor: "{{ nfs_server_flavor | default('j1.small') }}"
   user: "{{ cluster_deploy_user }}"
   num_nodes: 1
   root_volume_size: "{{ nfs_volume_size | default(10) }}"
-  node_resource: "Cluster::NodeWithVolume" 
+  node_resource: "Cluster::NodeWithVolume"
   nodenet_resource: "Cluster::NodeNet1"
   info: "{{ nfs_cluster_info | to_json }}"
+  extra_groups:
+    - nfs_servers

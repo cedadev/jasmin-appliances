@@ -3,6 +3,8 @@
 beegfs_cluster_info:
   storage_type: "beegfs"
   beegfs_servers: "$PRIMARY_IPS"
+  group: mds
+  vars: {}
 
 beegfs_groups:
   - "{{ beegfs_group_mds }}"

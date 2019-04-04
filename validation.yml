@@ -1,13 +1,8 @@
 ---
 # A series of simple tests to validate the Slurm cluster deployment
-# These will eventually be split into different files to test the 
+# These will eventually be split into different files to test the
 # different stages of the deployment.
 # Login and compute groups of slurm cluster have been used as hosts for now.
-
-- hosts: openstack
-  roles:
-    - role: jasmin.cluster-infra
-      cluster_network: "caastest-U-internal"
 
 - hosts:
   - login
@@ -16,14 +11,14 @@
     - name: get ids of all users
       shell: id {{ item.username }}
       with_items:
-        - "{{ jasmin_users }}" 
+        - "{{ jasmin_users }}"
       register: shell_result
       run_once: true
       ignore_errors: yes
- 
+
     - set_fact:
         check_users: "{{ shell_result.results | rejectattr('rc','equalto', 0) | map(attribute='stderr') | list}}"
-    
+
     - fail:
         msg: "{{ check_users }}"
       when: check_users
@@ -33,7 +28,10 @@
 
     - fail:
         msg: "filesystem not mounted on NFS clients"
-      when: not check_mount
+      when:
+        - hostvars.localhost.storage_type is defined
+        - hostvars.localhost.storage_type == 'nfs'
+        - not check_mount
 
     - name: check status of munge process
       shell: "systemctl status munge"
@@ -51,6 +49,9 @@
 
 # run some simple slurm jobs
 - hosts: login
+  become: true
+  become_user: "{{ jasmin_users | map(attribute='username') | first }}"
+  become_flags: "--login" # Use a login shell to load the module function and ensure $HOME is set
   tasks:
     - name: Slurm job to get hostname of compute nodes
       shell: srun -N 2 hostname
@@ -61,29 +62,54 @@
     - debug:
         msg: "hostnames of compute nodes {{ srun_hostname.stdout_lines }}"
 
-    - name: running IMB-MPI1 through Slurm
+    - name: running IMB-MPI1 through Slurm salloc
       shell: |
-        module load gnu openmpi imb 
+        module load gnu7 openmpi3 imb
         salloc -N 2 mpirun IMB-MPI1 PingPong
       register: mpi
       run_once: true
-      failed_when: mpi.rc != 0 
+      failed_when: mpi.rc != 0
 
     - debug:
          msg: "{{ mpi.stdout_lines }}"
 
+    - name: Create IMB-MPI1 script
+      copy:
+        dest: "{{ jasmin_users | map(attribute='home') | first }}/pingpong.sh"
+        content: |
+          #!/bin/bash
+          module load gnu7 openmpi3 imb
+          mpirun IMB-MPI1 PingPong
+
+    - name: running IMB-MPI1 through Slurm sbatch
+      command: sbatch -N 2 ./pingpong.sh
+      register: sbatch
+      run_once: true
+      failed_when: sbatch.rc != 0
+
+    - set_fact:
+        job_id: "{{ sbatch.stdout | regex_replace('^Submitted batch job (\\d+)$', '\\1') }}"
+
+    - name: waiting for IMB-MPI1 batch job to finish
+      command: "squeue -h -j {{ job_id }}"
+      register: squeue
+      # Wait for two minutes for the job to finish
+      delay: 5
+      retries: 24
+      until: "squeue.stdout_lines | length == 0"
+
+    - name: Check IMB-MPI1 job output file exists
+      stat:
+        path: "{{ jasmin_users | map(attribute='home') | first }}/slurm-{{ job_id }}.out"
+
 #Testing NFS clients can read/write.
 #To do: change the hosts to nfs_clients
     - name: Create a test file on the login node
-      become: true
-      become_user: "{{ jasmin_users | map(attribute='username') | first}}" 
       tempfile:
         path: "{{ jasmin_users | map(attribute='home') | first }}"
       register: tempfile_name
-    
+
     - name: write to test file
-      become: true
-      become_user: "{{ jasmin_users | map(attribute='username') | first}}" 
       copy:
         content: "{{ tempfile_name.path }}"
         dest: "{{ tempfile_name.path }}"

@@ -9,7 +9,7 @@
 
     - name: Extract output of existing ephemeral bastion
       set_fact:
-        cluster_existing_gw_ip: "{{ ((openstack_stack_outputs | json_query(query)) + [omit]) | first }}"
+        cluster_existing_gw_ip: "{{ ((openstack_stack_outputs | json_query(query) | default([], true)) + [omit]) | first }}"
       vars:
         query: "node_groups[?name=='{{ deploy_gw_group_name }}'].nodes[0].ip"
       when: openstack_stack_outputs is defined
