@@ -111,6 +111,11 @@
   tasks:
     - import_tasks: tasks/slurm/install-sladduser.yml
 
+- import_playbook: playbooks/validation.yml
+  when:
+    - validation is defined
+    - validation | bool
+
 # Delete the gateway if required
 - hosts: openstack
   tasks:
