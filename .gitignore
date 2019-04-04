@@ -1,3 +1,5 @@
+.*.swp
+*.py[cod]
 *.retry
 roles/*/
 .python-version

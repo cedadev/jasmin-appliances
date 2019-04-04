@@ -1,0 +1,4 @@
+openstacksdk
+pytest
+shortuuid
+six
