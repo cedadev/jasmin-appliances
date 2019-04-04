@@ -10,9 +10,8 @@ beegfs_groups:
 
 beegfs_group_mds:
   name: "mds"
-  flavor: "j1.small"
-  image: "centos-7-20190104"
-  user: "centos"
+  flavor: "{{ beegfs_mds_flavor | default('j1.small') }}"
+  user: "{{ cluster_deploy_user }}"
   num_nodes: 1
   root_volume_size: "{{ beegfs_mds_volume_size | default(2) }}"
   node_resource: "Cluster::NodeWithVolume"
@@ -21,12 +20,9 @@ beegfs_group_mds:
 
 beegfs_group_oss:
   name: "oss"
-  flavor: "j2.small"
-  image: "centos-7-20190104"
-  user: "centos"
+  flavor: "{{ beegfs_oss_flavor | default('j2.small') }}"
+  user: "{{ cluster_deploy_user }}"
   num_nodes: "{{ beegfs_oss_num_nodes | default(3) }}"
   root_volume_size: "{{ beegfs_oss_volume_size | default(10) }}"
   node_resource: "Cluster::NodeWithVolume"
   nodenet_resource: "Cluster::NodeNet1"
-
-...

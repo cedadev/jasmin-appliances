@@ -82,8 +82,8 @@
 
         
 - hosts:
-    - "{{ cluster_name }}_login"
-    - "{{ cluster_name }}_compute"
+    - "login"
+    - "compute"
   become: true
   pre_tasks:
 
@@ -100,15 +100,16 @@
   roles:
     - role: stackhpc.openhpc
       openhpc_enable:
-        control: "{{ inventory_hostname in groups[cluster_name + '_login'] }}"
-        batch: "{{ inventory_hostname in groups[cluster_name + '_compute'] }}"
+        control: "{{ inventory_hostname in groups['login'] }}"
+        batch: "{{ inventory_hostname in groups['compute'] }}"
         runtime: true
       openhpc_cluster_name: "{{ cluster_name }}"
+      openhpc_packages: "{{ slurm_packages }}"
       openhpc_slurm_partitions: "{{ slurm_partitions }}"
-      openhpc_slurm_control_host: "{{ groups[cluster_name + '_login'] | first }}"
+      openhpc_slurm_control_host: "{{ groups['login'] | first }}"
 
 # Add user creation tool `sladduser` to the login node for admin users
-- hosts: "{{ cluster_name }}_login"
+- hosts: "login"
   become: true
   tasks:
     - import_tasks: tasks/slurm/install-sladduser.yml

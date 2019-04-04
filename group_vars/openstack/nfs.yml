@@ -12,12 +12,9 @@ nfs_groups:
 nfs_group_server:
   name: "nfs_servers"
   flavor: "{{ nfs_server_flavor | default('j1.small') }}"
-  image: "centos-7-20190104"
-  user: "centos"
+  user: "{{ cluster_deploy_user }}"
   num_nodes: 1
   root_volume_size: "{{ nfs_volume_size | default(10) }}"
   node_resource: "Cluster::NodeWithVolume" 
   nodenet_resource: "Cluster::NodeNet1"
   info: "{{ nfs_cluster_info | to_json }}"
-
-...

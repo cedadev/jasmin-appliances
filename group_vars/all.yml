@@ -1,9 +1,29 @@
+---
+# Cluster state can be present or absent.
+cluster_state: "present"
+
+# Boolean (or any value convertible using the bool filter in Ansible)
+# indicating whether system packages should be upgraded (i.e. the equivalent
+# of yum update -y). Should default to false if not given.
+cluster_upgrade_system_packages: false
+
+# Jasmin Homedir
+jasmin_homedir: "/jasmin"
+
+# Default nfs configuration
+nfs_fstype: "xfs"
+nfs_disk_location: "/dev/sdb"
+nfs_export: "/srv/home"
+
+# Cloud provider to use for Kubernetes clusters
+cloud_provider: openstack
+
 # Define a list of SLURM partitions to create.
-slurm_partitions: 
-  - name: caas
+slurm_partitions:
+  - name: "caas"
     groups:
-      - name: "compute"        # Corresponds with group name in openstack/slurm
-        num_nodes: "{{ groups[cluster_name + '_compute'] | length }}"
+      - name: "compute" # Corresponds with group name in openstack/slurm
+        num_nodes: "{{ groups['compute'] | length }}"
 
 # A list of OpenHPC runtime libraries to install on compute and control nodes
 slurm_packages:
@@ -45,13 +65,12 @@ slurm_packages:
 # kdump not required
 kdump_enable: false
 
-jasmin_homedir: "/jasmin"
+# Groups and users
 jasmin_group_name: "jasmin"
 jasmin_groups:
   - name: "{{ jasmin_group_name }}"
     gid: 2000
-
-jasmin_users: 
+jasmin_users:
   - username: "stig"
     groups: [ "{{ jasmin_group_name }}" ]
     name: "Stig Telfer <stig@stackhpc.com>"
@@ -59,4 +78,3 @@ jasmin_users:
     uid: 3391
     ssh_key:
       - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDkXbp+OEyRoAtLPvmNJoLQJJKbjfWXVT3xyyLArzbKDNUkC8mdOUJDFPOJj91CEKKPd1x+6ys6EzJ8zFpfTQYkULClUE3XVx5q7ZMdQE3wROK+++z4RCcKrTgArd2wp5cfluMbwgp+HThuv+hdEvpEmltiALWk8wocPS6lHQmpq7AA+oB798ErNGITjfOdBbAmzcJ/Qba6y8J/ksShBDyn+dnhOT/M9wLsJaO5lh2wRqO6WxLZ6N5tlQZyyXAxBsphi+4u4gG1FiCdu7CClQr+zxEGHOnYxtbSa0X51zINxFKQAljI0IXYFJ3/7hmjkGhd1bGdXvVIqFOQdKGNFvXR stig@skellig.local"
-

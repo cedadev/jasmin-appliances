@@ -6,7 +6,7 @@ logo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAACDVB
 parameters:
   - name: "nfs_volume_size"
     label: "Volume size (GB)"
-    description: "Size of NFS shared volume."
+    description: "Size of NFS storage volume."
     kind: "integer"
     options:
       min: 10

@@ -11,13 +11,10 @@ gluster_groups:
 
 gluster_group_servers:
   name: "server"
-  flavor: "j1.small"
-  image: "centos-7-20190104"
-  user: "centos"
-  num_nodes: "{{ gluster_num_nodes }}"
+  flavor: "{{ gluster_server_flavor | default('j1.small') }}"
+  user: "{{ cluster_deploy_user }}"
+  num_nodes: "{{ gluster_num_nodes | default(3) }}"
   root_volume_size: "{{ gluster_volume_size | default(10) }}"
-  node_resource: "Cluster::NodeWithVolume" 
+  node_resource: "Cluster::NodeWithVolume"
   nodenet_resource: "Cluster::NodeNet1"
   info: "{{ gluster_cluster_info | to_json }}"
-
-...
