@@ -1,6 +1,4 @@
 ---
-# Cluster state can be present or absent.
-cluster_state: "present"
 
 # Boolean (or any value convertible using the bool filter in Ansible)
 # indicating whether system packages should be upgraded (i.e. the equivalent
@@ -70,11 +68,4 @@ jasmin_group_name: "jasmin"
 jasmin_groups:
   - name: "{{ jasmin_group_name }}"
     gid: 2000
-jasmin_users:
-  - username: "stig"
-    groups: [ "{{ jasmin_group_name }}" ]
-    name: "Stig Telfer <stig@stackhpc.com>"
-    home: "{{jasmin_homedir}}/stig"
-    uid: 3391
-    ssh_key:
-      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDkXbp+OEyRoAtLPvmNJoLQJJKbjfWXVT3xyyLArzbKDNUkC8mdOUJDFPOJj91CEKKPd1x+6ys6EzJ8zFpfTQYkULClUE3XVx5q7ZMdQE3wROK+++z4RCcKrTgArd2wp5cfluMbwgp+HThuv+hdEvpEmltiALWk8wocPS6lHQmpq7AA+oB798ErNGITjfOdBbAmzcJ/Qba6y8J/ksShBDyn+dnhOT/M9wLsJaO5lh2wRqO6WxLZ6N5tlQZyyXAxBsphi+4u4gG1FiCdu7CClQr+zxEGHOnYxtbSa0X51zINxFKQAljI0IXYFJ3/7hmjkGhd1bGdXvVIqFOQdKGNFvXR stig@skellig.local"
+jasmin_users: []
