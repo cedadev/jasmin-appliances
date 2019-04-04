@@ -52,7 +52,7 @@
     - hostvars.localhost.storage_type is defined
     - hostvars.localhost.storage_type == 'gluster'
 
-- import_playbook: beegfs.yml
+- import_playbook: playbooks/beegfs.yml
   when:
     - hostvars.localhost.storage_type is defined
     - hostvars.localhost.storage_type == 'beegfs'
