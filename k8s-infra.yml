@@ -44,6 +44,8 @@
   become: yes
 
 - import_playbook: validate-kubernetes.yml
+  vars:
+    ansible_become: yes
 
 # Delete the gateway if required
 - hosts: openstack

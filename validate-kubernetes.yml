@@ -4,7 +4,7 @@
   vars:
     sonobuoy_quick_test: true
   environment:
-    PATH: >
+    PATH: >-
       {{ ansible_env.HOME }}/go/bin:{{ ansible_env.PATH }}
   handlers:
 
@@ -15,25 +15,29 @@
 
   tasks:
 
-    - name: Install golang repo for CentOS
-      yum_repository:
-        name: go-repo-CentOS
-        description: >
-          Golang CentOS repository
-        baseurl: https://mirror.go-repo.io/centos/$releasever/$basearch/
-        gpgkey: https://mirror.go-repo.io/centos/RPM-GPG-KEY-GO-REPO
-        gpgcheck: yes
-        enabled: yes
+    - rpm_key:
+        key: https://mirror.go-repo.io/centos/RPM-GPG-KEY-GO-REPO
+        state: present
+      become: yes
+
+    - name: Download yum repository
+      get_url:
+        url: https://mirror.go-repo.io/centos/go-repo.repo
+        dest: /etc/yum.repos.d/go-repo-CentOS.repo
       become: yes
 
     - name: Install golang
       yum:
-        name: golang
+        name:
+          - golang
+          - git
         state: latest
       become: yes
 
     - name: Install sonobuoy
       command: go get -u -v github.com/heptio/sonobuoy
+      register: install_sonobuoy
+      changed_when: install_sonobuoy.stderr_lines | length > 1
 
     - name: Run cleanup handler in case it already exists
       command: /bin/true
