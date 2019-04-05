@@ -6,8 +6,16 @@
   environment:
     PATH: >
       {{ ansible_env.HOME }}/go/bin:{{ ansible_env.PATH }}
+  handlers:
+
+    - name: Cleanup sonobuoy
+      command: sonobuoy delete --wait
+      register: delete_status
+      changed_when: delete_status.stderr is not search('already deleted')
+
   tasks:
-    - name: Install golang repo
+
+    - name: Install golang repo for CentOS
       yum_repository:
         name: go-repo-CentOS
         description: >
@@ -17,35 +25,45 @@
         gpgcheck: yes
         enabled: yes
       become: yes
+
     - name: Install golang
       yum:
         name: golang
         state: latest
       become: yes
+
     - name: Install sonobuoy
       command: go get -u -v github.com/heptio/sonobuoy
-    - name: Cleanup sonobuoy in case a previous run already exists
-      command: sonobuoy delete --wait
+
+    - name: Run cleanup handler in case it already exists
+      command: /bin/true
+      notify: Cleanup sonobuoy
+    - meta: flush_handlers
+
     - name: Run sonobuoy 
       command: >
         sonobuoy run --wait --mode {{ "quick" if sonobuoy_quick_test | bool else "conformance" }}
+
     - name: Retrieve results
       command: sonobuoy retrieve
       register: result_path
+
     - name: Get e2e status
       command: >
         sonobuoy e2e {{ result_path.stdout }}
       register: status
+      changed_when: false
+
     - name: Fail and dump status if errorenous
       fail:
         msg: >
           {{ status.stdout }}
       when: >
-        "failed tests: 0" != status.stdout
-    - name: Cleanup sonobuoy
-      command: sonobuoy delete --wait
+        status.stdout is not search('failed tests: 0')
+
     - name: Delete result file
       file:
         path: >-
           {{ ansible_env.PWD }}/{{ result_path.stdout }}
         state: absent
+      notify: Cleanup sonobuoy
