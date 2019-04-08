@@ -4,9 +4,6 @@ cluster_image: "centos-7-20190104"
 cluster_floating_network: "NERCvSE"
 cluster_deploy_user: "centos"
 cluster_delegate_role: "_member_"
-cluster_master_flavor: "j3.medium"
-cluster_worker_flavor: "j3.medium"
-cluster_num_workers: 3
 
 cluster_type:
   storage: "storage"

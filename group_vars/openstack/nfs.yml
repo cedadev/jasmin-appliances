@@ -1,6 +1,4 @@
 ---
-# The storage size (in gigabytes) for the NFS export.
-nfs_volume_size: 10
 
 nfs_cluster_info:
   storage_type: "nfs"
@@ -13,11 +11,12 @@ nfs_groups:
 
 nfs_group_server:
   name: "server"
-  flavor: "j1.small"
-  image: "{{ cluster_image }}"
+  flavor: "{{ nfs_server_flavor | default('j1.small') }}"
   user: "{{ cluster_deploy_user }}"
   num_nodes: 1
-  root_volume_size: "{{ nfs_volume_size }}"
-  node_resource: "Cluster::NodeWithVolume" 
+  root_volume_size: "{{ nfs_volume_size | default(10) }}"
+  node_resource: "Cluster::NodeWithVolume"
   nodenet_resource: "Cluster::NodeNet1"
   info: "{{ nfs_cluster_info | to_json }}"
+  extra_groups:
+    - nfs_servers

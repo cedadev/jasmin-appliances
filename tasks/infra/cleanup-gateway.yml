@@ -7,5 +7,5 @@
     cluster_stack_update_only: true
     # Just pass through cluster_groups from above
   when:
-    - cluster_gw_group == deploy_gw_group_name
     - cluster_state | default('present') | lower == 'present'
+    - cluster_gw_group == deploy_gw_group_name

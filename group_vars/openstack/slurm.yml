@@ -2,23 +2,31 @@
 
 slurm_gw_group_name: "login"
 
+slurm_extra_groups:
+  - slurm
+  - nfs_clients                 # Make this conditional?
+  - beegfs_clients              # Make this conditional?
+  - gluster_clients             # Make this conditional?
+
 slurm_login:
   name: "{{ slurm_gw_group_name }}"
-  flavor: "j1.small"
+  user: "{{ cluster_deploy_user }}"
+  flavor: "{{ cluster_login_flavor | default('j1.small') }}"
   num_nodes: 1
   root_volume_size: 0
-  node_resource: "Cluster::Node" 
+  node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
-  user: "{{ cluster_deploy_user }}"
+  extra_groups: "{{ slurm_extra_groups }}"
 
 slurm_compute:
   name: "compute"
-  flavor: "{{ cluster_worker_flavor }}"
+  user: "{{ cluster_deploy_user }}"
+  flavor: "{{ cluster_compute_flavor | default('j2.tiny') }}"
   num_nodes: "{{ cluster_num_workers }}"
   root_volume_size: 0
-  node_resource: "Cluster::Node" 
+  node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
-  user: "{{ cluster_deploy_user }}"
+  extra_groups: "{{ slurm_extra_groups }}"
 
 slurm_groups_fixed_ip:
   - "{{ slurm_login | combine(cluster_gw_fip_mixin) }}"

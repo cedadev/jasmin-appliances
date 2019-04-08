@@ -11,11 +11,6 @@
       vars:
         cluster_groups: "{{ gluster_groups }}"
         cluster_tag: "{{ cluster_type.storage }}"
-    - name: Add servers to gluster_servers group
-      add_host:
-        name: "{{ item }}"
-        groups: gluster_servers
-      loop: "{{ groups.get('server', []) }}"
 
 - hosts: cluster
   become: true
@@ -28,7 +23,7 @@
   roles:
     - role: resmo.ntp
 
-- import_playbook: playbooks/gluster.yml
+- import_playbook: gluster.yml
 
 - hosts: gluster_servers
   tasks:

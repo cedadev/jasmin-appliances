@@ -1,6 +1,7 @@
 name: "gluster"
 label: "Gluster"
-description: "Gluster storage cluster."
+description: "Shared storage cluster using the Gluster filesystem."
+logo: https://user-images.githubusercontent.com/13452123/55539498-ad1f6d80-56b8-11e9-8250-384321e5b94f.jpg
 
 parameters:
   - name: "gluster_volume_size"
@@ -8,11 +9,20 @@ parameters:
     description: "Gluster storage server volume size per node."
     kind: "integer"
     options:
-      min: 5
+      min: 10
+    immutable: true
 
   - name: "gluster_num_nodes"
     label: "Number of storage nodes"
-    description: "Number of Gluster storage server nodes."
+    description: "Number of Gluster storage nodes."
     kind: "integer"
     options:
-      min: 1
+      min: 3
+
+  - name: "gluster_server_flavor"
+    label: "Server size"
+    description: "The size to use for Gluster nodes."
+    kind: "cloud.size"
+    options:
+      min_ram: 2048
+    immutable: true

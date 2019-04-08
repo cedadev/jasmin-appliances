@@ -1,6 +1,7 @@
 name: "kubernetes"
 label: "Kubernetes"
 description: "Single-master Kubernetes cluster using kubeadm."
+logo: https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png
 
 parameters:
   - name: "cluster_version"
@@ -46,8 +47,9 @@ parameters:
 
   - name: "cluster_fixed_ip"
     label: "External IP"
-    description: >
+    description: |
       The external IP to attach to the master node.
+
       If not selected, the cluster will have no permanent external IP.
       However, an IP must still be available to use for deployment and will be released afterwards.
     kind: "cloud.ip"

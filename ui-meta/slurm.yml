@@ -1,6 +1,7 @@
 name: "slurm"
 label: "Slurm"
-description: "Slurm OpenHPC cluster."
+description: "Batch cluster running the Slurm workload manager."
+logo: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Slurm_logo.svg/158px-Slurm_logo.svg.png
 
 parameters:
   - name: "cluster_num_workers"
@@ -11,7 +12,39 @@ parameters:
       min: 1
 
   - name: "storage_name"
-    label: "Home directory storage"
-    description: "Name of the storage cluster to use for user home directories."
-    kind: "string"
-    default: ""
+    label: "Shared storage"
+    description: |
+      The storage cluster to use for shared storage.
+
+      This storage is mounted at `/jasmin`, and is used for home directories.
+    kind: "cloud.cluster"
+    options:
+      tag: storage
+    immutable: true
+
+  - name: "cluster_login_flavor"
+    label: "Login node size"
+    description: "The size to use for the login node."
+    kind: "cloud.size"
+    options:
+      min_ram: 1024
+    immutable: true
+
+  - name: "cluster_compute_flavor"
+    label: "Compute node size"
+    description: "The size to use for the compute nodes."
+    kind: "cloud.size"
+    options:
+      min_ram: 1024
+    immutable: true
+
+  - name: "cluster_fixed_ip"
+    label: "External IP"
+    description: |
+      The external IP to attach to the login node.
+
+      If not selected, the cluster will have no permanent external IP.
+      However, an IP must still be available to use for deployment and will be released afterwards.
+    kind: "cloud.ip"
+    required: false
+    immutable: true

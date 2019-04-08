@@ -11,11 +11,6 @@
       vars:
         cluster_groups: "{{ beegfs_groups }}"
         cluster_tag: "{{ cluster_type.storage }}"
-    - name: Add servers to beegfs_servers group
-      add_host:
-        name: "{{ item }}"
-        groups: beegfs_servers
-      loop: "{{ groups.get('mds', []) + groups.get('oss', []) }}"
 
 - hosts: beegfs_servers
   become: true
@@ -25,7 +20,7 @@
     - import_tasks: tasks/cluster-hosts.yml
     - import_tasks: tasks/cluster-firewalld.yml
 
-- import_playbook: playbooks/beegfs.yml
+- import_playbook: beegfs.yml
 
 - hosts: beegfs_servers
   tasks:

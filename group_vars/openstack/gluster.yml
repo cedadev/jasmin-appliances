@@ -1,10 +1,5 @@
 ---
 
-# The storage size per node/brick (in gigabytes) for the Gluster export.
-gluster_volume_size: 10
-# Number of gluster bricks to create
-gluster_num_nodes: 3
-
 gluster_cluster_info:
   storage_type: "gluster"
   gluster_servers: "$PRIMARY_IPS"
@@ -16,13 +11,12 @@ gluster_groups:
 
 gluster_group_servers:
   name: "server"
-  flavor: "j1.small"
-  image: "centos-7-20190104"
-  user: "centos"
-  num_nodes: "{{ gluster_num_nodes }}"
-  root_volume_size: "{{ gluster_volume_size }}"
-  node_resource: "Cluster::NodeWithVolume" 
+  flavor: "{{ gluster_server_flavor | default('j1.small') }}"
+  user: "{{ cluster_deploy_user }}"
+  num_nodes: "{{ gluster_num_nodes | default(3) }}"
+  root_volume_size: "{{ gluster_volume_size | default(10) }}"
+  node_resource: "Cluster::NodeWithVolume"
   nodenet_resource: "Cluster::NodeNet1"
   info: "{{ gluster_cluster_info | to_json }}"
-
-...
+  extra_groups:
+    - gluster_servers

@@ -11,11 +11,6 @@
       vars:
         cluster_groups: "{{ nfs_groups }}"
         cluster_tag: "{{ cluster_type.storage }}"
-    - name: Add servers to nfs_servers group
-      add_host:
-        name: "{{ item }}"
-        groups: nfs_servers
-      loop: "{{ groups.get('server', []) }}"
 
 - hosts: cluster
   become: true
@@ -23,7 +18,7 @@
     - import_tasks: tasks/cluster-hosts.yml
     - import_tasks: tasks/cluster-firewalld.yml
 
-- import_playbook: playbooks/nfs.yml
+- import_playbook: nfs.yml
 
 - hosts: nfs_servers
   tasks:

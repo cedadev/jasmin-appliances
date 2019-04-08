@@ -15,21 +15,14 @@
         cluster_groups_fixed_ip: "{{ slurm_groups_fixed_ip }}"
         # Tag to assign to  the cluster
         cluster_tag: "{{ cluster_type.slurm }}"
-    - name: Add provisioned nodes to groups for their cluster roles
-      add_host:
-        name: "{{ item }}"
-        groups:
-          - slurm
-          - nfs_clients                 # Make this conditional?
-          - beegfs_clients              # Make this conditional?
-          - gluster_clients             # Make this conditional?
-      with_items: "{{ groups['login'] + groups['compute'] }}"
 
 - hosts: openstack
   tasks:
     - name: Import configuration from storage stack
       import_tasks: tasks/storage_stack.yml
-      when: storage_name is defined
+      when:
+        - storage_name is defined
+        - cluster_state | default('present') | lower == 'present'
 
 - hosts: cluster
   become: true
@@ -42,12 +35,12 @@
   roles:
     - role: resmo.ntp
 
-- import_playbook: playbooks/nfs.yml
+- import_playbook: nfs.yml
   when:
     - hostvars.localhost.storage_type is defined
     - hostvars.localhost.storage_type == 'nfs'
 
-- import_playbook: playbooks/gluster.yml
+- import_playbook: gluster.yml
   when:
     - hostvars.localhost.storage_type is defined
     - hostvars.localhost.storage_type == 'gluster'

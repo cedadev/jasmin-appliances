@@ -1,50 +1,53 @@
 ---
 
-# If no fixed IP is given, see if there is an existing one from an ephemeral deployment gateway
 - block:
-    - name: Query existing stack for its output
-      os_stack_outputs:
-        stack: "{{ cluster_name }}"
-      ignore_errors: true
+    # If no fixed IP is given, see if there is an existing one from an ephemeral deployment gateway
+    - block:
+        - name: Query existing stack for its output
+          os_stack_outputs:
+            stack: "{{ cluster_name }}"
+          ignore_errors: true
 
-    - name: Extract output of existing ephemeral bastion
+        - name: Extract output of existing ephemeral bastion
+          set_fact:
+            cluster_existing_gw_ip: "{{ ((openstack_stack_outputs | json_query(query) | default([], true)) + [omit]) | first }}"
+          vars:
+            query: "node_groups[?name=='{{ deploy_gw_group_name }}'].nodes[0].ip"
+          when: openstack_stack_outputs is defined
+      when: cluster_fixed_ip is not defined
+
+    - name: Find gateway floating IP
+      os_network_find_fip:
+        floating_network: "{{ cluster_floating_network }}"
+        ip: "{{ cluster_fixed_ip | default(cluster_existing_gw_ip) | default(omit) }}"
+      register: cluster_fip
+
+    - name: Set gateway facts
       set_fact:
-        cluster_existing_gw_ip: "{{ ((openstack_stack_outputs | json_query(query) | default([], true)) + [omit]) | first }}"
-      vars:
-        query: "node_groups[?name=='{{ deploy_gw_group_name }}'].nodes[0].ip"
-      when: openstack_stack_outputs is defined
-  when: cluster_fixed_ip is not defined
+        cluster_gw_fip_id: "{{ cluster_fip.id }}"
+        cluster_gw_fip_ip: "{{ cluster_fip.ip }}"
+        cluster_gw_group: >-
+          {%- if cluster_fixed_ip is defined and cluster_gw_group_fixed_ip is defined -%}
+            {{ cluster_gw_group_fixed_ip }}
+          {%- else -%}
+            {{ deploy_gw_group_name }}
+          {%- endif -%}
 
-- name: Find gateway floating IP
-  os_network_find_fip:
-    floating_network: "{{ cluster_floating_network }}"
-    ip: "{{ cluster_fixed_ip | default(cluster_existing_gw_ip) | default(omit) }}"
-  register: cluster_fip
+    - name: Set infrastructure groups for fixed IP
+      set_fact:
+        # Here, we use lookup to force the evaluation of the given cluster_groups
+        # This avoids a recursive templating error when used as the value of cluster_groups below
+        cluster_infra_groups: >-
+          {%- if cluster_gw_group == deploy_gw_group_name -%}
+            {{ lookup('vars', 'cluster_groups') + [deploy_gw_group] }}
+          {%- else -%}
+            {{ cluster_groups_fixed_ip }}
+          {%- endif -%}
+  when: cluster_state | default('present') | lower == 'present'
 
-- name: Set gateway facts
-  set_fact:
-    cluster_gw_fip_id: "{{ cluster_fip.id }}"
-    cluster_gw_fip_ip: "{{ cluster_fip.ip }}"
-    cluster_gw_group: >-
-      {%- if cluster_fixed_ip is defined and cluster_gw_group_fixed_ip is defined -%}
-        {{ cluster_gw_group_fixed_ip }}
-      {%- else -%}
-        {{ deploy_gw_group_name }}
-      {%- endif -%}
-
-- name: Set infrastructure groups for fixed IP
-  set_fact:
-    # Here, we use lookup to force the evaluation of the given cluster_groups
-    # This avoids a recursive templating error when used as the value of cluster_groups below
-    cluster_infra_groups: >-
-      {%- if cluster_gw_group == deploy_gw_group_name -%}
-        {{ lookup('vars', 'cluster_groups') + [deploy_gw_group] }}
-      {%- else -%}
-        {{ cluster_groups_fixed_ip }}
-      {%- endif -%}
-
+# If cluster_state=absent, it doesn't matter that no groups are set
 - name: Provision infrastructure
   include_role:
     name: jasmin.cluster-infra
   vars:
-    cluster_groups: "{{ cluster_infra_groups }}"
+    cluster_groups: "{{ cluster_infra_groups | default([]) }}"
