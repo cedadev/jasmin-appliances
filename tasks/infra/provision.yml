@@ -1,6 +1,7 @@
 ---
 
-- block:
+- name: Configure infrastructure
+  block:
     # If no fixed IP is given, see if there is an existing one from an ephemeral deployment gateway
     - block:
         - name: Query existing stack for its output
@@ -45,9 +46,64 @@
           {%- endif -%}
   when: cluster_state | default('present') | lower == 'present'
 
+- name: Set cluster image fact
+  set_fact:
+    # Use an image named after the cluster
+    cluster_image: "cluster-{{ cluster_name }}"
+
+- name: Check if cluster image exists
+  os_image_facts:
+    image: "{{ cluster_image }}"
+
+- name: Set cluster_image_exists fact
+  set_fact:
+    # We want to get a boolean out, so use a double-negation to convert
+    # The Jinja bool filter does not do what we need
+    cluster_image_exists: "{{ not (not (openstack_image | default(None))) }}"
+
+- name: Create cluster image
+  block:
+    - name: Get cluster base image info
+      os_image_facts:
+        image: "{{ cluster_image_base }}"
+
+    - name: Create volume from base image
+      os_volume:
+        display_name: "cluster-image-{{ cluster_name }}"
+        image: "{{ cluster_image_base }}"
+        # Convert from bytes to GiB
+        size: "{{ (openstack_image.size / 1024 / 1024 / 1024) | round(0, 'ceil') | int }}"
+      register: cluster_image_volume
+
+    - name: Create cluster image from volume
+      os_volume_upload_to_image:
+        volume_id: "{{ cluster_image_volume.id }}"
+        image_name: "{{ cluster_image }}"
+        disk_format: "{{ openstack_image.disk_format }}"
+
+    - name: Add cluster_image tag to image
+      os_image:
+        name: "{{ cluster_image }}"
+        properties:
+          "jasmin_cluster_image": "1"
+
+    - name: Remove volume
+      os_volume:
+        display_name: "{{ cluster_image_volume.volume.display_name }}"
+        state: absent
+  when:
+    - cluster_state | default('present') | lower == 'present'
+    - not cluster_image_exists
+
 # If cluster_state=absent, it doesn't matter that no groups are set
 - name: Provision infrastructure
   include_role:
     name: jasmin.cluster-infra
   vars:
     cluster_groups: "{{ cluster_infra_groups | default([]) }}"
+
+- name: Remove cluster image
+  os_image:
+    name: "cluster-{{ cluster_name }}"
+    state: absent
+  when: cluster_state | default('present') | lower != 'present'
