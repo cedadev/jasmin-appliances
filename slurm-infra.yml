@@ -45,7 +45,7 @@
     - hostvars.localhost.storage_type is defined
     - hostvars.localhost.storage_type == 'gluster'
 
-- import_playbook: playbooks/beegfs.yml
+- import_playbook: beegfs.yml
   when:
     - hostvars.localhost.storage_type is defined
     - hostvars.localhost.storage_type == 'beegfs'
@@ -109,7 +109,7 @@
   tasks:
     - import_tasks: tasks/slurm/install-sladduser.yml
 
-- import_playbook: playbooks/validation.yml
+- import_playbook: validation.yml
   when:
     - validation is defined
     - validation | bool
