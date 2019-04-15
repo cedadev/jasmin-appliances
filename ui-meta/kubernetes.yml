@@ -9,7 +9,7 @@ parameters:
     description: "The Kubernetes version to use."
     kind: "choice"
     options:
-      choices: ["1.12", "1.13", "1.14"]
+      choices: ["1.13", "1.14"]
 
   - name: "cluster_num_workers"
     label: "Worker nodes"
