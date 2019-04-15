@@ -1,4 +1,4 @@
-ansible>=2.7.10
+ansible~=2.7.10
 openstacksdk>=0.28.0
 python-openstackclient>=3.18.0
 python-heatclient
