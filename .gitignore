@@ -4,3 +4,4 @@ roles/*/
 group_vars/all/secret
 *_ssh_private_key
 inventory.*
+.vscode

@@ -1,24 +1,26 @@
 ---
 
-k8s_gw_group_name: "kube-masters"
+k8s_gw_group_name: "master"
 
 k8s_group_masters:
   name: "{{ k8s_gw_group_name }}"
-  user: "{{ cluster_deploy_user }}"
   node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: 1
   flavor: "{{ cluster_master_flavor }}"
   root_volume_size: 0
+  inventory_groups:
+    - kube-masters
 
 k8s_group_workers:
-  name: "kube-workers"
-  user: "{{ cluster_deploy_user }}"
+  name: "worker"
   node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: "{{ cluster_num_workers }}"
   flavor: "{{ cluster_worker_flavor }}"
   root_volume_size: 0
+  inventory_groups:
+    - kube-workers
 
 k8s_groups_fixed_ip:
   - "{{ k8s_group_masters | combine(cluster_gw_fip_mixin) }}"

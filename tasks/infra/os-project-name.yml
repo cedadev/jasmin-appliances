@@ -1,0 +1,27 @@
+---
+
+- block:
+    - name: Set OpenStack project name from environment
+      set_fact:
+        openstack_project_name: "{{ lookup('env', 'OS_PROJECT_NAME') }}"
+
+    - name: Set OpenStack project name from project ID
+      block:
+        - name: Set OpenStack project ID from environment
+          set_fact:
+            openstack_project_id: "{{ lookup('env', 'OS_PROJECT_ID') }}"
+
+        - name: Discover project name from ID
+          command: "openstack project show {{ openstack_project_id }} -f value -c name"
+          register: openstack_project_cmd
+
+        - name: Set OpenStack project name fact
+          set_fact:
+            openstack_project_name: "{{ openstack_project_cmd.stdout }}"
+      when: not openstack_project_name
+  when: inventory_hostname in groups.get('openstack', [])
+
+- name: Set openstack_project_name from openstack host
+  set_fact:
+    openstack_project_name: "{{ hostvars[groups['openstack'] | first].openstack_project_name }}"
+  when: inventory_hostname not in groups.get('openstack', [])

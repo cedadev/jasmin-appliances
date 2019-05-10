@@ -2,7 +2,7 @@
 # Sorted by maintainer name, role name
 - name: jasmin.cluster-infra
   src: https://github.com/cedadev/jasmin-cluster-infra-ansible
-  version: master
+  version: multi-stack
 - name: jasmin.k8s
   src: https://github.com/cedadev/k8s-ansible
   version: master

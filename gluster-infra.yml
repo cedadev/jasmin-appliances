@@ -15,11 +15,11 @@
 - hosts: cluster
   become: true
   tasks:
-    - import_tasks: tasks/cluster-hosts.yml 
-    - import_tasks: tasks/cluster-firewalld.yml
+    - import_tasks: tasks/network/hosts.yml
+    - import_tasks: tasks/network/firewall.yml
 
 - hosts: cluster
-  become: true  
+  become: true
   roles:
     - role: resmo.ntp
 

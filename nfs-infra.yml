@@ -15,8 +15,8 @@
 - hosts: cluster
   become: true
   tasks:
-    - import_tasks: tasks/cluster-hosts.yml
-    - import_tasks: tasks/cluster-firewalld.yml
+    - import_tasks: tasks/network/hosts.yml
+    - import_tasks: tasks/network/firewall.yml
 
 - import_playbook: nfs.yml
 

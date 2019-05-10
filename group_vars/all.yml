@@ -6,7 +6,7 @@
 cluster_upgrade_system_packages: false
 
 # Jasmin Homedir
-jasmin_homedir: "/jasmin"
+jasmin_homedir: "/home"
 
 # Default nfs configuration
 nfs_fstype: "xfs"

@@ -1,0 +1,22 @@
+---
+
+# Playbook to open firewall access to all hosts on the local IP subnet
+
+- name: Ensure firewalld is started
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: Detect tenant CIDR
+  set_fact:
+    tenant_cidr: "{{ [ansible_default_ipv4.network, ansible_default_ipv4.netmask] | join('/') | ipaddr('net') }}"
+
+# The trusted zone allows all traffic
+- name: Allow all traffic from tenant CIDR
+  firewalld:
+    zone: trusted
+    source: "{{ tenant_cidr }}"
+    state: enabled
+    immediate: yes
+    permanent: yes

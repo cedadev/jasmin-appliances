@@ -12,11 +12,10 @@ gluster_groups:
 gluster_group_servers:
   name: "server"
   flavor: "{{ gluster_server_flavor | default('j1.small') }}"
-  user: "{{ cluster_deploy_user }}"
   num_nodes: "{{ gluster_num_nodes | default(3) }}"
   root_volume_size: "{{ gluster_volume_size | default(10) }}"
   node_resource: "Cluster::NodeWithVolume"
   nodenet_resource: "Cluster::NodeNet1"
   info: "{{ gluster_cluster_info | to_json }}"
-  extra_groups:
+  inventory_groups:
     - gluster_servers
