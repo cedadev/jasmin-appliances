@@ -7,7 +7,7 @@ cluster_delegate_role: "_member_"
 
 cluster_type:
   storage: "storage"
-  freeipa: "freeipa"
+  identity: "identity"
   kubernetes: "kubernetes"
   slurm: "slurm"
 

@@ -1,0 +1,50 @@
+---
+
+- name: Install FreeIPA packages
+  yum:
+    name:
+      - freeipa-server
+      - bind
+      - bind-dyndb-ldap
+    state: latest
+
+# This is required by ipa-server-install if IPv6 is enabled in the kernel
+- name: Enable IPv6 for loopback interface
+  sysctl:
+    name: net.ipv6.conf.lo.disable_ipv6
+    value: 0
+
+- name: Configure FreeIPA server
+  command: >
+    ipa-server-install
+      --unattended
+      --realm {{ freeipa_realm | quote }}
+      --domain {{ freeipa_realm | lower | quote }}
+      --ds-password {{ freeipa_password | quote }}
+      --admin-password {{ freeipa_password | quote }}
+  args:
+    creates: /var/log/ipaserver-install.log
+
+- name: Set bash as the default login shell
+  ipa_config:
+    ipadefaultloginshell: /bin/bash
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_password }}"
+
+- name: Create allow all rule for admins
+  ipa_hbacrule:
+    cn: allow_all_admins
+    description: Allow admins to access any host from any host
+    state: enabled
+    hostcategory: all
+    servicecategory: all
+    usergroup: [admins]
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_password }}"
+
+- name: Disable default blanket allow all rule
+  ipa_hbacrule:
+    cn: allow_all
+    state: disabled
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_password }}"

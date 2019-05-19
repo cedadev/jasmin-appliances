@@ -1,0 +1,61 @@
+---
+
+- name: Install FreeIPA client packages
+  yum:
+    name: freeipa-client
+    state: latest
+
+- name: Configure FreeIPA client
+  command: >
+    ipa-client-install
+      --unattended
+      --mkhomedir
+      --server {{ freeipa_server | quote }}
+      --fixed-primary
+      --realm {{ freeipa_realm | quote }}
+      --domain {{ freeipa_realm | lower | quote }}
+      --principal admin
+      --password {{ freeipa_password | quote }}
+  args:
+    creates: /var/log/ipaclient-install.log
+
+# By default, ipa-client-install enables challenge-response authentication
+# In this case, this is basically password authentication, so disable it
+- name: Disable password-based SSH authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^{{ item.name }}'
+    line: "{{ item.name }} {{ item.value }}"
+  loop:
+    - name: PasswordAuthentication
+      value: "no"
+    - name: ChallengeResponseAuthentication
+      value: "no"
+  register: sshd_configure_passwords
+
+- name: Restart sshd
+  service:
+    name: sshd
+    state: restarted
+  when: sshd_configure_passwords is changed
+
+- name: Decrease cache timeout for SSSD
+  lineinfile:
+    path: /etc/sssd/sssd.conf
+    regexp: '^{{ item.name }}'
+    line: "{{ item.name }} = {{ item.value }}"
+    insertafter: '^\[domain/'
+  loop:
+    - name: entry_cache_timeout
+      value: "300"
+    - name: entry_cache_user_timeout
+      value: "300"
+    - name: entry_cache_group_timeout
+      value: "300"
+  register: sssd_configure_cache
+
+- name: Restart SSSD
+  service:
+    name: sssd
+    state: restarted
+  when: sssd_configure_cache is changed

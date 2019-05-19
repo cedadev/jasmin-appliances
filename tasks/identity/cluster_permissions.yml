@@ -1,0 +1,57 @@
+---
+
+# Tasks to create FreeIPA groups and rules for the cluster
+
+- name: Sanitise cluster name for use in groups
+  set_fact:
+    cluster_name_sanitised: "{{ cluster_name | lower | replace('-', '_') }}"
+
+- name: Set FreeIPA group facts
+  set_fact:
+    host_group_name: "{{ cluster_name_sanitised }}_hosts"
+    host_group_description: "Hosts for cluster '{{ cluster_name }}'"
+    user_group_name: "{{ cluster_name_sanitised }}_users"
+    user_group_description: "Users for cluster '{{ cluster_name }}'"
+    hbac_rule_name: "{{ cluster_name_sanitised }}_allow_users"
+    hbac_rule_description: "Allow cluster users SSH access to cluster hosts for '{{ cluster_name }}'"
+
+- name: Create host group
+  ipa_hostgroup:
+    cn: "{{ host_group_name }}"
+    description: "{{ host_group_description }}"
+    # Map a list of inventory hostnames to their FQDNs
+    host: >-
+      {{
+        hostvars |
+          dict2items |
+          selectattr('key', 'in', inventory_hostnames) |
+          map(attribute = 'value') |
+          map(attribute = 'ansible_fqdn') |
+          list
+      }}
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_password }}"
+
+- name: Create users group
+  ipa_group:
+    cn: "{{ user_group_name }}"
+    description: "{{ user_group_description }}"
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_password }}"
+  when: create_users_group | default(true)
+
+- name: Grant the users group access to the host group
+  ipa_hbacrule:
+    cn: "{{ hbac_rule_name }}"
+    description: "{{ hbac_rule_description }}"
+    hostgroup:
+      - "{{ host_group_name }}"
+    servicecategory: all
+    usergroup:
+      - "{{ user_group_name }}"
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_password }}"
+  when:
+    - create_users_group | default(true)
+    - permit_user_ssh | default(false)
+

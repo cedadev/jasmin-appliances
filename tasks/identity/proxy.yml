@@ -1,19 +1,5 @@
 ---
 
-# Nginx doesn't resolve using /etc/hosts, but we require this because
-# we need to contact the FreeIPA server using it's FQDN
-# To get round it, we run dnsmasq and point Nginx to use 127.0.0.1 as resolver
-# - name: Install dnsmasq
-#   yum:
-#     name: dnsmasq
-#     state: latest
-
-# - name: Ensure dnsmasq is started
-#   service:
-#     name: dnsmasq
-#     state: restarted
-#     enabled: yes
-
 - name: Install Nginx
   yum:
     name: nginx
@@ -41,16 +27,13 @@
 
 - name: Install main Nginx configuration
   template:
-    src: nginx/nginx.conf.j2
+    src: templates/identity/nginx.conf.j2
     dest: /etc/nginx/nginx.conf
 
 - name: Install FreeIPA site configuration
   template:
-    src: freeipa/nginx_site.conf.j2
+    src: templates/identity/freeipa_site.conf.j2
     dest: /etc/nginx/conf.d/freeipa.conf
-  vars:
-    ssl_certificate_path: /etc/nginx/ssl/server.crt
-    ssl_private_key_path: /etc/nginx/ssl/server.key
 
 - name: Ensure Nginx is started
   service:
