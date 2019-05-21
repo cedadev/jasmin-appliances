@@ -1,15 +1,14 @@
 ---
 
-- name: Configure infrastructure
-  block:
+- block:
     # If no fixed IP is given, see if there is an existing one from an ephemeral deployment gateway
     - block:
-        - name: Query existing stack for its output
+        - name: Query existing stack output
           os_stack_outputs:
             stack: "{{ cluster_name }}"
           ignore_errors: true
 
-        - name: Extract output of existing ephemeral bastion
+        - name: Extract ip of existing ephemeral bastion
           set_fact:
             cluster_existing_gw_ip: "{{ ((openstack_stack_outputs | json_query(query) | default([], true)) + [omit]) | first }}"
           vars:
@@ -17,32 +16,44 @@
           when: openstack_stack_outputs is defined
       when: cluster_fixed_ip is not defined
 
-    - name: Find gateway floating IP
+    - name: Find cluster floating ip
       os_network_find_fip:
         floating_network: "{{ cluster_floating_network }}"
         ip: "{{ cluster_fixed_ip | default(cluster_existing_gw_ip) | default(omit) }}"
       register: cluster_fip
 
-    - name: Set gateway facts
+    - name: Set cluster ip facts
       set_fact:
-        cluster_gw_fip_id: "{{ cluster_fip.id }}"
-        cluster_gw_fip_ip: "{{ cluster_fip.ip }}"
+        cluster_fip_id: "{{ cluster_fip.id }}"
+        cluster_fip_ip: "{{ cluster_fip.ip }}"
+
+    # Only set the gateway group fact if there is not already a proxy command set
+    # The first pass through the jasmin-cluster-infra role will set the proxy command
+    - name: Configure cluster gateway group
+      set_fact:
         cluster_gw_group: >-
           {%- if cluster_fixed_ip is defined and cluster_gw_group_fixed_ip is defined -%}
             {{ cluster_gw_group_fixed_ip }}
           {%- else -%}
             {{ deploy_gw_group_name }}
           {%- endif -%}
+      when: cluster_gw_ssh_proxy_command is not defined
 
-    - name: Set infrastructure groups for fixed IP
+    # Configure the groups to use for the call to jasmin-cluster-infra
+    #   1. If using the ephemeral gateway group, inject it
+    #   2. If a fixed ip was given, use the fixed ip groups
+    #   3. If a fixed ip was not given, use the regular groups
+    - name: Configure infrastructure groups
       set_fact:
         # Here, we use lookup to force the evaluation of the given cluster_groups
         # This avoids a recursive templating error when used as the value of cluster_groups below
         cluster_infra_groups: >-
-          {%- if cluster_gw_group == deploy_gw_group_name -%}
+          {%- if cluster_gw_group is defined and cluster_gw_group == deploy_gw_group_name -%}
             {{ lookup('vars', 'cluster_groups') + [deploy_gw_group] }}
-          {%- else -%}
+          {%- elif cluster_fixed_ip is defined -%}
             {{ cluster_groups_fixed_ip }}
+          {%- else -%}
+            {{ lookup('vars', 'cluster_groups') }}
           {%- endif -%}
   when: cluster_state | default('present') | lower == 'present'
 

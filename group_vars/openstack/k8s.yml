@@ -23,7 +23,7 @@ k8s_group_workers:
     - kube-workers
 
 k8s_groups_fixed_ip:
-  - "{{ k8s_group_masters | combine(cluster_gw_fip_mixin) }}"
+  - "{{ k8s_group_masters | combine(cluster_fip_mixin) }}"
   - "{{ k8s_group_workers }}"
 
 k8s_groups_no_ip:

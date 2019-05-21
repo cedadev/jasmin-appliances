@@ -25,7 +25,7 @@ identity_group_freeipa_server:
     freeipa_password: "{{ freeipa_password }}"
 
 identity_groups_fixed_ip:
-  - "{{ identity_group_proxy | combine(cluster_gw_fip_mixin) }}"
+  - "{{ identity_group_proxy | combine(cluster_fip_mixin) }}"
   - "{{ identity_group_freeipa_server }}"
 
 identity_groups_no_ip:

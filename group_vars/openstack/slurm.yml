@@ -27,7 +27,7 @@ slurm_compute:
   inventory_groups: "{{ slurm_inventory_groups }}"
 
 slurm_groups_fixed_ip:
-  - "{{ slurm_login | combine(cluster_gw_fip_mixin) }}"
+  - "{{ slurm_login | combine(cluster_fip_mixin) }}"
   - "{{ slurm_compute }}"
 
 slurm_groups_no_ip:
