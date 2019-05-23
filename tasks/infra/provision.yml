@@ -1,34 +1,52 @@
 ---
 
 - block:
-    # If no fixed IP is given, see if there is an existing one from an ephemeral deployment gateway
+    # If a fixed IP is given, get it's details
     - block:
+        - name: Find cluster floating ip
+          os_network_find_fip:
+            floating_network: "{{ cluster_floating_network }}"
+            ip: "{{ cluster_fixed_ip }}"
+          register: cluster_fip
+
+        - name: Set cluster ip facts
+          set_fact:
+            cluster_fip_id: "{{ cluster_fip.id }}"
+            cluster_fip_ip: "{{ cluster_fip.ip }}"
+      when: cluster_fixed_ip is defined
+
+    # If no fixed IP is given, that means we are using either:
+    #   1. A pre-configured gateway, in which case there is nothing to do
+    #   2. An ephemeral gateway, which we need to find an IP for
+    - name: Find IP for ephemeral gateway
+      block:
         - name: Query existing stack output
           os_stack_outputs:
             stack: "{{ cluster_name }}"
           ignore_errors: true
 
-        - name: Extract ip of existing ephemeral bastion
+        - name: Extract ip of existing ephemeral gateway
           set_fact:
             cluster_existing_gw_ip: "{{ ((openstack_stack_outputs | json_query(query) | default([], true)) + [omit]) | first }}"
           vars:
             query: "node_groups[?name=='{{ deploy_gw_group_name }}'].nodes[0].ip"
           when: openstack_stack_outputs is defined
-      when: cluster_fixed_ip is not defined
 
-    - name: Find cluster floating ip
-      os_network_find_fip:
-        floating_network: "{{ cluster_floating_network }}"
-        ip: "{{ cluster_fixed_ip | default(cluster_existing_gw_ip) | default(omit) }}"
-      register: cluster_fip
+        - name: Find gateway floating ip
+          os_network_find_fip:
+            floating_network: "{{ cluster_floating_network }}"
+            ip: "{{ cluster_existing_gw_ip | default(omit) }}"
+          register: cluster_fip
 
-    - name: Set cluster ip facts
-      set_fact:
-        cluster_fip_id: "{{ cluster_fip.id }}"
-        cluster_fip_ip: "{{ cluster_fip.ip }}"
+        - name: Set cluster ip facts
+          set_fact:
+            cluster_fip_id: "{{ cluster_fip.id }}"
+            cluster_fip_ip: "{{ cluster_fip.ip }}"
+      when:
+        - cluster_fixed_ip is not defined
+        - cluster_gw_ssh_proxy_command is not defined
 
-    # Only set the gateway group fact if there is not already a proxy command set
-    # The first pass through the jasmin-cluster-infra role will set the proxy command
+    # Only set the gateway group fact if there is not a pre-configured gateway
     - name: Configure cluster gateway group
       set_fact:
         cluster_gw_group: >-
@@ -44,17 +62,22 @@
     #   2. If a fixed ip was given, use the fixed ip groups
     #   3. If a fixed ip was not given, use the regular groups
     - name: Configure infrastructure groups
-      set_fact:
+      block:
         # Here, we use lookup to force the evaluation of the given cluster_groups
         # This avoids a recursive templating error when used as the value of cluster_groups below
-        cluster_infra_groups: >-
-          {%- if cluster_gw_group is defined and cluster_gw_group == deploy_gw_group_name -%}
-            {{ lookup('vars', 'cluster_groups') + [deploy_gw_group] }}
-          {%- elif cluster_fixed_ip is defined -%}
-            {{ cluster_groups_fixed_ip }}
-          {%- else -%}
-            {{ lookup('vars', 'cluster_groups') }}
-          {%- endif -%}
+        - set_fact:
+            cluster_infra_groups: "{{ lookup('vars', 'cluster_groups') + [deploy_gw_group] }}"
+          when:
+            - cluster_gw_group is defined
+            - cluster_gw_group == deploy_gw_group_name
+
+        - set_fact:
+            cluster_infra_groups: "{{ cluster_groups_fixed_ip }}"
+          when: cluster_fixed_ip is defined
+
+        - set_fact:
+            cluster_infra_groups: "{{ lookup('vars', 'cluster_groups') }}"
+          when: cluster_infra_groups is not defined
   when: cluster_state | default('present') | lower == 'present'
 
 - name: Set cluster image fact

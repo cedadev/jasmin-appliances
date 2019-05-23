@@ -1,5 +1,11 @@
 ---
 
+- name: Set FreeIPA server facts
+  set_fact:
+    freeipa_server: "{{ hostvars[groups.freeipa_servers | first].ansible_fqdn }}"
+    freeipa_realm: "{{ hostvars[groups.freeipa_servers | first].freeipa_realm }}"
+    freeipa_password: "{{ hostvars[groups.freeipa_servers | first].freeipa_password }}"
+
 - name: Install FreeIPA client packages
   yum:
     name: freeipa-client
@@ -39,23 +45,27 @@
     state: restarted
   when: sshd_configure_passwords is changed
 
-- name: Decrease cache timeout for SSSD
+- name: Configure SSSD
   lineinfile:
     path: /etc/sssd/sssd.conf
     regexp: '^{{ item.name }}'
     line: "{{ item.name }} = {{ item.value }}"
     insertafter: '^\[domain/'
   loop:
+    # Set the cache timeout for users and groups at 5 mins
     - name: entry_cache_timeout
       value: "300"
     - name: entry_cache_user_timeout
       value: "300"
     - name: entry_cache_group_timeout
       value: "300"
-  register: sssd_configure_cache
+    # Allow enumeration of users and groups
+    - name: enumerate
+      value: "true"
+  register: sssd_configure
 
 - name: Restart SSSD
   service:
     name: sssd
     state: restarted
-  when: sssd_configure_cache is changed
+  when: sssd_configure is changed

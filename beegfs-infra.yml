@@ -1,34 +1,48 @@
 ---
 
-# This playbook uses the Ansible OpenStack modules to create a cluster
-# using a number of compute node instances, and configure it
-# for a BeeGFS server
-
 - hosts: openstack
   tasks:
     - import_tasks: tasks/install-dependencies.yml
+
+    # Add the identity stack to the cluster and configure it as the gateway
+    - include_role:
+        name: jasmin.cluster-infra
+      vars:
+        cluster_name: "{{ identity_stack_name }}"
+        cluster_stack_update: false
+        cluster_gw_group: "{{ identity_gw_group_name }}"
+
+    # Provision the cluster infrastructure
     - import_tasks: tasks/infra/provision.yml
       vars:
         cluster_groups: "{{ beegfs_groups }}"
         cluster_tag: "{{ cluster_type.storage }}"
 
-- hosts: beegfs_servers
+- hosts: cluster
   become: true
   tasks:
-    - set_fact:
-        beegfs_name: "{{ cluster_name }}"
     - import_tasks: tasks/network/hosts.yml
     - import_tasks: tasks/network/firewall.yml
 
+# Join the hosts to the FreeIPA realm
+- hosts: beegfs_servers
+  become: true
+  tasks:
+    - include_tasks: tasks/identity/freeipa_client.yml
+
+# Set the permissions for the cluster in FreeIPA
+- hosts: freeipa_servers
+  become: true
+  tasks:
+    - include_tasks: tasks/identity/cluster_permissions.yml
+  vars:
+    # We don't need a group to permit users access to these hosts
+    create_users_group: false
+
 - import_playbook: beegfs.yml
+  vars:
+    beegfs_name: "{{ cluster_name }}"
 
 - hosts: beegfs_servers
   tasks:
     - include: tasks/update.yml
-
-- hosts: openstack
-  tasks:
-    - import_tasks: tasks/infra/cleanup-gateway.yml
-      vars:
-        cluster_groups: "{{ beegfs_groups }}"
-        cluster_tag: "{{ cluster_type.storage }}"

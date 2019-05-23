@@ -5,10 +5,11 @@
   pre_tasks:
     - name: Ensure fixed IP is given
       fail:
-        msg: "Freeipa server requires a fixed external IP"
+        msg: "Fixed external IP is required"
       when: cluster_fixed_ip is not defined
   tasks:
     - import_tasks: tasks/install-dependencies.yml
+    - import_tasks: tasks/infra/os-project-name.yml
     - import_tasks: tasks/infra/provision.yml
       vars:
         # These are the groups to use when no fixed IP is given
@@ -19,7 +20,6 @@
         cluster_groups_fixed_ip: "{{ identity_groups_fixed_ip }}"
         # Tag to assign to the cluster
         cluster_tag: "{{ cluster_type.identity }}"
-    - import_tasks: tasks/infra/os-project-name.yml
 
 - hosts: cluster
   become: true
@@ -27,24 +27,17 @@
     # Set up the networking
     - import_tasks: tasks/network/hosts.yml
     - import_tasks: tasks/network/firewall.yml
-    # Make sure the openstack_project_name fact is set on each host
-    - import_tasks: tasks/infra/os-project-name.yml
 
 - hosts: freeipa_servers
   become: true
   tasks:
     - include_tasks: tasks/identity/freeipa_server.yml
-  vars:
-    freeipa_realm: "{{ openstack_project_name | upper }}.LOCAL"
 
 - hosts: identity_proxies
   become: true
   tasks:
     - include_tasks: tasks/identity/freeipa_client.yml
     - include_tasks: tasks/identity/proxy.yml
-  vars:
-    freeipa_server: "{{ hostvars[groups.freeipa_servers | first].ansible_fqdn }}"
-    freeipa_realm: "{{ openstack_project_name | upper }}.LOCAL"
 
 # Set the permissions for the cluster in FreeIPA
 - hosts: freeipa_servers
@@ -52,6 +45,5 @@
   tasks:
     - include_tasks: tasks/identity/cluster_permissions.yml
   vars:
-    inventory_hostnames: "{{ groups.cluster }}"
     # We don't need a group to permit users access to these hosts
     create_users_group: false

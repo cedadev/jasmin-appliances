@@ -62,10 +62,3 @@ slurm_packages:
 
 # kdump not required
 kdump_enable: false
-
-# Groups and users
-jasmin_group_name: "jasmin"
-jasmin_groups:
-  - name: "{{ jasmin_group_name }}"
-    gid: 2000
-jasmin_users: []

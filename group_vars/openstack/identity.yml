@@ -23,6 +23,7 @@ identity_group_freeipa_server:
     - freeipa_servers
   facts:
     freeipa_password: "{{ freeipa_password }}"
+    freeipa_realm: "{{ openstack_project_name | upper }}.LOCAL"
 
 identity_groups_fixed_ip:
   - "{{ identity_group_proxy | combine(cluster_fip_mixin) }}"
