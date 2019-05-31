@@ -3,12 +3,10 @@
 cluster_image_base: "centos-7-20190104"
 cluster_floating_network: "NERCvSE"
 cluster_deploy_user: "root"
-cluster_delegate_role: "_member_"
+cluster_delegate_role: _member_
 
 cluster_type:
   storage: "storage"
   identity: "identity"
   kubernetes: "kubernetes"
   slurm: "slurm"
-
-...

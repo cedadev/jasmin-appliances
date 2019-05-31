@@ -10,7 +10,9 @@ k8s_group_masters:
   flavor: "{{ cluster_master_flavor }}"
   root_volume_size: 0
   inventory_groups:
-    - kube-masters
+    - rke_hosts
+  facts:
+    rke_node_roles: [etcd, controlplane]
 
 k8s_group_workers:
   name: "worker"
@@ -20,7 +22,9 @@ k8s_group_workers:
   flavor: "{{ cluster_worker_flavor }}"
   root_volume_size: 0
   inventory_groups:
-    - kube-workers
+    - rke_hosts
+  facts:
+    rke_node_roles: [worker]
 
 k8s_groups_fixed_ip:
   - "{{ k8s_group_masters | combine(cluster_fip_mixin) }}"

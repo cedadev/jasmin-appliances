@@ -4,12 +4,12 @@ description: "Single-master Kubernetes cluster using kubeadm."
 logo: https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png
 
 parameters:
-  - name: "cluster_version"
+  - name: "kubernetes_version"
     label: "Version"
     description: "The Kubernetes version to use."
     kind: "choice"
     options:
-      choices: ["1.13", "1.14"]
+      choices: ["1.12", "1.13", "1.14"]
 
   - name: "cluster_num_workers"
     label: "Worker nodes"

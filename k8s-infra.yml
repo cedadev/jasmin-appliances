@@ -8,45 +8,145 @@
 - hosts: openstack
   tasks:
     - import_tasks: tasks/install-dependencies.yml
+
+    # Add the identity stack to the cluster and configure it as the gateway
+    - include_role:
+        name: jasmin.cluster-infra
+      vars:
+        cluster_name: "{{ identity_stack_name }}"
+        cluster_stack_update: false
+        cluster_gw_group: "{{ identity_gw_group_name }}"
+
+    # Provision the Kubernetes infrastructure
     - import_tasks: tasks/infra/provision.yml
       vars:
         # These are the groups to use when no fixed IP is given
         cluster_groups: "{{ k8s_groups_no_ip }}"
-        # This is the gateway group to use when a fixed IP is given
-        cluster_gw_group_fixed_ip: "{{ k8s_gw_group_name }}"
         # These are the groups to use when a fixed IP is given
         cluster_groups_fixed_ip: "{{ k8s_groups_fixed_ip }}"
         # Tag to assign to the cluster
         cluster_tag: "{{ cluster_type.kubernetes }}"
-    # Generate keystone trust token
-    - import_tasks: tasks/os-keystone-trust.yml
-      when: cluster_state | default('present') | lower == 'present'
 
-# Do cluster setup for all hosts
-#   If cluster_state=absent, this play will be skipped as the inventory will be empty
-- hosts: kube-masters,kube-workers
-  roles:
-    - role: jasmin.k8s/kubeadm
-      kube_role: "{{ 'master' if inventory_hostname in groups['kube-masters'] else 'worker' }}"
-      openstack_trust_id: "{{ hostvars[groups['openstack'] | first]['openstack_trust_id'] }}"
-      openstack_project_id: "{{ hostvars[groups['openstack'] | first]['openstack_project_id'] }}"
-      kubernetes_version: "{{ cluster_version }}"
-      upgrade_system_packages: "{{ cluster_upgrade_system_packages | default(false) }}"
-  become: yes
-
-# Install addons via the master
-#   If cluster_state=absent, this play will be skipped as the inventory will be empty
-- hosts: kube-masters
-  roles:
-    - jasmin.k8s/helm
-    - jasmin.k8s/ingress_nginx
-    - jasmin.k8s/kubernetes_dashboard
-  become: yes
-
-# Delete the gateway if required
-- hosts: openstack
+- hosts: cluster
+  become: true
   tasks:
-    - import_tasks: tasks/infra/cleanup-gateway.yml
+    - import_tasks: tasks/network/hosts.yml
+
+# Before installing Kubernetes, enroll as a FreeIPA client
+- hosts: rke_hosts
+  become: true
+  tasks:
+    - include_tasks: tasks/identity/freeipa_client.yml
+
+# Set the permissions for the cluster in FreeIPA
+- hosts: freeipa_servers
+  become: true
+  tasks:
+    - include_tasks: tasks/identity/cluster_permissions.yml
+
+# Before starting, make sure that we have an Openstack trust
+# We use local facts on the cluster hosts to persist the trust
+# between playbook runs, but it needs to be generated on the
+# openstack host
+- hosts: openstack,rke_hosts
+  tasks:
+    # Generate keystone trust on openstack host
+    - name: Create Openstack trust
+      os_keystone_trust:
+        trustee_user_id: "{{ openstack_trustee_id }}"
+        impersonation: true
+        roles:
+          - name: _member_
+      register: openstack_trust
+      when:
+        - cluster_state | default('present') | lower == 'present'
+        - inventory_hostname in groups.openstack
+        - "'openstack_trust_id' not in hostvars[groups.rke_hosts[0]].ansible_local"
+
+- hosts: rke_hosts
+  become: true
+  pre_tasks:
+    # Persist the trust if it is newly generated
+    - block:
+        - name: Ensure facts.d directory exists
+          file:
+            path: /etc/ansible/facts.d
+            state: directory
+
+        - name: Write facts.d files for trust facts
+          copy:
+            content: "{{ item.value | to_json }}"
+            dest: /etc/ansible/facts.d/{{ item.name }}.fact
+            mode: "u=rw,g=,o="
+          loop:
+            - name: openstack_trust_id
+              value: "{{ hostvars[groups.openstack[0]].openstack_trust.trust_id }}"
+            - name: openstack_project_id
+              value: "{{ hostvars[groups.openstack[0]].openstack_trust.project_id }}"
+          loop_control:
+            label: "{{ item.name }}"
+
+        - name: Reload facts
+          setup:
+      when: "'openstack_trust_id' not in ansible_local"
+  roles:
+    # Install Kubernetes using RKE
+    - role: jasmin.rke
       vars:
-        cluster_groups: "{{ k8s_groups_no_ip }}"
-        cluster_tag: "{{ cluster_type.kubernetes }}"
+        # In order to consume a single floating IP, we want to schedule the ingress controllers
+        # on the controlplane nodes
+        # However RKE doesn't allow us to specify tolerations
+        # So we don't deploy ingress with RKE at all and deploy with Helm later
+        rke_ingress_config: { provider: none }
+        rke_cloud_provider: openstack
+        openstack_trust_id: "{{ ansible_local.openstack_trust_id }}"
+        openstack_project_id: "{{ ansible_local.openstack_project_id }}"
+  tasks:
+    # On the first host in the play, install Helm and the Ingress controller
+    - block:
+        # Install Helm
+        - include_role:
+            name: jasmin.helm
+
+        # Install the Nginx ingress controller on the controlplane nodes
+        - include_role:
+            name: jasmin.helm
+            tasks_from: chart.yml
+          vars:
+            helm_release_name: nginx-ingress-controller
+            helm_release_chart: stable/nginx-ingress
+            helm_release_namespace: nginx-ingress
+            helm_release_values:
+              serviceAccount: { create: true }
+              rbac: { create: true }
+              controller:
+                hostNetwork: true
+                kind: DaemonSet
+                daemonset:
+                  useHostPort: true
+                # The controller tolerates the etcd and controlplane node-role taints
+                tolerations:
+                  - key: node-role.kubernetes.io/etcd
+                    operator: Exists
+                  - key: node-role.kubernetes.io/controlplane
+                    operator: Exists
+                # But we specifically target controlplane nodes
+                nodeSelector:
+                  node-role.kubernetes.io/controlplane: "true"
+                # We are using the host network, so just create a ClusterIP service
+                service:
+                  type: ClusterIP
+                # Make sure to use the RollingUpdate update strategy
+                updateStrategy:
+                  type: RollingUpdate
+      when: inventory_hostname == ansible_play_hosts[0]
+
+    # On the controlplane hosts, open ports 80 and 443
+    - name: Open HTTP(S) ports for ingress controller
+      firewalld:
+        service: "{{ item }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      loop: [http, https]
+      when: "'controlplane' in rke_node_roles"

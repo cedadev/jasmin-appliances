@@ -13,9 +13,6 @@ nfs_fstype: "xfs"
 nfs_disk_location: "/dev/sdb"
 nfs_export: "/srv/home"
 
-# Cloud provider to use for Kubernetes clusters
-cloud_provider: openstack
-
 # Define a list of SLURM partitions to create.
 slurm_partitions:
   - name: "caas"
