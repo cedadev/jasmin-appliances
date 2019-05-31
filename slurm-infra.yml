@@ -34,13 +34,13 @@
     - resmo.ntp
   # Join the Slurm hosts to the FreeIPA realm
   tasks:
-    - include_tasks: tasks/identity/freeipa_client.yml
+    - include_tasks: tasks/identity/freeipa/client.yml
 
 # Set the permissions for the cluster in FreeIPA
 - hosts: freeipa_servers
   become: true
   tasks:
-    - include_tasks: tasks/identity/cluster_permissions.yml
+    - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
   vars:
     # Users in the cluster group should get SSH access
     permit_user_ssh: true

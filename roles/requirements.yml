@@ -1,5 +1,5 @@
 ---
-# Sorted by maintainer name, role name
+
 - name: jasmin.cluster-infra
   src: https://github.com/cedadev/jasmin-cluster-infra-ansible
   version: multi-stack

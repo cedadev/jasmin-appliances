@@ -28,13 +28,13 @@
 - hosts: nfs_servers
   become: true
   tasks:
-    - include_tasks: tasks/identity/freeipa_client.yml
+    - include_tasks: tasks/identity/freeipa/client.yml
 
 # Set the permissions for the cluster in FreeIPA
 - hosts: freeipa_servers
   become: true
   tasks:
-    - include_tasks: tasks/identity/cluster_permissions.yml
+    - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
   vars:
     # We don't need a group to permit users access to these hosts
     create_users_group: false

@@ -36,13 +36,13 @@
 - hosts: rke_hosts
   become: true
   tasks:
-    - include_tasks: tasks/identity/freeipa_client.yml
+    - include_tasks: tasks/identity/freeipa/client.yml
 
 # Set the permissions for the cluster in FreeIPA
 - hosts: freeipa_servers
   become: true
   tasks:
-    - include_tasks: tasks/identity/cluster_permissions.yml
+    - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
 
 # Before starting, make sure that we have an Openstack trust
 # We use local facts on the cluster hosts to persist the trust
