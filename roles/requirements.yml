@@ -6,17 +6,15 @@
 - name: jasmin.rke
   src: https://github.com/cedadev/rke-ansible
   version: master
-- src: mrlesmithjr.squid
-- src: oasis_roles.kdump
+- name: jasmin.helm
+  src: https://github.com/cedadev/helm-ansible
+  version: master
 - src: resmo.ntp
-- src: singleplatform-eng.users
 - src: stackhpc.beegfs
 - name: stackhpc.gluster-cluster
   src: https://github.com/stackhpc/ansible-role-gluster-cluster.git
 - name: stackhpc.openhpc
   version: v0.3.0
-- src: stackhpc.os-container-infra
-- src: stackhpc.os-config
 - name: stackhpc.cluster-nfs
   src: https://github.com/stackhpc/ansible-role-cluster-nfs
   version: master
