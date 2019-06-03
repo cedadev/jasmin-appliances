@@ -1,0 +1,43 @@
+---
+
+# These tasks configure Keycloak to work behind a reverse proxy
+
+- name: Configure Keycloak for X-Forwarded-For
+  xml:
+    path: /opt/keycloak/latest/standalone/configuration/standalone.xml
+    xpath: "//{{ xpath_parts | join('/') }}"
+    attribute: "proxy-address-forwarding"
+    value: "true"
+  vars:
+    # local-name allows us to avoid binding namespaces
+    xpath_parts:
+      - '*[local-name() = "subsystem" and namespace-uri() = "urn:jboss:domain:undertow:8.0"]'
+      - '*[local-name() = "server"]'
+      - '*[local-name() = "http-listener"]'
+  register: keycloak_config
+
+- name: Restart Keycloak
+  service:
+    name: keycloak
+    state: restarted
+  when: keycloak_config is changed
+
+- name: Wait for Keycloak API to be available
+  uri:
+    url: "http://localhost:8080/auth/"
+    status_code: 200
+  register: keycloak_api
+  until: keycloak_api is succeeded
+  retries: 60
+  delay: 5
+
+- name: Adjust Keycloak client redirect URIs for proxy server
+  keycloak_client:
+    client_id: security-admin-console
+    redirect_uris:
+      - "/auth/admin/master/console/*"
+      - "{{ proxy_base_url }}/auth/admin/master/console/*"
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_realm: master
+    auth_username: "{{ keycloak_admin_user }}"
+    auth_password: "{{ keycloak_admin_password }}"

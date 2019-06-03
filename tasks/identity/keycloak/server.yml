@@ -1,0 +1,88 @@
+---
+
+# These tasks install and configure Keycloak
+
+- name: Create keycloak user
+  user:
+    name: keycloak
+    create_home: no
+    shell: /usr/sbin/nologin
+
+- name: Install Java
+  yum:
+    name: java-1.8.0-openjdk
+    state: latest
+
+- name: Ensure Keycloak install directory exists
+  file:
+    path: /opt/keycloak/{{ keycloak_version }}
+    state: directory
+
+- name: Fetch Keycloak archive
+  get_url:
+    url: "{{ keycloak_archive_url }}"
+    checksum: "{{ keycloak_archive_checksum }}"
+    dest: "/opt/keycloak/{{ keycloak_archive_name }}"
+  register: keycloak_archive
+
+- name: Unpack Keycloak archive
+  unarchive:
+    remote_src: yes
+    src: "/opt/keycloak/{{ keycloak_archive_name }}"
+    dest: "/opt/keycloak/{{ keycloak_version }}"
+    extra_opts: ["--strip-components=1"]
+    owner: keycloak
+    group: keycloak
+  when: keycloak_archive is changed
+
+- name: Create latest symlink
+  file:
+    path: /opt/keycloak/latest
+    src: /opt/keycloak/{{ keycloak_version }}
+    state: link
+
+- name: Create Keycloak local admin user
+  command: >
+    /opt/keycloak/latest/bin/add-user-keycloak.sh
+      -r master
+      -u {{ keycloak_admin_user }}
+      -p {{ keycloak_admin_password | quote }}
+  register: keycloak_admin
+  changed_when: keycloak_admin.rc == 0
+  failed_when: >
+    keycloak_admin.rc != 0 and
+    "User with username '" + keycloak_admin_user + "' already added" not in keycloak_admin.stderr
+
+- name: Create keycloak systemd service
+  copy:
+    content: |
+      [Unit]
+      Description=Keycloak Identity Provider
+      After=syslog.target network.target
+
+      [Service]
+      Environment=LAUNCH_JBOSS_IN_BACKGROUND=1
+      User=keycloak
+      LimitNOFILE=102642
+      ExecStart=/opt/keycloak/latest/bin/standalone.sh -b 0.0.0.0
+      TimeoutStartSec=600
+      TimeoutStopSec=600
+
+      [Install]
+      WantedBy=multi-user.target
+    dest: /etc/systemd/system/keycloak.service
+  register: keycloak_systemd_service
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  when: keycloak_systemd_service is changed
+
+- name: Ensure Keycloak is started
+  service:
+    name: keycloak
+    state: started
+    enabled: yes
+
+- include_tasks: tasks/identity/keycloak/configure_proxy.yml
+- include_tasks: tasks/identity/keycloak/configure_sssd.yml

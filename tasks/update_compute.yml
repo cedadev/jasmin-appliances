@@ -14,7 +14,7 @@
       node_to_drain: "{{ ansible_hostname }}"
     when: drain | default(true) | bool
 
-  - import_tasks: tasks/update.yml
+  - import_tasks: tasks/util/upgrade_os_packages.yml
 
   - import_tasks: tasks/resume.yml
     delegate_to: "{{ groups['login'] | first }}"

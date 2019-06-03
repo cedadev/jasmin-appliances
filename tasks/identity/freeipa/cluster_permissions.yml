@@ -20,7 +20,7 @@
   ipa_hostgroup:
     cn: "{{ host_group_name }}"
     ipa_host: "{{ ansible_fqdn }}"
-    ipa_pass: "{{ freeipa_password }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
   register: hostgroup_previous
   # It is OK if the group doesn't exist
   ignore_errors: yes
@@ -45,7 +45,7 @@
     fqdn: "{{ host_fqdn }}"
     state: absent
     ipa_host: "{{ ansible_fqdn }}"
-    ipa_pass: "{{ freeipa_password }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
   loop: "{{ hostgroup_previous_hosts | difference(hostgroup_hosts) }}"
   loop_control:
     loop_var: host_fqdn
@@ -59,7 +59,7 @@
     # If deleting the cluster, also delete the hostgroup
     state: "{{ cluster_state | default('present') }}"
     ipa_host: "{{ ansible_fqdn }}"
-    ipa_pass: "{{ freeipa_password }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
 
 - name: Create users group
   ipa_group:
@@ -68,7 +68,7 @@
     # If deleting the cluster, also delete the group
     state: "{{ cluster_state | default('present') }}"
     ipa_host: "{{ ansible_fqdn }}"
-    ipa_pass: "{{ freeipa_password }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
   when: create_users_group | default(true)
 
 - name: Grant users group access to host group
@@ -83,7 +83,7 @@
     # If deleting the cluster, also delete the rule
     state: "{{ cluster_state | default('present') }}"
     ipa_host: "{{ ansible_fqdn }}"
-    ipa_pass: "{{ freeipa_password }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
   when:
     - create_users_group | default(true)
     - permit_user_ssh | default(false)

@@ -32,8 +32,8 @@
 
 - name: Install FreeIPA site configuration
   template:
-    src: templates/identity/freeipa_site.conf.j2
-    dest: /etc/nginx/conf.d/freeipa.conf
+    src: templates/identity/identity_site.conf.j2
+    dest: /etc/nginx/conf.d/identity.conf
 
 - name: Ensure Nginx is started
   service:

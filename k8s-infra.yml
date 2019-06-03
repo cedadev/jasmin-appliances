@@ -32,10 +32,12 @@
   tasks:
     - import_tasks: tasks/network/hosts.yml
 
-# Before installing Kubernetes, enroll as a FreeIPA client
 - hosts: rke_hosts
   become: true
   tasks:
+    # If requested, apply any system package upgrades
+    - include_tasks: tasks/util/upgrade_os_packages.yml
+    # Before installing Kubernetes, enroll as a FreeIPA client
     - include_tasks: tasks/identity/freeipa/client.yml
 
 # Set the permissions for the cluster in FreeIPA

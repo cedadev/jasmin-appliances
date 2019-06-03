@@ -136,8 +136,8 @@
   vars:
     cluster_groups: "{{ cluster_infra_groups | default([]) }}"
 
-# - name: Remove cluster image
-#   os_image:
-#     name: "cluster-{{ cluster_name }}"
-#     state: absent
-#   when: cluster_state | default('present') | lower != 'present'
+- name: Remove cluster image
+  os_image:
+    name: "cluster-{{ cluster_name }}"
+    state: absent
+  when: cluster_state | default('present') | lower != 'present'

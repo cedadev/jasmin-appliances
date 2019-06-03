@@ -43,4 +43,4 @@
 
 - hosts: nfs_servers
   tasks:
-    - include: tasks/update.yml
+    - include: tasks/util/upgrade_os_packages.yml

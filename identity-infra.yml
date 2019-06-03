@@ -28,15 +28,39 @@
     - import_tasks: tasks/network/hosts.yml
     - import_tasks: tasks/network/firewall.yml
 
+# Apply patches on the identity servers only
+- hosts: identity_servers
+  become: true
+  tasks:
+    - include_tasks: tasks/util/upgrade_os_packages.yml
+
 - hosts: freeipa_servers
   become: true
   tasks:
     - include_tasks: tasks/identity/freeipa/server.yml
 
-- hosts: identity_proxies
+# Enroll the Keycloak and proxy servers as FreeIPA clients
+- hosts: keycloak_servers,identity_proxies
   become: true
   tasks:
     - include_tasks: tasks/identity/freeipa/client.yml
+
+- hosts: keycloak_servers
+  become: true
+  tasks:
+    # Use a persistent random string for the Keycloak local admin password
+    # All interaction will be by logging in with the FreeIPA admin
+    - include_tasks: tasks/util/persistent_random_fact.yml
+      vars:
+        fact_name: keycloak_admin_password
+        random_string_length: 40
+    - include_tasks: tasks/identity/keycloak/server.yml
+  vars:
+    proxy_base_url: "https://{{ cluster_fixed_ip }}"
+
+- hosts: identity_proxies
+  become: true
+  tasks:
     - include_tasks: tasks/identity/proxy.yml
 
 # Set the permissions for the cluster in FreeIPA
