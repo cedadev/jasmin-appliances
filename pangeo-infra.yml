@@ -47,41 +47,30 @@
         helm_release_namespace: pangeo
         helm_release_values:
           jupyterhub:
+            # We authenticate using the FreeIPA LDAP database
+            # We use LDAP for two reasons:
+            #   1. The LDAP authenticator supports controlling access by group membership
+            #      The oauthenticator doesn't understand OpenID Connect so can't use the groups claim
+            #   2. There is a bug in NSX that means we can't loop back into the same tenancy via external IPs
             auth:
-              type: dummy
-              dummy:
-                password: "{{ pangeo_password }}"
+              type: ldap
+              ldap:
+                server:
+                  address: "{{ hostvars[groups.freeipa_servers | first].ansible_default_ipv4.address }}"
+                dn:
+                  templates:
+                    - "uid={username},cn=users,cn=accounts,dc=rancher-test-u,dc=local"
+                allowedGroups:
+                  - 'cn=admins,cn=groups,cn=accounts,dc=rancher-test-u,dc=local'
+                  - 'cn=kubernetes_users,cn=groups,cn=accounts,dc=rancher-test-u,dc=local'
               admin:
                 access: true
-                users: ["{{ pangeo_username }}"]
-              whitelist:
-                users: ["{{ pangeo_username }}"]
-            ingress:
-              enabled: true
-              hosts: ["pangeo.{{ cluster_fixed_ip }}.nip.io"]
-              tls:
-                - hosts: ["pangeo.{{ cluster_fixed_ip }}.nip.io"]
-            proxy:
-              service:
-                type: ClusterIP
-              secretToken: "{{ ansible_local.pangeo_secret_token }}"
+                users: [admin]
             hub:
               db:
                 type: sqlite-pvc
                 pvc:
                   storageClassName: standard
-              # extraConfig:
-              #   customPodHook: |
-              #     from kubernetes import client
-              #     def modify_pod_hook(spawner, pod):
-              #         pod.spec.containers[0].security_context = client.V1SecurityContext(
-              #             privileged=True,
-              #             capabilities=client.V1Capabilities(
-              #                 add=['SYS_ADMIN']
-              #             )
-              #         )
-              #         return pod
-              #     c.KubeSpawner.modify_pod_hook = modify_pod_hook
             singleuser:
               image:
                 name: pangeo/pangeo-notebook
@@ -100,4 +89,12 @@
               memory:
                 limit: 14G
                 guarantee: 4G
-
+            proxy:
+              service:
+                type: ClusterIP
+              secretToken: "{{ ansible_local.pangeo_secret_token }}"
+            ingress:
+              enabled: true
+              hosts: ["pangeo.{{ cluster_fixed_ip }}.nip.io"]
+              tls:
+                - hosts: ["pangeo.{{ cluster_fixed_ip }}.nip.io"]

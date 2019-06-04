@@ -37,6 +37,8 @@ identity_group_keycloak_server:
   inventory_groups:
     - identity_servers
     - keycloak_servers
+  facts:
+    keycloak_hostname: "{{ cluster_fixed_ip }}"
 
 identity_groups_fixed_ip:
   - "{{ identity_group_proxy | combine(cluster_fip_mixin) }}"
