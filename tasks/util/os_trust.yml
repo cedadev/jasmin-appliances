@@ -1,0 +1,41 @@
+---
+
+# These tasks create an Openstack trust for interacting with the OS API
+#
+# The trust needs to be created on the Openstack host, but is persisted as a local fact on
+# the cluster nodes so it is not re-generated unnecessarily
+
+- block:
+    - name: Create Openstack trust
+      os_keystone_trust:
+        trustee_user_id: "{{ openstack_trustee_id }}"
+        impersonation: true
+        roles:
+          - name: _member_
+      delegate_to: "{{ groups.openstack | first }}"
+      become: no
+      run_once: yes
+      register: openstack_trust
+
+    # Persist the trust in local facts
+    - name: Ensure facts.d directory exists
+      file:
+        path: /etc/ansible/facts.d
+        state: directory
+
+    - name: Write facts.d files for trust facts
+      copy:
+        content: "{{ item.value | to_json }}"
+        dest: /etc/ansible/facts.d/{{ item.name }}.fact
+        mode: "u=rw,g=,o="
+      loop:
+        - name: openstack_trust_id
+          value: "{{ openstack_trust.trust_id }}"
+        - name: openstack_project_id
+          value: "{{ openstack_trust.project_id }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Reload facts
+      setup:
+  when: "'openstack_trust_id' not in ansible_local"

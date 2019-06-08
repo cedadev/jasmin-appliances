@@ -1,0 +1,65 @@
+---
+
+# These tasks register a client application with Keycloak
+# The client secret is returned by setting the keycloak_client_secret fact
+
+- name: Register client application with Keycloak
+  keycloak_client:
+    realm: master
+    client_id: "{{ keycloak_client_id }}"
+    name: "{{ keycloak_client_name }}"
+    description: "{{ keycloak_client_description | default(omit) }}"
+    enabled: yes
+    protocol: openid-connect
+    # These correspond to the OAuth grant types
+    #   Authorization code
+    standard_flow_enabled: yes
+    #   Implicit
+    implicit_flow_enabled: no
+    #   Resource owner password credentials
+    direct_access_grants_enabled: no
+    #   Client credentials
+    service_accounts_enabled: no
+    # Clients are either public or confidential
+    #    Confidential clients have a secret and should generally be used
+    public_client: no
+    # Include a protocol mapper that includes the user's group memberships under the groups claim
+    protocol_mappers:
+      - name: Groups
+        protocol: openid-connect
+        protocolMapper: oidc-group-membership-mapper
+        config:
+          claim.name: "groups"
+          # This prevents Keycloak using a leading slash
+          full.path: "false"
+          id.token.claim: "true"
+          access.token.claim: "true"
+          userinfo.token.claim: "true"
+    base_url: "{{ keycloak_client_base_url | default(omit) }}"
+    redirect_uris: "{{ keycloak_client_redirect_uris }}"
+    # If deleting the cluster, also delete the client
+    state: "{{ cluster_state | default('present') }}"
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_realm: master
+    auth_username: "{{ keycloak_admin_user }}"
+    auth_password: "{{ keycloak_admin_password }}"
+  register: keycloak_client
+
+- block:
+    - name: Get client secret
+      command: >
+        /opt/keycloak/latest/bin/kcadm.sh get
+          clients/{{ keycloak_client.end_state.id }}/client-secret
+          --no-config
+          --server http://localhost:8080/auth
+          --realm master
+          --user {{ keycloak_admin_user }}
+          --password {{ keycloak_admin_password | quote }}
+      changed_when: false
+      register: keycloak_client_secret_cmd
+
+    - name: Set OIDC client facts
+      set_fact:
+        keycloak_client_id: "{{ keycloak_client.end_state.clientId }}"
+        keycloak_client_secret: "{{ (keycloak_client_secret_cmd.stdout | from_json).value }}"
+  when: cluster_state | default('present') | lower == 'present'

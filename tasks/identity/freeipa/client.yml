@@ -6,6 +6,16 @@
     freeipa_realm: "{{ hostvars[groups.freeipa_servers | first].freeipa_realm }}"
     freeipa_admin_password: "{{ hostvars[groups.freeipa_servers | first].freeipa_admin_password }}"
 
+- name: Add FreeIPA server as DNS resolver
+  lineinfile:
+    path: /etc/resolv.conf
+    regexp: '{{ freeipa_server_ip | replace(".", "\.") }}'
+    line: "nameserver {{ freeipa_server_ip }}"
+    insertbefore: '^nameserver'
+    firstmatch: yes
+  vars:
+    freeipa_server_ip: "{{ hostvars[groups.freeipa_servers | first].ansible_default_ipv4.address }}"
+
 - name: Install FreeIPA client packages
   yum:
     name: freeipa-client
@@ -16,6 +26,7 @@
     ipa-client-install
       --unattended
       --mkhomedir
+      --enable-dns-updates
       --force-join
       --server {{ freeipa_server | quote }}
       --fixed-primary

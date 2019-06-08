@@ -27,70 +27,48 @@
         # Tag to assign to the cluster
         cluster_tag: "{{ cluster_type.kubernetes }}"
 
+# Gather facts for all hosts
 - hosts: cluster
-  become: true
-  tasks:
-    - import_tasks: tasks/network/hosts.yml
+  tasks: []
 
 - hosts: rke_hosts
   become: true
   tasks:
-    # If requested, apply any system package upgrades
-    - include_tasks: tasks/util/upgrade_os_packages.yml
+    - include_tasks: tasks/kubernetes/upgrade_os_packages.yml
     # Before installing Kubernetes, enroll as a FreeIPA client
     - include_tasks: tasks/identity/freeipa/client.yml
 
 # Set the permissions for the cluster in FreeIPA
+# We don't create a user group
+# The admins group is granted the cluster-admin role via OIDC below
 - hosts: freeipa_servers
   become: true
   tasks:
     - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
+      vars:
+        create_user_group: false
 
-# Before starting, make sure that we have an Openstack trust
-# We use local facts on the cluster hosts to persist the trust
-# between playbook runs, but it needs to be generated on the
-# openstack host
-- hosts: openstack,rke_hosts
+# Create/delete the OIDC client for the cluster
+- hosts: keycloak_servers
+  become: true
   tasks:
-    # Generate keystone trust on openstack host
-    - name: Create Openstack trust
-      os_keystone_trust:
-        trustee_user_id: "{{ openstack_trustee_id }}"
-        impersonation: true
-        roles:
-          - name: _member_
-      register: openstack_trust
-      when:
-        - cluster_state | default('present') | lower == 'present'
-        - inventory_hostname in groups.openstack
-        - "'openstack_trust_id' not in hostvars[groups.rke_hosts[0]].ansible_local"
+    - include_tasks: tasks/identity/keycloak/oidc_client.yml
+      vars:
+        keycloak_client_id: cluster-{{ cluster_name | replace('_', '-') }}
+        keycloak_client_name: "Kubernetes Cluster: {{ cluster_name }}"
+        keycloak_client_description: >
+          Client for connecting to Kubernetes cluster '{{ cluster_name }}'.
+        keycloak_client_redirect_uris:
+          - http://localhost:8000
+          - urn:ietf:wg:oauth:2.0:oob
 
+# Install Kubernetes
 - hosts: rke_hosts
   become: true
   pre_tasks:
-    # Persist the trust if it is newly generated
-    - block:
-        - name: Ensure facts.d directory exists
-          file:
-            path: /etc/ansible/facts.d
-            state: directory
-
-        - name: Write facts.d files for trust facts
-          copy:
-            content: "{{ item.value | to_json }}"
-            dest: /etc/ansible/facts.d/{{ item.name }}.fact
-            mode: "u=rw,g=,o="
-          loop:
-            - name: openstack_trust_id
-              value: "{{ hostvars[groups.openstack[0]].openstack_trust.trust_id }}"
-            - name: openstack_project_id
-              value: "{{ hostvars[groups.openstack[0]].openstack_trust.project_id }}"
-          loop_control:
-            label: "{{ item.name }}"
-
-        - name: Reload facts
-          setup:
-      when: "'openstack_trust_id' not in ansible_local"
+    # Before starting, make sure that we have an Openstack trust
+    # This is created on the Openstack host but persisted on the cluster nodes
+    - include_tasks: tasks/util/os_trust.yml
   roles:
     # Install Kubernetes using RKE
     - role: jasmin.rke
@@ -103,6 +81,32 @@
         rke_cloud_provider: openstack
         openstack_trust_id: "{{ ansible_local.openstack_trust_id }}"
         openstack_project_id: "{{ ansible_local.openstack_project_id }}"
+        # Configure the API server to authenticate using Keycloak
+        rke_extra_config:
+          services:
+            kube-api:
+              extra_args:
+                oidc-issuer-url: "{{ hostvars[groups.keycloak_servers | first].keycloak_oidc_issuer_url }}"
+                oidc-client-id: "{{ hostvars[groups.keycloak_servers | first].keycloak_client_id }}"
+                oidc-username-claim: preferred_username
+                oidc-username-prefix: "oidc:"
+                oidc-groups-claim: groups
+                oidc-groups-prefix: "oidc:"
+        # Add a cluster-role-binding granting cluster-admin for the oidc:admins group
+        rke_extra_addons: |
+          ---
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: ClusterRoleBinding
+          metadata:
+            name: oidc-admins-cluster-admin
+          subjects:
+            - apiGroup: rbac.authorization.k8s.io
+              kind: Group
+              name: oidc:admins
+          roleRef:
+            apiGroup: rbac.authorization.k8s.io
+            kind: ClusterRole
+            name: cluster-admin
   tasks:
     # On the first host in the play, install Helm and the Ingress controller
     - block:

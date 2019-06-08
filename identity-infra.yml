@@ -2,14 +2,8 @@
 
 # Provision the cluster infrastructure
 - hosts: openstack
-  pre_tasks:
-    - name: Ensure fixed IP is given
-      fail:
-        msg: "Fixed external IP is required"
-      when: cluster_fixed_ip is not defined
   tasks:
     - import_tasks: tasks/install-dependencies.yml
-    - import_tasks: tasks/infra/os-project-name.yml
     - import_tasks: tasks/infra/provision.yml
       vars:
         # These are the groups to use when no fixed IP is given
@@ -24,8 +18,6 @@
 - hosts: cluster
   become: true
   tasks:
-    # Set up the networking
-    - import_tasks: tasks/network/hosts.yml
     - import_tasks: tasks/network/firewall.yml
 
 # Apply patches on the identity servers only
@@ -45,6 +37,15 @@
   tasks:
     - include_tasks: tasks/identity/freeipa/client.yml
 
+# Set the permissions for the cluster in FreeIPA
+- hosts: freeipa_servers
+  become: true
+  tasks:
+    - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
+  vars:
+    # We don't need a group to permit users access to these hosts
+    create_users_group: false
+
 - hosts: keycloak_servers
   become: true
   tasks:
@@ -55,19 +56,10 @@
         fact_name: keycloak_admin_password
         random_string_length: 40
     - include_tasks: tasks/identity/keycloak/server.yml
-  vars:
-    proxy_base_url: "https://{{ cluster_fixed_ip }}"
+      vars:
+        proxy_external_domain: "{{ hostvars[groups.identity_proxies | first].proxy_external_domain }}"
 
 - hosts: identity_proxies
   become: true
   tasks:
     - include_tasks: tasks/identity/proxy.yml
-
-# Set the permissions for the cluster in FreeIPA
-- hosts: freeipa_servers
-  become: true
-  tasks:
-    - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
-  vars:
-    # We don't need a group to permit users access to these hosts
-    create_users_group: false

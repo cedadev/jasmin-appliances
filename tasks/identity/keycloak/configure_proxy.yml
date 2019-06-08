@@ -36,7 +36,7 @@
     client_id: security-admin-console
     redirect_uris:
       - "/auth/admin/master/console/*"
-      - "{{ proxy_base_url }}/auth/admin/master/console/*"
+      - "https://{{ proxy_external_domain }}/auth/admin/master/console/*"
     auth_keycloak_url: http://localhost:8080/auth
     auth_realm: master
     auth_username: "{{ keycloak_admin_user }}"

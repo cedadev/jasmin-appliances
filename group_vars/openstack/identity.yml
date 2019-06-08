@@ -12,6 +12,8 @@ identity_group_proxy:
   inventory_groups:
     - identity_servers
     - identity_proxies
+  facts:
+    proxy_external_domain: "{{ cluster_fixed_ip }}.nip.io"
 
 identity_group_freeipa_server:
   name: freeipa
@@ -25,7 +27,7 @@ identity_group_freeipa_server:
     - freeipa_servers
   facts:
     freeipa_admin_password: "{{ admin_password }}"
-    freeipa_realm: "{{ openstack_project_name | upper }}.LOCAL"
+    freeipa_realm: "NOVALOCAL"
 
 identity_group_keycloak_server:
   name: keycloak
@@ -38,7 +40,7 @@ identity_group_keycloak_server:
     - identity_servers
     - keycloak_servers
   facts:
-    keycloak_hostname: "{{ cluster_fixed_ip }}"
+    keycloak_oidc_issuer_url: "https://{{ identity_group_proxy.facts.proxy_external_domain }}/auth/realms/master"
 
 identity_groups_fixed_ip:
   - "{{ identity_group_proxy | combine(cluster_fip_mixin) }}"
@@ -46,5 +48,6 @@ identity_groups_fixed_ip:
   - "{{ identity_group_keycloak_server }}"
 
 identity_groups_no_ip:
+  - "{{ identity_group_proxy }}"
   - "{{ identity_group_freeipa_server }}"
   - "{{ identity_group_keycloak_server }}"
