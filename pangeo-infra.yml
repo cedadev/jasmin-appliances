@@ -7,6 +7,22 @@
 # Reuse Kubernetes playbook to create a cluster
 - import_playbook: k8s-infra.yml
 
+# Create a FreeIPA group for the notebook users
+- hosts: freeipa_servers
+  become: true
+  tasks:
+    - set_fact:
+        pangeo_notebook_users_group: "{{ cluster_name | lower | replace('-', '_') }}_notebook_users"
+
+    - name: Create notebook users group
+      ipa_group:
+        cn: "{{ pangeo_notebook_users_group }}"
+        description: "Notebook users for Pangeo cluster '{{ cluster_name }}'"
+        # If deleting the cluster, also delete the group
+        state: "{{ cluster_state | default('present') }}"
+        ipa_host: "{{ ansible_fqdn }}"
+        ipa_pass: "{{ freeipa_admin_password }}"
+
 # Helm will have been installed on the first host in the cluster
 - hosts: "{{ groups.get('rke_hosts', []) | first | default('!all') }}"
   become: true
@@ -21,21 +37,13 @@
     - name: Install Pangeo Helm repository
       command: helm repo add pangeo https://pangeo-data.github.io/helm-chart/
 
-    # The Pangeo Helm chart has a typo - https://github.com/pangeo-data/helm-chart/issues/94
-    # So we check it out and fix it before installing
-    - name: Fetch pangeo chart
-      command: >
-        helm fetch pangeo/pangeo
-          --version 19.03.05
-          --untar --untardir {{ ansible_env.HOME }}/pangeo-chart
-
-    - name: Fix typo in pangeo chart
-      lineinfile:
-        path: "{{ ansible_env.HOME }}/pangeo-chart/pangeo/templates/dask-kubernetes-rbac.yaml"
-        # The line with the typo is the only line containing "apiGroup:"
-        regexp: 'apiGroup: (.*)'
-        line: '  apiGroup: \1'
-        backrefs: yes
+    # Set facts that we need for the Helm chart
+    - set_fact:
+        pangeo_notebook_users_group: "{{ hostvars[groups.freeipa_servers | first].pangeo_notebook_users_group }}"
+        freeipa_ldap_domain: >-
+          {%- for part in (freeipa_realm | lower).split('.') -%}
+            dc={{ part }}{%- if not loop.last -%},{%- endif -%}
+          {%- endfor -%}
 
     # Install the Pangeo chart
     - include_role:
@@ -43,58 +51,9 @@
         tasks_from: chart.yml
       vars:
         helm_release_name: pangeo
-        helm_release_chart: "{{ ansible_env.HOME }}/pangeo-chart/pangeo"
+        helm_release_chart: pangeo/pangeo
+        helm_release_version: 19.05.31-bcc66da
         helm_release_namespace: pangeo
-        helm_release_values:
-          jupyterhub:
-            # We authenticate using the FreeIPA LDAP database
-            # We use LDAP for two reasons:
-            #   1. The LDAP authenticator supports controlling access by group membership
-            #      The oauthenticator doesn't understand OpenID Connect so can't use the groups claim
-            #   2. There is a bug in NSX that means we can't loop back into the same tenancy via external IPs
-            auth:
-              type: ldap
-              ldap:
-                server:
-                  address: "{{ hostvars[groups.freeipa_servers | first].ansible_default_ipv4.address }}"
-                dn:
-                  templates:
-                    - "uid={username},cn=users,cn=accounts,dc=rancher-test-u,dc=local"
-                allowedGroups:
-                  - 'cn=admins,cn=groups,cn=accounts,dc=rancher-test-u,dc=local'
-                  - 'cn=kubernetes_users,cn=groups,cn=accounts,dc=rancher-test-u,dc=local'
-              admin:
-                access: true
-                users: [admin]
-            hub:
-              db:
-                type: sqlite-pvc
-                pvc:
-                  storageClassName: standard
-            singleuser:
-              image:
-                name: pangeo/pangeo-notebook
-                tag: "2019.05.23"
-              startTimeout: 1000
-              storage:
-                type: dynamic
-                capacity: 10Gi
-                dynamic:
-                  storageClass: standard
-              cloudMetadata:
-                enabled: true
-              cpu:
-                limit: 4
-                guarantee: 1
-              memory:
-                limit: 14G
-                guarantee: 4G
-            proxy:
-              service:
-                type: ClusterIP
-              secretToken: "{{ ansible_local.pangeo_secret_token }}"
-            ingress:
-              enabled: true
-              hosts: ["pangeo.{{ cluster_fixed_ip }}.nip.io"]
-              tls:
-                - hosts: ["pangeo.{{ cluster_fixed_ip }}.nip.io"]
+        helm_release_values_template: templates/helm/pangeo.yml
+        helm_release_recreate_pods: yes
+        helm_release_force: yes

@@ -1,0 +1,28 @@
+---
+
+serviceAccount:
+  create: true
+
+rbac:
+  create: true
+
+controller:
+  hostNetwork: true
+  kind: DaemonSet
+  daemonset:
+    useHostPort: true
+  # The controller tolerates the etcd and controlplane node-role taints
+  tolerations:
+    - key: node-role.kubernetes.io/etcd
+      operator: Exists
+    - key: node-role.kubernetes.io/controlplane
+      operator: Exists
+  # But we specifically target controlplane nodes
+  nodeSelector:
+    node-role.kubernetes.io/controlplane: "true"
+  # We are using the host network, so just create a ClusterIP service
+  service:
+    type: ClusterIP
+  # Make sure to use the RollingUpdate update strategy
+  updateStrategy:
+    type: RollingUpdate

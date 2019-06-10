@@ -46,7 +46,7 @@
   tasks:
     - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
       vars:
-        create_user_group: false
+        create_users_group: false
 
 # Create/delete the OIDC client for the cluster
 - hosts: keycloak_servers
@@ -119,32 +119,10 @@
             name: jasmin.helm
             tasks_from: chart.yml
           vars:
-            helm_release_name: nginx-ingress-controller
+            helm_release_name: nginx-ingress
             helm_release_chart: stable/nginx-ingress
             helm_release_namespace: nginx-ingress
-            helm_release_values:
-              serviceAccount: { create: true }
-              rbac: { create: true }
-              controller:
-                hostNetwork: true
-                kind: DaemonSet
-                daemonset:
-                  useHostPort: true
-                # The controller tolerates the etcd and controlplane node-role taints
-                tolerations:
-                  - key: node-role.kubernetes.io/etcd
-                    operator: Exists
-                  - key: node-role.kubernetes.io/controlplane
-                    operator: Exists
-                # But we specifically target controlplane nodes
-                nodeSelector:
-                  node-role.kubernetes.io/controlplane: "true"
-                # We are using the host network, so just create a ClusterIP service
-                service:
-                  type: ClusterIP
-                # Make sure to use the RollingUpdate update strategy
-                updateStrategy:
-                  type: RollingUpdate
+            helm_release_values_template: templates/helm/nginx-ingress.yml
       when: inventory_hostname == ansible_play_hosts[0]
 
     # On the controlplane hosts, open ports 80 and 443
