@@ -16,3 +16,4 @@ parameters:
     kind: "string"
     options:
       secret: true
+      confirm: true
