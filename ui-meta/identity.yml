@@ -1,0 +1,22 @@
+name: "identity"
+label: "Identity Management"
+description: |
+  Identity management for clusters using FreeIPA and Keycloak.
+
+  Allows the management of user accounts and permissions across clusters,
+  allowing the same account to be used for SSH and web-based authentication.
+logo: https://user-images.githubusercontent.com/13452123/59352838-8c5b4000-8d19-11e9-9f3c-2de73454f9ab.png
+
+parameters:
+  - name: "cluster_fixed_ip"
+    label: "External IP"
+    description: The external IP to use for the identity management web interfaces.
+    kind: "cloud.ip"
+    immutable: true
+
+  - name: "admin_password"
+    label: "Admin password"
+    description: "Password for the `admin` user."
+    kind: "string"
+    options:
+      secret: true
