@@ -1,7 +1,7 @@
 name: "kubernetes"
 label: "Kubernetes"
 description: "Single-master Kubernetes cluster using kubeadm."
-logo: https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png
+logo: https://user-images.githubusercontent.com/13452123/59425960-e5d17680-8dce-11e9-86c4-ffe3cbff6701.png
 
 parameters:
   - name: "kubernetes_version"
