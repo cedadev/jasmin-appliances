@@ -14,6 +14,7 @@ parameters:
     label: "Admin password"
     description: "Password for the `admin` user."
     kind: "string"
+    immutable: true
     options:
       secret: true
       confirm: true
