@@ -82,6 +82,9 @@
         # However RKE doesn't allow us to specify tolerations
         # So we don't deploy ingress with RKE at all and deploy with Helm later
         rke_ingress_config: { provider: none }
+        # Use the centos user with the cluster SSH key
+        rke_ssh_user: centos
+        rke_ssh_private_key: "{{ lookup('file', ansible_ssh_private_key_file) }}"
         rke_cloud_provider: openstack
         openstack_trust_id: "{{ ansible_local.openstack_trust_id }}"
         openstack_project_id: "{{ ansible_local.openstack_project_id }}"

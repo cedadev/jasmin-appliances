@@ -42,7 +42,7 @@
       {%- if keycloak_client_delete | default(True) -%}
         {{- cluster_state | default('present') -}}
       {%- else -%}
-        {{ omit }}
+        {{- omit -}}
       {%- endif -%}
     auth_keycloak_url: http://localhost:8080/auth
     auth_realm: master
