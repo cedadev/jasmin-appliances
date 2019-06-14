@@ -49,18 +49,22 @@
         create_users_group: false
 
 # Create/delete the OIDC client for the cluster
+# We create a single client for all Kubernetes clusters in the tenancy
+# to avoid needing to share a secret for every cluster with every user
+# This means that we don't want to delete the client when the cluster is deleted
 - hosts: keycloak_servers
   become: true
   tasks:
     - include_tasks: tasks/identity/keycloak/oidc_client.yml
       vars:
-        keycloak_client_id: cluster-{{ cluster_name | replace('_', '-') }}
-        keycloak_client_name: "Kubernetes Cluster: {{ cluster_name }}"
+        keycloak_client_id: kubectl-oidc-login
+        keycloak_client_name: "Kubectl OIDC"
         keycloak_client_description: >
-          Client for connecting to Kubernetes cluster '{{ cluster_name }}'.
+          Client for connecting to Kubernetes clusters with kubectl.
         keycloak_client_redirect_uris:
           - http://localhost:8000
           - urn:ietf:wg:oauth:2.0:oob
+        keycloak_client_delete: false
 
 # Install Kubernetes
 - hosts: rke_hosts

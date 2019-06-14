@@ -1,15 +1,26 @@
 name: "kubernetes"
 label: "Kubernetes"
-description: "Single-master Kubernetes cluster using kubeadm."
+description: >
+  Single-master Kubernetes cluster using Rancher Kubernetes Engine (RKE).
 logo: https://user-images.githubusercontent.com/13452123/59425960-e5d17680-8dce-11e9-86c4-ffe3cbff6701.png
 
 parameters:
+  - name: "identity_stack_name"
+    label: "Identity"
+    description: >
+      The identity manager for managing access to the cluster.
+    kind: "cloud.cluster"
+    options:
+      tag: identity
+    immutable: true
+
   - name: "kubernetes_version"
     label: "Version"
     description: "The Kubernetes version to use."
     kind: "choice"
     options:
-      choices: ["1.12", "1.13", "1.14"]
+      choices: ["1.11", "1.12", "1.13", "1.14"]
+    default: "1.13"
 
   - name: "cluster_num_workers"
     label: "Worker nodes"
@@ -50,8 +61,7 @@ parameters:
     description: |
       The external IP to attach to the master node.
 
-      If not selected, the cluster will have no permanent external IP.
-      However, an IP must still be available to use for deployment and will be released afterwards.
+      If not selected, the cluster will not be directly accessible from outside your tenancy.
     kind: "cloud.ip"
     required: false
     immutable: true
