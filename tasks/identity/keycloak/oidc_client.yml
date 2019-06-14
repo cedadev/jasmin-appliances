@@ -43,7 +43,7 @@
         {{- cluster_state | default('present') -}}
       {%- else -%}
         omit
-      {%- end -%}
+      {%- endif -%}
     auth_keycloak_url: http://localhost:8080/auth
     auth_realm: master
     auth_username: "{{ keycloak_admin_user }}"
