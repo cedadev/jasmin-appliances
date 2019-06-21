@@ -9,15 +9,15 @@
 - name: jasmin.helm
   src: https://github.com/cedadev/helm-ansible
   version: master
-- src: resmo.ntp
-- src: stackhpc.beegfs
+- name: stackhpc.beegfs
+  src: https://github.com/stackhpc/ansible-role-beegfs.git
+  version: master
 - name: stackhpc.gluster-cluster
   src: https://github.com/stackhpc/ansible-role-gluster-cluster.git
-- name: stackhpc.openhpc
-  version: v0.3.0
-- name: stackhpc.cluster-nfs
-  src: https://github.com/stackhpc/ansible-role-cluster-nfs
   version: master
-- name: stackhpc.cluster-infra
-  src: https://github.com/stackhpc/ansible-role-cluster-infra
-  version: newton-backport
+- name: stackhpc.openhpc
+  src: https://github.com/stackhpc/ansible-role-openhpc.git
+  version: master
+- name: stackhpc.cluster-nfs
+  src: https://github.com/stackhpc/ansible-role-cluster-nfs.git
+  version: master

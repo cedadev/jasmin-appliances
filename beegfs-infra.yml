@@ -18,16 +18,16 @@
         cluster_groups: "{{ beegfs_groups }}"
         cluster_tag: "{{ cluster_type.storage }}"
 
+# Gather facts for all hosts
 - hosts: cluster
-  become: true
-  tasks:
-    - import_tasks: tasks/network/hosts.yml
-    - import_tasks: tasks/network/firewall.yml
+  tasks: []
 
-# Join the hosts to the FreeIPA realm
 - hosts: beegfs_servers
   become: true
   tasks:
+    - import_tasks: tasks/network/firewall.yml
+    - include: tasks/util/upgrade_os_packages.yml
+    # Join the hosts to the FreeIPA realm
     - include_tasks: tasks/identity/freeipa/client.yml
 
 # Set the permissions for the cluster in FreeIPA
@@ -42,7 +42,3 @@
 - import_playbook: beegfs.yml
   vars:
     beegfs_name: "{{ cluster_name }}"
-
-- hosts: beegfs_servers
-  tasks:
-    - include: tasks/util/upgrade_os_packages.yml

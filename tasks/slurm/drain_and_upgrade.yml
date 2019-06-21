@@ -1,0 +1,35 @@
+---
+
+# These tasks upgrade the OS packages on a SLURM host
+# They make an effort to drain the host first to avoid downtime where possible
+
+# Check whether there are any updates, so we don't drain nodes unnecessarily
+- name: Check for available updates
+  yum:
+    list: updates
+    update_cache: true
+  register: yum_list_updates
+
+- block:
+    # Try to drain pods from the host - if the drain times out, continue anyway
+    - name: Drain host
+      include_role:
+        name: stackhpc.openhpc
+        apply:
+          ignore_errors: yes
+      vars:
+        openhpc_enable:
+          drain: true
+      # You can't drain the control host
+      when: inventory_hostname in groups['slurm_compute']
+
+    - include_tasks: tasks/util/upgrade_os_packages.yml
+
+    - name: Resume host
+      include_role:
+        name: stackhpc.openhpc
+      vars:
+        openhpc_enable:
+          resume: true
+      when: inventory_hostname in groups['slurm_compute']
+  when: yum_list_updates.results | length > 0

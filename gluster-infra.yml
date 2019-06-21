@@ -22,18 +22,16 @@
         cluster_groups: "{{ gluster_groups }}"
         cluster_tag: "{{ cluster_type.storage }}"
 
+# Gather facts for all hosts
 - hosts: cluster
-  become: true
-  tasks:
-    - import_tasks: tasks/network/hosts.yml
-    - import_tasks: tasks/network/firewall.yml
-  roles:
-    - role: resmo.ntp
+  tasks: []
 
-# Join the hosts to the FreeIPA realm
 - hosts: gluster_servers
   become: true
   tasks:
+    - import_tasks: tasks/network/firewall.yml
+    - include: tasks/util/upgrade_os_packages.yml
+    # Join the hosts to the FreeIPA realm
     - include_tasks: tasks/identity/freeipa/client.yml
 
 # Set the permissions for the cluster in FreeIPA
@@ -46,7 +44,3 @@
     create_users_group: false
 
 - import_playbook: gluster.yml
-
-- hosts: gluster_servers
-  tasks:
-    - include: tasks/util/upgrade_os_packages.yml

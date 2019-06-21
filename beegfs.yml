@@ -12,10 +12,10 @@
     - role: stackhpc.beegfs
       beegfs_enable:
         admon: false
-        mgmt: "{{ 'mds' in groups and inventory_hostname in groups['mds'] }}"
-        meta: "{{ 'mds' in groups and inventory_hostname in groups['mds'] }}"
-        oss: "{{ 'oss' in groups and inventory_hostname in groups['oss'] }}"
-        tuning: "{{ 'oss' in groups and inventory_hostname in groups['oss'] }}"
+        mgmt: "{{ 'beegfs_mds' in groups and inventory_hostname in groups['beegfs_mds'] }}"
+        meta: "{{ 'beegfs_mds' in groups and inventory_hostname in groups['beegfs_mds'] }}"
+        oss: "{{ 'beegfs_oss' in groups and inventory_hostname in groups['beegfs_oss'] }}"
+        tuning: "{{ 'beegfs_oss' in groups and inventory_hostname in groups['beegfs_oss'] }}"
         client: "{{ 'beegfs_clients' in groups and inventory_hostname in groups['beegfs_clients'] }}"
       beegfs_oss:
       - dev: "/dev/sdb"

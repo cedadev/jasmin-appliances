@@ -4,11 +4,9 @@ k8s_gw_group_name: "master"
 
 k8s_group_masters:
   name: "{{ k8s_gw_group_name }}"
-  node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: 1
   flavor: "{{ cluster_master_flavor }}"
-  root_volume_size: 0
   inventory_groups:
     - rke_hosts
   facts:
@@ -16,11 +14,9 @@ k8s_group_masters:
 
 k8s_group_workers:
   name: "worker"
-  node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: "{{ cluster_num_workers }}"
   flavor: "{{ cluster_worker_flavor }}"
-  root_volume_size: 0
   inventory_groups:
     - rke_hosts
   facts:

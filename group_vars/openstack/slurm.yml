@@ -12,19 +12,15 @@ slurm_login:
   name: "{{ slurm_gw_group_name }}"
   flavor: "{{ cluster_login_flavor | default('j1.small') }}"
   num_nodes: 1
-  root_volume_size: 0
-  node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
-  inventory_groups: "{{ slurm_inventory_groups }}"
+  inventory_groups: "{{ slurm_inventory_groups + ['slurm_login'] }}"
 
 slurm_compute:
   name: "compute"
   flavor: "{{ cluster_compute_flavor | default('j2.tiny') }}"
   num_nodes: "{{ cluster_num_workers }}"
-  root_volume_size: 0
-  node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
-  inventory_groups: "{{ slurm_inventory_groups }}"
+  inventory_groups: "{{ slurm_inventory_groups + ['slurm_compute'] }}"
 
 slurm_groups_fixed_ip:
   - "{{ slurm_login | combine(cluster_fip_mixin) }}"

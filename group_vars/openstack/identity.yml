@@ -4,11 +4,9 @@ identity_gw_group_name: "proxy"
 
 identity_group_proxy:
   name: "{{ identity_gw_group_name }}"
-  node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: 1
   flavor: "{{ identity_proxy_flavor | default('j2.small') }}"
-  root_volume_size: 0
   inventory_groups:
     - identity_servers
     - identity_proxies
@@ -17,11 +15,9 @@ identity_group_proxy:
 
 identity_group_freeipa_server:
   name: freeipa
-  node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: 1
   flavor: "{{ freeipa_server_flavor | default('j2.small') }}"
-  root_volume_size: 0
   inventory_groups:
     - identity_servers
     - freeipa_servers
@@ -31,11 +27,9 @@ identity_group_freeipa_server:
 
 identity_group_keycloak_server:
   name: keycloak
-  node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: 1
   flavor: "{{ keycloak_server_flavor | default('j2.small') }}"
-  root_volume_size: 0
   inventory_groups:
     - identity_servers
     - keycloak_servers

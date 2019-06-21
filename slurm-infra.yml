@@ -22,18 +22,18 @@
         # Tag to assign to  the cluster
         cluster_tag: "{{ cluster_type.slurm }}"
 
+# Gather facts for all hosts
 - hosts: cluster
-  become: true
-  tasks:
-    - import_tasks: tasks/network/hosts.yml
-    - import_tasks: tasks/network/firewall.yml
+  tasks: []
 
 - hosts: slurm
   become: true
-  roles:
-    - resmo.ntp
-  # Join the Slurm hosts to the FreeIPA realm
   tasks:
+    - include_tasks: tasks/network/firewall.yml
+    - include_tasks: tasks/slurm/upgrade_os_packages.yml
+      vars:
+        openhpc_slurm_control_host: "{{ groups['slurm_login'] | first }}"
+    # Join the hosts to the FreeIPA realm
     - include_tasks: tasks/identity/freeipa/client.yml
 
 # Set the permissions for the cluster in FreeIPA
@@ -68,30 +68,25 @@
     - hostvars.localhost.storage_type is defined
     - hostvars.localhost.storage_type == 'beegfs'
 
-- hosts:
-    - "login"
-    - "compute"
+- hosts: slurm
   become: true
   pre_tasks:
-    - name: Ensure the OpenHPC package repo rpm is present
+    - name: Install OpenHPC repository
       yum:
-        name: "https://github.com/openhpc/ohpc/releases/download/v1.3.GA/ohpc-release-1.3-1.el7.x86_64.rpm"
+        name: "{{ openhpc_repo_url }}"
         state: present
-
-    - name: Ensure latest python is present
-      yum:
-        name: python
-        state: latest
   roles:
     - role: stackhpc.openhpc
       openhpc_enable:
-        control: "{{ inventory_hostname in groups['login'] }}"
-        batch: "{{ inventory_hostname in groups['compute'] }}"
+        control: "{{ inventory_hostname in groups['slurm_login'] }}"
+        batch: "{{ inventory_hostname in groups['slurm_compute'] }}"
         runtime: true
       openhpc_cluster_name: "{{ cluster_name }}"
-      openhpc_packages: "{{ slurm_packages }}"
-      openhpc_slurm_partitions: "{{ slurm_partitions }}"
-      openhpc_slurm_control_host: "{{ groups['login'] | first }}"
+      # Put all the compute nodes into a single partition
+      openhpc_slurm_partitions:
+        - name: "compute"
+          num_nodes: "{{ groups['slurm_compute'] | length }}"
+      openhpc_slurm_control_host: "{{ groups['slurm_login'] | first }}"
 
 # - import_playbook: validation.yml
 #   when:

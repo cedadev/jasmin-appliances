@@ -13,7 +13,7 @@
 - name: Enable IPv6 for loopback interface
   sysctl:
     name: net.ipv6.conf.lo.disable_ipv6
-    value: 0
+    value: "0"
 
 - name: Configure FreeIPA server
   command: >
