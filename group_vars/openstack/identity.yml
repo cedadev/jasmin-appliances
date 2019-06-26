@@ -11,7 +11,7 @@ identity_group_proxy:
     - identity_servers
     - identity_proxies
   facts:
-    proxy_external_domain: "{{ cluster_fixed_ip }}.nip.io"
+    proxy_external_domain: "{{ proxy_external_domain | default(cluster_fixed_ip + '.nip.io', true) }}"
 
 identity_group_freeipa_server:
   name: freeipa

@@ -4,21 +4,32 @@ description: "The Pangeo software stack running on Kubernetes."
 logo: "https://raw.githubusercontent.com/pangeo-data/branding/master/logo/pangeo_simple_logo.png"
 
 parameters:
-  - name: "cluster_version"
-    label: "Kubernetes version"
+  - name: identity_stack_name
+    label: "Identity manager"
+    description: >
+      The identity manager for managing access to the cluster.
+    kind: "cloud.cluster"
+    options:
+      tag: identity
+    immutable: true
+
+  - name: kubernetes_version
+    label: "Version"
     description: "The Kubernetes version to use."
     kind: "choice"
     options:
-      choices: ["1.12", "1.13", "1.14"]
+      choices: ["1.11", "1.12", "1.13", "1.14"]
+    default: "1.13"
 
-  - name: "cluster_num_workers"
+  - name: cluster_num_workers
     label: "Worker nodes"
     description: "The number of worker nodes in the cluster."
     kind: "integer"
     options:
-      min: 3
+      min: 1
+    default: 3
 
-  - name: "cluster_master_flavor"
+  - name: cluster_master_flavor
     label: "Master size"
     description: "The size to use for the master node."
     kind: "cloud.size"
@@ -27,7 +38,7 @@ parameters:
       min_ram: 2048
     immutable: true
 
-  - name: "cluster_worker_flavor"
+  - name: cluster_worker_flavor
     label: "Worker size"
     description: "The size to use for the worker nodes."
     kind: "cloud.size"
@@ -36,33 +47,55 @@ parameters:
       min_ram: 8192
     immutable: true
 
-  - name: "cluster_root_volume_size"
+  - name: cluster_root_volume_size
     label: "Root volume size (GB)"
-    description: "The size of the root volume of cluster nodes."
+    description: The size of the root volume of cluster nodes.
     kind: "integer"
     options:
-      min: 10
+      min: 20
     immutable: true
     default: 40
 
-  - name: "cluster_fixed_ip"
+  - name: cluster_fixed_ip
     label: "External IP"
-    description: |
-      The external IP to attach to the master node.
-
-      On successful deployment, the Pangeo interface will be available at this IP.
+    description: The external IP to attach to the master node.
     kind: "cloud.ip"
     immutable: true
 
-  - name: "pangeo_username"
-    label: "Admin username"
-    description: "Username of the Pangeo cluster adminstrator."
-    kind: "string"
-    default: "admin"
-
-  - name: "pangeo_password"
-    label: "Admin password"
-    description: "Password for the Pangeo cluster."
-    kind: "string"
+  - name: pangeo_notebook_cpu
+    label: Notebook CPUs
+    description: The number of CPUs to allocate to each user notebook.
+    kind: integer
     options:
-      secret: true
+      min: 1
+    default: 1
+
+  - name: pangeo_notebook_mem
+    label: Notebook RAM
+    description: The amount of RAM to allocate to each user notebook (GB).
+    kind: integer
+    options:
+      min: 1
+    default: 2
+
+  - name: pangeo_notebook_storage
+    label: Notebook storage
+    description: The amount of storage to allocate to each user notebook (GB).
+    kind: integer
+    options:
+      min: 1
+    default: 10
+
+  - name: pangeo_domain
+    label: Pangeo domain
+    description: |
+      The domain to use to access Pangeo (optional).
+
+      If not given, pangeo.<ip>.nip.io will be used, which requires no action.
+
+      If given, a DNS entry for the domain, pointing to the selected IP,
+      must already exist. A DNS entry will **not** be created for you,
+      and the lack of a correct DNS entry will cause configuration to fail.
+    kind: string
+    immutable: true
+    required: false

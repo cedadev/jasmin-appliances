@@ -5,13 +5,13 @@ description: >
 logo: https://user-images.githubusercontent.com/13452123/59352838-8c5b4000-8d19-11e9-9f3c-2de73454f9ab.png
 
 parameters:
-  - name: "cluster_fixed_ip"
+  - name: cluster_fixed_ip
     label: "External IP"
-    description: The external IP to use for the identity management web interfaces.
+    description: The external IP to use for the proxy.
     kind: "cloud.ip"
     immutable: true
 
-  - name: "admin_password"
+  - name: admin_password
     label: "Admin password"
     description: "Password for the `admin` user."
     kind: "string"
@@ -19,3 +19,42 @@ parameters:
     options:
       secret: true
       confirm: true
+
+  - name: freeipa_server_flavor
+    label: FreeIPA size
+    description: The size to use for the FreeIPA server.
+    kind: "cloud.size"
+    immutable: true
+    default: 22  # This is j2.small
+    options:
+      min_ram: 2048
+
+  - name: keycloak_server_flavor
+    label: Keycloak size
+    description: The size to use for the Keycloak server.
+    kind: "cloud.size"
+    immutable: true
+    default: 22  # This is j2.small
+    options:
+      min_ram: 2048
+
+  - name: identity_proxy_flavor
+    label: Proxy size
+    description: The size to use for the proxy server.
+    kind: "cloud.size"
+    immutable: true
+    default: 11  # This is j1.tiny
+
+  - name: proxy_external_domain
+    label: Proxy domain
+    description: |
+      The domain to use for the proxy server (optional).
+
+      If not given, <ip>.nip.io will be used, which requires no action.
+
+      If given, a DNS entry for the domain, pointing to the selected IP,
+      must already exist. A DNS entry will **not** be created for you,
+      and the lack of a correct DNS entry will cause configuration to fail.
+    kind: string
+    immutable: true
+    required: false
