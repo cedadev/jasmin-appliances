@@ -7,6 +7,7 @@ k8s_group_masters:
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: 1
   flavor: "{{ cluster_master_flavor }}"
+  root_volume_size: "{{ cluster_root_volume_size }}"
   inventory_groups:
     - rke_hosts
   facts:
@@ -17,6 +18,7 @@ k8s_group_workers:
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: "{{ cluster_num_workers }}"
   flavor: "{{ cluster_worker_flavor }}"
+  root_volume_size: "{{ cluster_root_volume_size }}"
   inventory_groups:
     - rke_hosts
   facts:

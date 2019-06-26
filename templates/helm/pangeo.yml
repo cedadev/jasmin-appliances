@@ -26,7 +26,7 @@ jupyterhub:
   singleuser:
     image:
       name: pangeo/pangeo-notebook
-      tag: "2019.05.23"
+      tag: "2019.06.25"
     startTimeout: 1000
     storage:
       type: dynamic
@@ -55,5 +55,10 @@ jupyterhub:
   ingress:
     enabled: true
     hosts: ["pangeo.{{ cluster_fixed_ip }}.nip.io"]
+    # Get a certificate from the letsencrypt issuer
+    annotations:
+      certmanager.k8s.io/cluster-issuer: letsencrypt
+      certmanager.k8s.io/acme-challenge-type: http01
     tls:
       - hosts: ["pangeo.{{ cluster_fixed_ip }}.nip.io"]
+        secretName: pangeo-tls
