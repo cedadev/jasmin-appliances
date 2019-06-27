@@ -73,6 +73,7 @@
   pre_tasks:
     # Before starting, make sure that we have an Openstack trust
     # This is created on the Openstack host but persisted on the cluster nodes
+    # These tasks set the openstack_trust_id and openstack_project_id variables
     - include_tasks: tasks/util/os_trust.yml
   roles:
     # Install Kubernetes using RKE
@@ -87,8 +88,6 @@
         rke_ssh_user: centos
         rke_ssh_private_key: "{{ lookup('file', ansible_ssh_private_key_file) }}"
         rke_cloud_provider: openstack
-        openstack_trust_id: "{{ ansible_local.openstack_trust_id }}"
-        openstack_project_id: "{{ ansible_local.openstack_project_id }}"
         # Configure the API server to authenticate using Keycloak
         rke_extra_config:
           services:
