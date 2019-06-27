@@ -62,7 +62,7 @@ parameters:
     description: |
       The external IP to attach to the master node.
 
-      If not selected, the cluster will not be directly accessible from outside your tenancy.
+      If not selected, you will need to access the cluster via a separate SSH bastion.
     kind: "cloud.ip"
     required: false
     immutable: true

@@ -4,9 +4,18 @@ description: "Shared storage cluster using the BeeGFS filesystem."
 logo: https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/BeeGFS-Logo.png/320px-BeeGFS-Logo.png
 
 parameters:
+  - name: "identity_stack_name"
+    label: "Identity manager"
+    description: >
+      The identity manager for managing access to the cluster.
+    kind: "cloud.cluster"
+    options:
+      tag: identity
+    immutable: true
+
   - name: "beegfs_mds_volume_size"
     label: "Metadata volume size (GB)"
-    description: "BeeGFS metadata server volume size."
+    description: "Size of the BeeGFS metadata volume."
     kind: "integer"
     options:
       min: 1
@@ -14,7 +23,7 @@ parameters:
 
   - name: "beegfs_mds_flavor"
     label: "Metadata size"
-    description: "The size to use for the metadata node."
+    description: "The size to use for the metadata server."
     kind: "cloud.size"
     options:
       min_ram: 2048
@@ -28,17 +37,19 @@ parameters:
       min: 5
     immutable: true
 
-  - name: "beegfs_oss_num_nodes"
-    label: "Number of storage nodes"
-    description: "Number of BeeGFS object storage server nodes."
-    kind: "integer"
-    options:
-      min: 1
-
   - name: "beegfs_oss_flavor"
     label: "Object storage size"
     description: "The size to use for the object storage nodes."
     kind: "cloud.size"
     options:
       min_ram: 2048
+    immutable: true
+
+  - name: "beegfs_oss_num_nodes"
+    label: "Number of storage nodes"
+    description: "Number of BeeGFS object storage server nodes."
+    kind: "integer"
+    options:
+      min: 1
+    default: 3
     immutable: true

@@ -52,7 +52,7 @@ parameters:
 
       If not given, <ip>.nip.io will be used, which requires no action.
 
-      If given, a DNS entry for the domain, pointing to the selected IP,
+      If given, a DNS entry for the domain pointing to the selected IP
       must already exist. A DNS entry will **not** be created for you,
       and the lack of a correct DNS entry will cause configuration to fail.
     kind: string

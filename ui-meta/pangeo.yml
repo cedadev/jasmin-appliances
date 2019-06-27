@@ -71,16 +71,19 @@ parameters:
     default: 1
 
   - name: pangeo_notebook_mem
-    label: Notebook RAM
-    description: The amount of RAM to allocate to each user notebook (GB).
+    label: Notebook RAM (GB)
+    description: The amount of RAM to allocate to each user notebook.
     kind: integer
     options:
       min: 1
     default: 2
 
   - name: pangeo_notebook_storage
-    label: Notebook storage
-    description: The amount of storage to allocate to each user notebook (GB).
+    label: Notebook storage (GB)
+    description: |
+      The amount of storage to allocate to each user notebook.
+
+      This is dynamically provisioned and does not come out of the root volume.
     kind: integer
     options:
       min: 1
@@ -93,7 +96,7 @@ parameters:
 
       If not given, pangeo.<ip>.nip.io will be used, which requires no action.
 
-      If given, a DNS entry for the domain, pointing to the selected IP,
+      If given, a DNS entry for the domain pointing to the selected IP
       must already exist. A DNS entry will **not** be created for you,
       and the lack of a correct DNS entry will cause configuration to fail.
     kind: string
