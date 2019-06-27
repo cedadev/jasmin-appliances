@@ -94,7 +94,7 @@ parameters:
     description: |
       The domain to use to access Pangeo (optional).
 
-      If not given, pangeo.<ip>.nip.io will be used, which requires no action.
+      If not given, `pangeo.<ip>.nip.io` will be used, which requires no action.
 
       If given, a DNS entry for the domain pointing to the selected IP
       must already exist. A DNS entry will **not** be created for you,
