@@ -10,8 +10,9 @@ k8s_group_masters:
   root_volume_size: "{{ cluster_root_volume_size }}"
   inventory_groups:
     - rke_hosts
+    - rke_masters
   facts:
-    rke_node_roles: [etcd, controlplane]
+    kube_dashboard_domain: "{{ kube_dashboard_domain | default('kube-dashboard.' + cluster_fixed_ip + '.nip.io', true) }}"
 
 k8s_group_workers:
   name: "worker"
@@ -21,8 +22,7 @@ k8s_group_workers:
   root_volume_size: "{{ cluster_root_volume_size }}"
   inventory_groups:
     - rke_hosts
-  facts:
-    rke_node_roles: [worker]
+    - rke_workers
 
 k8s_groups_fixed_ip:
   - "{{ k8s_group_masters | combine(cluster_fip_mixin) }}"

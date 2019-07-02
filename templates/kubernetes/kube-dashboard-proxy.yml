@@ -1,0 +1,84 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kube-dashboard-proxy
+  # Get a certificate from the letsencrypt issuer
+  annotations:
+    certmanager.k8s.io/cluster-issuer: letsencrypt
+    certmanager.k8s.io/acme-challenge-type: http01
+spec:
+  rules:
+    - host: "{{ kube_dashboard_domain }}"
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: kube-dashboard-proxy
+              servicePort: 80
+  tls:
+    - hosts: ["{{ kube_dashboard_domain }}"]
+      secretName: kube-dashboard-proxy-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-dashboard-proxy
+spec:
+  selector:
+    app: kube-dashboard-proxy
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-dashboard-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kube-dashboard-proxy
+  template:
+    metadata:
+      labels:
+        app: kube-dashboard-proxy
+    spec:
+      containers:
+        - name: proxy
+          image: "quay.io/keycloak/keycloak-gatekeeper:{{ keycloak_gatekeeper_version }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          args:
+            - --listen=0.0.0.0:3000
+            - --discovery-url={{ keycloak_oidc_issuer_url }}
+            - --client-id={{ kube_dashboard_proxy_client_id }}
+            - --client-secret={{ kube_dashboard_proxy_client_secret }}
+            # Allow redirection-url to be auto-detected from X-Forwarded headers
+            - --upstream-url=https://kubernetes-dashboard
+            - --enable-authorization-header=true
+            - --resources=uri=/*
+            - --enable-default-deny=true
+            - --enable-refresh-tokens=true
+            - --enable-session-cookies=true
+            - --preserve-host=true
+            - --enable-encrypted-token=true
+            - --encryption-key={{ kube_dashboard_proxy_encryption_key }}
+            - --enable-logging=true
+            - --enable-json-logging=true
+            - --verbose
+          livenessProbe: &probe
+            httpGet:
+              path: /oauth/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            <<: *probe
+          securityContext:
+            readOnlyRootFilesystem: true

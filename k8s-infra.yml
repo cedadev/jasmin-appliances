@@ -57,14 +57,17 @@
   tasks:
     - include_tasks: tasks/identity/keycloak/oidc_client.yml
       vars:
-        keycloak_client_id: kubectl-oidc-login
-        keycloak_client_name: "Kubectl OIDC"
-        keycloak_client_description: >
-          Client for connecting to Kubernetes clusters with kubectl.
-        keycloak_client_redirect_uris:
-          - http://localhost:8000
-          - urn:ietf:wg:oauth:2.0:oob
-        keycloak_client_delete: false
+        keycloak_client_id: "{{ cluster_name }}"
+        keycloak_client_name: "Kubernetes cluster - {{ cluster_name }}"
+        # Include redirect URIs for use with kubectl and the dashboard authenticating proxy
+        keycloak_client_redirect_uris: >-
+          [
+            'http://localhost:8000',
+            'urn:ietf:wg:oauth:2.0:oob',
+            {%- if 'rke_masters' in groups -%}
+            'https://{{ hostvars[groups.rke_masters | first].kube_dashboard_domain }}/oauth/callback',
+            {%- endif -%}
+          ]
 
 # Install Kubernetes
 - hosts: rke_hosts
@@ -75,6 +78,16 @@
     # This is created on the Openstack host but persisted on the cluster nodes
     # These tasks set the openstack_trust_id and openstack_project_id variables
     - include_tasks: tasks/util/os_trust.yml
+
+    - name: Set RKE node roles (masters)
+      set_fact:
+        rke_node_roles: [etcd, controlplane]
+      when: inventory_hostname in groups.rke_masters
+
+    - name: Set RKE node roles (workers)
+      set_fact:
+        rke_node_roles: [worker]
+      when: inventory_hostname in groups.rke_workers
   roles:
     # Install Kubernetes using RKE
     - role: jasmin.rke
@@ -114,60 +127,26 @@
             apiGroup: rbac.authorization.k8s.io
             kind: ClusterRole
             name: cluster-admin
+
+- hosts: rke_masters
+  become: true
   tasks:
-    # On the first host in the play, install Helm and required charts
-    - block:
-        # Install Helm
-        - include_role:
-            name: jasmin.helm
+    # helm/kubectl commands need to run on the first host in the play
+    - include_role:
+        name: jasmin.helm
 
-        - name: Install cert-manager manifests
-          command: >
-            kubectl apply
-              -f https://raw.githubusercontent.com/jetstack/cert-manager/{{ cert_manager_version }}/deploy/manifests/00-crds.yaml
-              -f https://raw.githubusercontent.com/jetstack/cert-manager/{{ cert_manager_version }}/deploy/manifests/01-namespace.yaml
+    # Install the Nginx ingress controller first
+    - name: Install Nginx ingress controller
+      include_role:
+        name: jasmin.helm
+        tasks_from: chart.yml
+      vars:
+        helm_release_name: nginx-ingress
+        helm_release_chart: stable/nginx-ingress
+        helm_release_namespace: nginx-ingress
+        helm_release_values_template: templates/helm/nginx-ingress.yml
 
-        - name: Install Jetstack Helm repository
-          command: helm repo add jetstack https://charts.jetstack.io
-
-        - name: Install cert-manager
-          include_role:
-            name: jasmin.helm
-            tasks_from: chart.yml
-          vars:
-            helm_release_name: cert-manager
-            helm_release_chart: jetstack/cert-manager
-            helm_release_version: "{{ cert_manager_version }}"
-            helm_release_namespace: cert-manager
-
-        - name: Configure LetsEncrypt issuer
-          shell: |
-            kubectl apply -f - <<EOF
-            apiVersion: certmanager.k8s.io/v1alpha1
-            kind: ClusterIssuer
-            metadata:
-              name: letsencrypt
-            spec:
-              acme:
-                server: https://acme-v02.api.letsencrypt.org/directory
-                privateKeySecretRef:
-                  name: letsencrypt
-                # Enable the HTTP-01 challenge provider
-                http01: {}
-            EOF
-
-        - name: Install Nginx ingress controller
-          include_role:
-            name: jasmin.helm
-            tasks_from: chart.yml
-          vars:
-            helm_release_name: nginx-ingress
-            helm_release_chart: stable/nginx-ingress
-            helm_release_namespace: nginx-ingress
-            helm_release_values_template: templates/helm/nginx-ingress.yml
-      when: inventory_hostname == ansible_play_hosts[0]
-
-    # On the controlplane hosts, open ports 80 and 443
+    # Open ports 80 and 443 for the ingress controller
     - name: Open HTTP(S) ports for ingress controller
       firewalld:
         service: "{{ item }}"
@@ -175,4 +154,83 @@
         immediate: true
         state: enabled
       loop: [http, https]
-      when: "'controlplane' in rke_node_roles"
+
+    - name: Install cert-manager manifests
+      command: >
+        kubectl apply
+          -f https://raw.githubusercontent.com/jetstack/cert-manager/{{ cert_manager_version }}/deploy/manifests/00-crds.yaml
+          -f https://raw.githubusercontent.com/jetstack/cert-manager/{{ cert_manager_version }}/deploy/manifests/01-namespace.yaml
+
+    - name: Install Jetstack Helm repository
+      command: helm repo add jetstack https://charts.jetstack.io
+
+    - name: Install cert-manager
+      include_role:
+        name: jasmin.helm
+        tasks_from: chart.yml
+      vars:
+        helm_release_name: cert-manager
+        helm_release_chart: jetstack/cert-manager
+        helm_release_version: "{{ cert_manager_version }}"
+        helm_release_namespace: cert-manager
+
+    - name: Configure LetsEncrypt issuer
+      shell: |
+        kubectl apply -f - <<EOF
+        apiVersion: certmanager.k8s.io/v1alpha1
+        kind: ClusterIssuer
+        metadata:
+          name: letsencrypt
+        spec:
+          acme:
+            server: https://acme-v02.api.letsencrypt.org/directory
+            privateKeySecretRef:
+              name: letsencrypt
+            # Enable the HTTP-01 challenge provider
+            http01: {}
+        EOF
+
+    # Create a persistent secret token for the kube-dashboard proxy token encryption
+    - name: Create persistent encryption key
+      include_tasks: tasks/util/persistent_random_fact.yml
+      vars:
+        fact_name: kube_dashboard_proxy_encryption_key
+        # 32 chars is important - this is an AES-256 key
+        random_string_length: 32
+
+    - name: Install Kubernetes dashboard
+      include_role:
+        name: jasmin.helm
+        tasks_from: chart.yml
+      vars:
+        helm_release_name: kube-dashboard
+        helm_release_chart: stable/kubernetes-dashboard
+        helm_release_namespace: kube-system
+        helm_release_extra_args:
+          - --set fullnameOverride=kubernetes-dashboard
+
+    - name: Set manifests directory fact
+      set_fact:
+        kube_manifests_dir: "{{ ansible_env.HOME | default('root') }}/manifests"
+
+    - name: Ensure manifests directory exists
+      file:
+        path: "{{ kube_manifests_dir }}"
+        state: directory
+
+    - name: Install dashboard proxy manifest
+      template:
+        src: templates/kubernetes/kube-dashboard-proxy.yml
+        dest: "{{ kube_manifests_dir }}"
+        mode: u=rw,g=r,o=
+      vars:
+        keycloak_oidc_issuer_url: "{{ hostvars[groups.keycloak_servers | first].keycloak_oidc_issuer_url }}"
+        kube_dashboard_proxy_client_id: "{{ hostvars[groups.keycloak_servers | first].keycloak_client_id }}"
+        kube_dashboard_proxy_client_secret: "{{ hostvars[groups.keycloak_servers | first].keycloak_client_secret }}"
+        kube_dashboard_proxy_encryption_key: "{{ ansible_local.kube_dashboard_proxy_encryption_key }}"
+
+    - name: Install dashboard proxy
+      command: kubectl -n kube-system apply -f {{ kube_manifests_dir }}/kube-dashboard-proxy.yml
+
+    - name: Wait for dashboard proxy to start
+      command: kubectl -n kube-system rollout status deployment kube-dashboard-proxy

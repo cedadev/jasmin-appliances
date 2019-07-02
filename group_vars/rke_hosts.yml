@@ -1,3 +1,5 @@
 ---
 
 cert_manager_version: v0.8.1
+
+keycloak_gatekeeper_version: "6.0.1"

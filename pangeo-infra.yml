@@ -40,10 +40,6 @@
     # Set facts that we need for the Helm chart
     - set_fact:
         pangeo_notebook_users_group: "{{ hostvars[groups.freeipa_servers | first].pangeo_notebook_users_group }}"
-        freeipa_ldap_domain: >-
-          {%- for part in (freeipa_realm | lower).split('.') -%}
-            dc={{ part }}{%- if not loop.last -%},{%- endif -%}
-          {%- endfor -%}
 
     # Install the Pangeo chart
     - include_role:
