@@ -1,0 +1,97 @@
+---
+
+# These tasks configure Keycloak to use FreeIPA's LDAP as the user store
+# We assume that the host has already been joined to the FreeIPA realm
+
+- name: Enable LDAP user federation
+  keycloak_component:
+    name: ldap
+    provider_type: org.keycloak.storage.UserStorageProvider
+    provider_id: ldap
+    config:
+      editMode: READ_ONLY
+      priority: "0"
+      # Vendor is Red Hat Directory Server
+      vendor: rhds
+      usernameLDAPAttribute: uid
+      rdnLDAPAttribute: uid
+      uuidLDAPAttribute: ipaUniqueID
+      userObjectClasses: [posixAccount]
+      connectionUrl: "ldaps://{{ freeipa_server }}"
+      usersDn: "cn=users,cn=accounts,{{ freeipa_ldap_domain }}"
+      authType: simple
+      bindDn: "uid=admin,cn=users,cn=accounts,{{ freeipa_ldap_domain }}"
+      bindCredential: "{{ freeipa_admin_password }}"
+      cachePolicy: NO_CACHE
+      batchSizeForSync: "1000"
+      fullSyncPeriod: "604800"
+      changedSyncPeriod: "86400"
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_realm: master
+    auth_username: "{{ keycloak_admin_user }}"
+    auth_password: "{{ keycloak_admin_password }}"
+  register: keycloak_ldap
+
+- name: Modify LDAP first name mapper to use givenName
+  keycloak_component:
+    name: "first name"
+    provider_type: org.keycloak.storage.ldap.mappers.LDAPStorageMapper
+    provider_id: user-attribute-ldap-mapper
+    parent_id: "{{ keycloak_ldap.component.id }}"
+    config:
+      ldap.attribute: givenName
+      is.mandatory.in.ldap: "false"
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_realm: master
+    auth_username: "{{ keycloak_admin_user }}"
+    auth_password: "{{ keycloak_admin_password }}"
+
+- name: Add LDAP groups mapper
+  keycloak_component:
+    name: groups
+    provider_type: org.keycloak.storage.ldap.mappers.LDAPStorageMapper
+    provider_id: group-ldap-mapper
+    parent_id: "{{ keycloak_ldap.component.id }}"
+    config:
+      groups.dn: "cn=groups,cn=accounts,{{ freeipa_ldap_domain }}"
+      group.name.ldap.attribute: cn
+      group.object.classes: ["groupOfNames"]
+      preserve.group.inheritance: "true"
+      ignore.missing.groups: "false"
+      membership.ldap.attribute: "member"
+      membership.attribute.type: "DN"
+      membership.user.ldap.attribute: "uid"
+      # Although set in group.object.classes above, this seems to be required in order
+      # to exclude groups that don't have groupOfNames in their objectClasses
+      groups.ldap.filter: "(objectClass=groupOfNames)"
+      # This forces Keycloak to sync group memberships with LDAP if changed in Keycloak
+      mode: LDAP_ONLY
+      user.roles.retrieve.strategy: LOAD_GROUPS_BY_MEMBER_ATTRIBUTE
+      # This makes the Keycloak groups be the same as the LDAP groups
+      drop.non.existing.groups.during.sync: "true"
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_realm: master
+    auth_username: "{{ keycloak_admin_user }}"
+    auth_password: "{{ keycloak_admin_password }}"
+  register: keycloak_ldap_groups
+
+- name: Synchronise LDAP groups
+  command: >
+    /opt/keycloak/latest/bin/kcadm.sh create
+      user-storage/{{ keycloak_ldap.component.id }}/mappers/{{ keycloak_ldap_groups.component.id }}/sync?direction=fedToKeycloak
+      --no-config
+      --server http://localhost:8080/auth
+      --realm master
+      --user {{ keycloak_admin_user }}
+      --password {{ keycloak_admin_password | quote }}
+
+- name: Grant FreeIPA admins group admin access in Keycloak
+  command: >
+    /opt/keycloak/latest/bin/kcadm.sh add-roles
+      --gname admins
+      --rolename admin
+      --no-config
+      --server http://localhost:8080/auth
+      --realm master
+      --user {{ keycloak_admin_user }}
+      --password {{ keycloak_admin_password | quote }}

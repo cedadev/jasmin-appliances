@@ -1,10 +1,17 @@
 ---
 
-- name: Set FreeIPA server facts
+- name: Set FreeIPA facts
   set_fact:
     freeipa_server: "{{ hostvars[groups.freeipa_servers | first].ansible_fqdn }}"
     freeipa_realm: "{{ hostvars[groups.freeipa_servers | first].freeipa_realm }}"
     freeipa_admin_password: "{{ hostvars[groups.freeipa_servers | first].freeipa_admin_password }}"
+
+- name: Set FreeIPA facts (2)
+  set_fact:
+    freeipa_ldap_domain: >-
+      {%- for part in (freeipa_realm | lower).split('.') -%}
+        dc={{ part }}{%- if not loop.last -%},{%- endif -%}
+      {%- endfor -%}
 
 - name: Add FreeIPA server as DNS resolver
   lineinfile:

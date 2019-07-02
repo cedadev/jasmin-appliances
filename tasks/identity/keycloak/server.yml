@@ -85,4 +85,4 @@
     enabled: yes
 
 - include_tasks: tasks/identity/keycloak/configure_proxy.yml
-- include_tasks: tasks/identity/keycloak/configure_sssd.yml
+- include_tasks: tasks/identity/keycloak/configure_ldap.yml
