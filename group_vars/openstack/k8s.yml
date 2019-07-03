@@ -12,7 +12,7 @@ k8s_group_masters:
     - rke_hosts
     - rke_masters
   facts:
-    kube_dashboard_domain: "{{ kube_dashboard_domain | default('kube-dashboard.' + cluster_fixed_ip + '.nip.io', true) }}"
+    kubernetes_dashboard_domain: "{{ kubernetes_dashboard_domain | default('dashboard.' + cluster_fixed_ip + '.nip.io', true) }}"
 
 k8s_group_workers:
   name: "worker"

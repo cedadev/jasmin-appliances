@@ -62,7 +62,13 @@ parameters:
     description: |
       The external IP to attach to the master node.
 
-      If not selected, you will need to access the cluster via a separate SSH bastion.
+      This IP can be used to access the Kubernetes API using `kubectl`.
     kind: "cloud.ip"
-    required: false
     immutable: true
+
+  - name: kubernetes_dashboard_enable
+    label: "Enable Kubernetes dashboard?"
+    description: >-
+      If selected, the Kubernetes dashboard will be deployed, and will be
+      made available at `dashboard.<ip>.nip.io`.
+    kind: "boolean"

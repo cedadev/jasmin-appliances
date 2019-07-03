@@ -39,14 +39,14 @@
     - include_tasks: tasks/identity/freeipa/client.yml
 
 # Set the permissions for the cluster in FreeIPA
-# We don't create a user group
-# The admins group is granted the cluster-admin role via OIDC below
 - hosts: freeipa_servers
   become: true
   tasks:
     - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
       vars:
-        create_users_group: false
+        # Create a users group, but don't grant SSH access
+        # We will hook this group up to the cluster-admin role
+        create_users_group: true
 
 # Create/delete the OIDC client for the cluster
 # We create a single client for all Kubernetes clusters in the tenancy
@@ -65,7 +65,7 @@
             'http://localhost:8000',
             'urn:ietf:wg:oauth:2.0:oob',
             {%- if 'rke_masters' in groups -%}
-            'https://{{ hostvars[groups.rke_masters | first].kube_dashboard_domain }}/oauth/callback',
+            'https://{{ hostvars[groups.rke_masters | first].kubernetes_dashboard_domain }}/oauth/callback',
             {%- endif -%}
           ]
 
@@ -112,21 +112,24 @@
                 oidc-username-prefix: "oidc:"
                 oidc-groups-claim: groups
                 oidc-groups-prefix: "oidc:"
-        # Add a cluster-role-binding granting cluster-admin for the oidc:admins group
+        # Grant the cluster-admin role to the global admins and cluster admins groups
         rke_extra_addons: |
           ---
           apiVersion: rbac.authorization.k8s.io/v1
           kind: ClusterRoleBinding
           metadata:
             name: oidc-admins-cluster-admin
-          subjects:
-            - apiGroup: rbac.authorization.k8s.io
-              kind: Group
-              name: oidc:admins
           roleRef:
             apiGroup: rbac.authorization.k8s.io
             kind: ClusterRole
             name: cluster-admin
+          subjects:
+            - apiGroup: rbac.authorization.k8s.io
+              kind: Group
+              name: oidc:admins
+            - apiGroup: rbac.authorization.k8s.io
+              kind: Group
+              name: oidc:{{ hostvars[groups.freeipa_servers | first].user_group_name }}
 
 - hosts: rke_masters
   become: true
@@ -190,47 +193,42 @@
             http01: {}
         EOF
 
-    # Create a persistent secret token for the kube-dashboard proxy token encryption
-    - name: Create persistent encryption key
-      include_tasks: tasks/util/persistent_random_fact.yml
-      vars:
-        fact_name: kube_dashboard_proxy_encryption_key
-        # 32 chars is important - this is an AES-256 key
-        random_string_length: 32
-
     - name: Install Kubernetes dashboard
       include_role:
         name: jasmin.helm
         tasks_from: chart.yml
       vars:
-        helm_release_name: kube-dashboard
+        helm_release_name: kubernetes-dashboard
         helm_release_chart: stable/kubernetes-dashboard
         helm_release_namespace: kube-system
         helm_release_extra_args:
           - --set fullnameOverride=kubernetes-dashboard
+        helm_release_state: "{% if kubernetes_dashboard_enable | bool %}present{% else %}absent{% endif %}"
 
-    - name: Set manifests directory fact
-      set_fact:
-        kube_manifests_dir: "{{ ansible_env.HOME | default('root') }}/manifests"
-
-    - name: Ensure manifests directory exists
-      file:
-        path: "{{ kube_manifests_dir }}"
-        state: directory
-
-    - name: Install dashboard proxy manifest
-      template:
-        src: templates/kubernetes/kube-dashboard-proxy.yml
-        dest: "{{ kube_manifests_dir }}"
-        mode: u=rw,g=r,o=
+    # Create a persistent secret token for the kube-dashboard proxy token encryption
+    - name: Create persistent encryption key
+      include_tasks: tasks/util/persistent_random_fact.yml
       vars:
-        keycloak_oidc_issuer_url: "{{ hostvars[groups.keycloak_servers | first].keycloak_oidc_issuer_url }}"
-        kube_dashboard_proxy_client_id: "{{ hostvars[groups.keycloak_servers | first].keycloak_client_id }}"
-        kube_dashboard_proxy_client_secret: "{{ hostvars[groups.keycloak_servers | first].keycloak_client_secret }}"
-        kube_dashboard_proxy_encryption_key: "{{ ansible_local.kube_dashboard_proxy_encryption_key }}"
+        fact_name: kubernetes_dashboard_proxy_encryption_key
+        # 32 chars is important - this is an AES-256 key
+        random_string_length: 32
 
-    - name: Install dashboard proxy
-      command: kubectl -n kube-system apply -f {{ kube_manifests_dir }}/kube-dashboard-proxy.yml
+    - name: Install cedadev Helm repository
+      command: helm repo add cedadev https://cedadev.github.io/helm-charts
 
-    - name: Wait for dashboard proxy to start
-      command: kubectl -n kube-system rollout status deployment kube-dashboard-proxy
+    - name: Install dashboard authenticating proxy
+      include_role:
+        name: jasmin.helm
+        tasks_from: chart.yml
+      vars:
+        helm_release_name: kubernetes-dashboard-proxy
+        helm_release_chart: cedadev/keycloak-gatekeeper
+        helm_release_namespace: kube-system
+        helm_release_values_template: templates/helm/keycloak-gatekeeper.yml
+        helm_release_state: "{% if kubernetes_dashboard_enable | bool %}present{% else %}absent{% endif %}"
+        gatekeeper_discovery_url: "{{ hostvars[groups.keycloak_servers | first].keycloak_oidc_issuer_url }}"
+        gatekeeper_client_id: "{{ hostvars[groups.keycloak_servers | first].keycloak_client_id }}"
+        gatekeeper_client_secret: "{{ hostvars[groups.keycloak_servers | first].keycloak_client_secret }}"
+        gatekeeper_upstream: https://kubernetes-dashboard
+        gatekeeper_encryption_key: "{{ ansible_local.kubernetes_dashboard_proxy_encryption_key }}"
+        gatekeeper_domain: "{{ kubernetes_dashboard_domain }}"
