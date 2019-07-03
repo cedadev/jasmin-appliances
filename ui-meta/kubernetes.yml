@@ -67,8 +67,10 @@ parameters:
     immutable: true
 
   - name: kubernetes_dashboard_enable
-    label: "Enable Kubernetes dashboard?"
+    label: Kubernetes dashboard
     description: >-
       If selected, the Kubernetes dashboard will be deployed, and will be
       made available at `dashboard.<ip>.nip.io`.
     kind: "boolean"
+    options:
+      checkboxLabel: "Enable Kubernetes dashboard?"
