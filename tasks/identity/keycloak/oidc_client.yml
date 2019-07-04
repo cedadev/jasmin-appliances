@@ -45,9 +45,9 @@
           id.token.claim: "true"
           access.token.claim: "true"
     base_url: "{{ keycloak_client_base_url | default(omit) }}"
-    redirect_uris: "{{ keycloak_client_redirect_uris }}"
+    redirect_uris: "{{ keycloak_client_redirect_uris | default([]) }}"
     # If deleting the cluster, also delete the client
-    state: "{{ cluster_state | default('present') }}"
+    state: "{{ keycloak_client_state | default('present') }}"
     auth_keycloak_url: http://localhost:8080/auth
     auth_realm: master
     auth_username: "{{ keycloak_admin_user }}"

@@ -55,19 +55,24 @@
 - hosts: keycloak_servers
   become: true
   tasks:
-    - include_tasks: tasks/identity/keycloak/oidc_client.yml
-      vars:
-        keycloak_client_id: "{{ cluster_name }}"
-        keycloak_client_name: "Kubernetes cluster - {{ cluster_name }}"
-        # Include redirect URIs for use with kubectl and the dashboard authenticating proxy
+    - name: Set Keycloak redirect URIs
+      set_fact:
+        # Include redirect URIs for use with kubectl and the dashboards when enabled
         keycloak_client_redirect_uris: >-
           [
             'http://localhost:8000',
             'urn:ietf:wg:oauth:2.0:oob',
-            {%- if 'rke_masters' in groups -%}
+            {%- if kubernetes_dashboard_enable | default(true) -%}
             'https://{{ hostvars[groups.rke_masters | first].kubernetes_dashboard_domain }}/oauth/callback',
             {%- endif -%}
           ]
+      when: cluster_state | default('present') == 'present'
+
+    - include_tasks: tasks/identity/keycloak/oidc_client.yml
+      vars:
+        keycloak_client_id: "{{ cluster_name }}"
+        keycloak_client_name: "Kubernetes cluster - {{ cluster_name }}"
+        keycloak_client_state: "{{ cluster_state | default('present') }}"
 
 # Install Kubernetes
 - hosts: rke_hosts
@@ -138,6 +143,18 @@
     - include_role:
         name: jasmin.helm
 
+    - name: Install Helm repositories
+      command: helm repo add {{ item.name }} {{ item.url }}
+      loop:
+        - name: stable
+          url: https://kubernetes-charts.storage.googleapis.com/
+        - name: jetstack
+          url: https://charts.jetstack.io
+        - name: cedadev
+          url: https://cedadev.github.io/helm-charts
+      loop_control:
+        label: "{{ item.name }}"
+
     # Install the Nginx ingress controller first
     - name: Install Nginx ingress controller
       include_role:
@@ -163,9 +180,6 @@
         kubectl apply
           -f https://raw.githubusercontent.com/jetstack/cert-manager/{{ cert_manager_version }}/deploy/manifests/00-crds.yaml
           -f https://raw.githubusercontent.com/jetstack/cert-manager/{{ cert_manager_version }}/deploy/manifests/01-namespace.yaml
-
-    - name: Install Jetstack Helm repository
-      command: helm repo add jetstack https://charts.jetstack.io
 
     - name: Install cert-manager
       include_role:
@@ -203,18 +217,14 @@
         helm_release_namespace: kube-system
         helm_release_extra_args:
           - --set fullnameOverride=kubernetes-dashboard
-        helm_release_state: "{% if kubernetes_dashboard_enable | bool %}present{% else %}absent{% endif %}"
+        helm_release_state: "{% if kubernetes_dashboard_enable | default(true) | bool %}present{% else %}absent{% endif %}"
 
-    # Create a persistent secret token for the kube-dashboard proxy token encryption
-    - name: Create persistent encryption key
+    - name: Create Kubernetes dashboard proxy encryption key
       include_tasks: tasks/util/persistent_random_fact.yml
       vars:
         fact_name: kubernetes_dashboard_proxy_encryption_key
         # 32 chars is important - this is an AES-256 key
         random_string_length: 32
-
-    - name: Install cedadev Helm repository
-      command: helm repo add cedadev https://cedadev.github.io/helm-charts
 
     - name: Install dashboard authenticating proxy
       include_role:
@@ -225,7 +235,7 @@
         helm_release_chart: cedadev/keycloak-gatekeeper
         helm_release_namespace: kube-system
         helm_release_values_template: templates/helm/keycloak-gatekeeper.yml
-        helm_release_state: "{% if kubernetes_dashboard_enable | bool %}present{% else %}absent{% endif %}"
+        helm_release_state: "{% if kubernetes_dashboard_enable | default(true) | bool %}present{% else %}absent{% endif %}"
         gatekeeper_discovery_url: "{{ hostvars[groups.keycloak_servers | first].keycloak_oidc_issuer_url }}"
         gatekeeper_client_id: "{{ hostvars[groups.keycloak_servers | first].keycloak_client_id }}"
         gatekeeper_client_secret: "{{ hostvars[groups.keycloak_servers | first].keycloak_client_secret }}"

@@ -6,6 +6,11 @@ clientSecret: "{{ gatekeeper_client_secret }}"
 upstreamUrl: "{{ gatekeeper_upstream }}"
 encryptionKey: "{{ gatekeeper_encryption_key }}"
 
+{% if gatekeeper_protected_resources is defined -%}
+protectedResources:
+  {{ gatekeeper_protected_resources | to_nice_yaml(indent=2) | indent(width=2) }}
+{%- endif %}
+
 image:
   tag: "{{ keycloak_gatekeeper_version }}"
 
