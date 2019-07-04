@@ -62,6 +62,15 @@ parameters:
     kind: "cloud.ip"
     immutable: true
 
+  - name: kubernetes_dashboard_enable
+    label: Kubernetes dashboard
+    description: >-
+      If selected, the [Kubernetes dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
+      will be deployed and made available at `dashboard.<ip>.nip.io`.
+    kind: "boolean"
+    options:
+      checkboxLabel: "Enable Kubernetes dashboard?"
+
   - name: pangeo_notebook_cpu
     label: Notebook CPUs
     description: The number of CPUs to allocate to each user notebook.
