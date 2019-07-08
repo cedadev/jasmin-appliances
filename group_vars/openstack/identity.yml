@@ -1,17 +1,17 @@
 ---
 
-identity_gw_group_name: "proxy"
+identity_gw_group_name: "gateway"
 
-identity_group_proxy:
+identity_group_gateway:
   name: "{{ identity_gw_group_name }}"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: 1
-  flavor: "{{ identity_proxy_flavor | default('j2.small') }}"
+  flavor: "{{ identity_gateway_flavor | default('j2.small') }}"
   inventory_groups:
     - identity_servers
-    - identity_proxies
+    - gateway_servers
   facts:
-    proxy_external_domain: "{{ proxy_external_domain | default(cluster_fixed_ip + '.nip.io', true) }}"
+    gateway_external_domain: "{{ gateway_external_domain | default(cluster_fixed_ip + '.nip.io', true) }}"
 
 identity_group_freeipa_server:
   name: freeipa
@@ -34,14 +34,14 @@ identity_group_keycloak_server:
     - identity_servers
     - keycloak_servers
   facts:
-    keycloak_oidc_issuer_url: "https://{{ identity_group_proxy.facts.proxy_external_domain }}/auth/realms/master"
+    keycloak_oidc_issuer_url: "https://{{ identity_group_gateway.facts.gateway_external_domain }}/auth/realms/master"
 
 identity_groups_fixed_ip:
-  - "{{ identity_group_proxy | combine(cluster_fip_mixin) }}"
+  - "{{ identity_group_gateway | combine(cluster_fip_mixin) }}"
   - "{{ identity_group_freeipa_server }}"
   - "{{ identity_group_keycloak_server }}"
 
 identity_groups_no_ip:
-  - "{{ identity_group_proxy }}"
+  - "{{ identity_group_gateway }}"
   - "{{ identity_group_freeipa_server }}"
   - "{{ identity_group_keycloak_server }}"

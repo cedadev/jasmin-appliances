@@ -7,7 +7,7 @@ logo: https://user-images.githubusercontent.com/13452123/59352838-8c5b4000-8d19-
 parameters:
   - name: cluster_fixed_ip
     label: "External IP"
-    description: The external IP to use for the proxy.
+    description: The external IP to use for the gateway.
     kind: "cloud.ip"
     immutable: true
 
@@ -38,19 +38,19 @@ parameters:
     options:
       min_ram: 2048
 
-  - name: identity_proxy_flavor
-    label: Proxy size
-    description: The size to use for the proxy server.
+  - name: identity_gateway_flavor
+    label: Gateway size
+    description: The size to use for the gateway server.
     kind: "cloud.size"
     immutable: true
     default: 11  # This is j1.tiny
 
-  - name: proxy_external_domain
-    label: Proxy domain
+  - name: gateway_external_domain
+    label: Gateway domain
     description: |
-      The domain to use for the proxy server (optional).
+      The domain to use for the gateway server (optional).
 
-      If not given, `<ip>.nip.io` will be used, which requires no action.
+      If not given, `<ip>.nip.io` will be used. No specific DNS entry is required.
 
       If given, a DNS entry for the domain pointing to the selected IP
       must already exist. A DNS entry will **not** be created for you,

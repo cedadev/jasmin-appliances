@@ -78,11 +78,23 @@
     daemon_reload: yes
   when: keycloak_systemd_service is changed
 
+- name: Configure Keycloak for X-Forwarded-For
+  xml:
+    path: /opt/keycloak/latest/standalone/configuration/standalone.xml
+    xpath: "//{{ xpath_parts | join('/') }}"
+    attribute: "proxy-address-forwarding"
+    value: "true"
+  vars:
+    # local-name allows us to avoid binding namespaces
+    xpath_parts:
+      - '*[local-name() = "subsystem" and namespace-uri() = "urn:jboss:domain:undertow:8.0"]'
+      - '*[local-name() = "server"]'
+      - '*[local-name() = "http-listener"]'
+
 - name: Ensure Keycloak is started
   service:
     name: keycloak
     state: started
     enabled: yes
 
-- include_tasks: tasks/identity/keycloak/configure_proxy.yml
 - include_tasks: tasks/identity/keycloak/configure_ldap.yml

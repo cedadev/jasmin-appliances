@@ -49,11 +49,12 @@
       --non-interactive
       --nginx
       certonly
-      -d {{ proxy_external_domain }}
+      -d {{ gateway_external_domain }}
       --register-unsafely-without-email
       --agree-tos
+      --staging
   args:
-    creates: /etc/letsencrypt/live/{{ proxy_external_domain }}/privkey.pem
+    creates: /etc/letsencrypt/live/{{ gateway_external_domain }}/privkey.pem
 
 # Run twice a day as per documentation
 - name: Configure certbot auto-renewal

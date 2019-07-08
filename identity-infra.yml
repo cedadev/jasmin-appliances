@@ -31,8 +31,8 @@
   tasks:
     - include_tasks: tasks/identity/freeipa/server.yml
 
-# Enroll the Keycloak and proxy servers as FreeIPA clients
-- hosts: keycloak_servers,identity_proxies
+# Enroll the Keycloak and gateway servers as FreeIPA clients
+- hosts: keycloak_servers,gateway_servers
   become: true
   tasks:
     - include_tasks: tasks/identity/freeipa/client.yml
@@ -58,9 +58,9 @@
 
     - include_tasks: tasks/identity/keycloak/server.yml
       vars:
-        proxy_external_domain: "{{ hostvars[groups.identity_proxies | first].proxy_external_domain }}"
+        gateway_external_domain: "{{ hostvars[groups.gateway_servers | first].gateway_external_domain }}"
 
-- hosts: identity_proxies
+- hosts: gateway_servers
   become: true
   tasks:
     - include_tasks: tasks/identity/proxy.yml
