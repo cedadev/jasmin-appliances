@@ -52,7 +52,6 @@
       -d {{ gateway_external_domain }}
       --register-unsafely-without-email
       --agree-tos
-      --staging
   args:
     creates: /etc/letsencrypt/live/{{ gateway_external_domain }}/privkey.pem
 
