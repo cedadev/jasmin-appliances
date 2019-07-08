@@ -97,4 +97,13 @@
     state: started
     enabled: yes
 
+- name: Wait for Keycloak API to be available
+  uri:
+    url: "http://localhost:8080/auth/"
+    status_code: 200
+  register: keycloak_api
+  until: keycloak_api is succeeded
+  retries: 60
+  delay: 5
+
 - include_tasks: tasks/identity/keycloak/configure_ldap.yml
