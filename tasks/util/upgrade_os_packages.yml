@@ -15,8 +15,18 @@
       failed_when: false
       register: reboot_required
 
-    - name: Reboot if required
-      reboot:
+    - name: Reboot hosts if required
+      block:
+        # Reboot any gateway hosts first in order to avoid race conditions issuing the
+        # reboot command to other nodes
+        # The 'cluster_gateway_host' variable is set by jasmin.cluster-infra on the gateway host only
+        - name: Reboot gateway hosts
+          reboot:
+          when: cluster_gateway_host | default(false) | bool
+
+        - name: Reboot all other hosts
+          reboot:
+          when: not (cluster_gateway_host | default(false) | bool)
       when: reboot_required.rc != 0
 
     - name: Check if any services need restarting
