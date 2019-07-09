@@ -53,7 +53,7 @@
         cn: "{{ cluster_name | lower | replace('-', '_') }}_gateway_allow_all"
         description: Allow all users to access gateway host
         state: enabled
-        hosts: >-
+        host: >-
           {{
             hostvars |
               dict2items |
