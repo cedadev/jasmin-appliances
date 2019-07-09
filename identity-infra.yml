@@ -42,9 +42,30 @@
   become: true
   tasks:
     - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
-  vars:
-    # We don't need a group to permit users access to these hosts
-    create_users_group: false
+      vars:
+        # We don't need a group to permit users access to these hosts
+        create_users_group: false
+
+    # Create a rule that permits all users SSH access to the gateway hosts
+    # This allows use as a jump host for accessing clusters without an IP
+    - name: Permit all users to access gateway hosts
+      ipa_hbacrule:
+        cn: "{{ cluster_name | lower | replace('-', '_') }}_gateway_allow_all"
+        description: Allow all users to access gateway host
+        state: enabled
+        hosts: >-
+          {{
+            hostvars |
+              dict2items |
+              selectattr('key', 'in', groups.gateway_servers) |
+              map(attribute = 'value') |
+              map(attribute = 'ansible_fqdn') |
+              list
+          }}
+        servicecategory: all
+        usercategory: all
+        ipa_host: "{{ ansible_fqdn }}"
+        ipa_pass: "{{ freeipa_admin_password }}"
 
 - hosts: keycloak_servers
   become: true
