@@ -38,6 +38,7 @@ parameters:
     kind: "cloud.size"
     options:
       min_ram: 1024
+      min_disk: 10
     immutable: true
 
   - name: "cluster_compute_flavor"
@@ -46,6 +47,7 @@ parameters:
     kind: "cloud.size"
     options:
       min_ram: 1024
+      min_disk: 10
     immutable: true
 
   - name: "cluster_fixed_ip"

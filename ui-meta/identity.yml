@@ -28,6 +28,7 @@ parameters:
     default: 22  # This is j2.small
     options:
       min_ram: 2048
+      min_disk: 10
 
   - name: keycloak_server_flavor
     label: Keycloak size
@@ -36,7 +37,8 @@ parameters:
     immutable: true
     default: 22  # This is j2.small
     options:
-      min_ram: 2048
+      min_ram: 1024
+      min_disk: 10
 
   - name: identity_gateway_flavor
     label: Gateway size
