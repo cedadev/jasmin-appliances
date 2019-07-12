@@ -41,7 +41,7 @@
         protocol: openid-connect
         protocolMapper: oidc-audience-mapper
         config:
-          included.client.audience: kubernetes
+          included.client.audience: "{{ keycloak_client_id }}"
           id.token.claim: "true"
           access.token.claim: "true"
     base_url: "{{ keycloak_client_base_url | default(omit) }}"
