@@ -5,7 +5,7 @@ logo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAACDVB
 
 parameters:
   - name: "identity_stack_name"
-    label: "Identity"
+    label: "Identity manager"
     description: >
       The identity manager for managing access to the cluster.
     kind: "cloud.cluster"
