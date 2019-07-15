@@ -35,3 +35,4 @@ parameters:
     kind: "integer"
     options:
       min: 3
+    default: 3
