@@ -28,9 +28,6 @@ parameters:
 
       Any attempt to access the admin interfaces from an IP address that is not in this range
       will be blocked.
-
-      These interfaces allow the creation and modification of users and permissions for all
-      your clusters, so it is recommended that this range be as small as possible.
     kind: "string"
     options:
       # This pattern matches a CIDR
