@@ -45,11 +45,24 @@ server {
     # 15768000 seconds = 6 months
     add_header Strict-Transport-Security max-age=15768000;
 
-    # Anything that is not Keycloak should go to FreeIPA
-    location / {
+    # The root URL should be redirected to IPA
+    location = / {
+        return 301 /ipa/ui/;
+    }
+    # Also redirect /ipa/ to the UI
+    location /ipa/ {
+        return 301 /ipa/ui/;
+    }
+
+    # IPA URLs start with /ipa/ui
+    location /ipa/ui/ {
+        # Access is restricted to the admin CIDR
+        allow {{ admin_allowed_cidr }};
+        deny all;
+
         # FreeIPA uses the Referer header to avoid MITM attacks, so spoof it...
         proxy_set_header Referer https://{{ freeipa_server }}/ipa/ui;
-        proxy_pass https://{{ freeipa_server }}/;
+        proxy_pass https://{{ freeipa_server }};
     }
 
     # Keycloak URLs start auth /auth
@@ -59,5 +72,12 @@ server {
         proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header  X-Forwarded-Proto $scheme;
         proxy_pass http://{{ hostvars[groups.keycloak_servers | first].ansible_fqdn }}:8080;
+
+        # Restrict access to the admin pages
+        # We still need to allow world access to non-admin for OpenID Connect and SAML auth to work
+        location /auth/admin {
+            allow {{ admin_allowed_cidr }};
+            deny all;
+        }
     }
 }
