@@ -15,7 +15,6 @@ parameters:
     label: "Admin password"
     description: "Password for the `admin` user."
     kind: "string"
-    immutable: true
     options:
       secret: true
       confirm: true
@@ -28,6 +27,8 @@ parameters:
 
       Any attempt to access the admin interfaces from an IP address that is not in this range
       will be blocked.
+
+      If you are not sure what value to use here, contact your local network administrator.
     kind: "string"
     options:
       # This pattern matches a CIDR

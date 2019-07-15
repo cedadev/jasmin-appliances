@@ -15,6 +15,12 @@
     name: net.ipv6.conf.lo.disable_ipv6
     value: "0"
 
+- name: Generate Directory Server password
+  include_tasks: tasks/util/persistent_random_fact.yml
+  vars:
+    fact_name: freeipa_ds_password
+    random_string_length: 40
+
 - name: Configure FreeIPA server
   command: >
     ipa-server-install
@@ -23,13 +29,28 @@
       --domain {{ freeipa_realm | lower | quote }}
       --setup-dns
       --no-forwarders
-      --ds-password {{ freeipa_admin_password | quote }}
+      --ds-password {{ ansible_local.freeipa_ds_password | quote }}
       --admin-password {{ freeipa_admin_password | quote }}
   register: ipa_server_install
   changed_when: ipa_server_install.rc == 0
   failed_when: >
     ipa_server_install.rc != 0 and
     'already exists in DNS' not in ipa_server_install.stderr
+
+- name: Get FreeIPA LDAP domain
+  set_fact:
+    freeipa_ldap_domain: >-
+      {%- for part in (freeipa_realm | lower).split('.') -%}
+        dc={{ part }}{%- if not loop.last -%},{%- endif -%}
+      {%- endfor -%}
+
+- name: Update admin password
+  ldap_passwd:
+    dn: "uid=admin,cn=users,cn=accounts,{{ freeipa_ldap_domain }}"
+    passwd: "{{ freeipa_admin_password }}"
+    server_uri: "ldaps://{{ ansible_fqdn }}"
+    bind_dn: "cn=Directory Manager"
+    bind_pw: "{{ ansible_local.freeipa_ds_password }}"
 
 # "novalocal" isn't a valid email domain, which prevents the creation of new users
 # So set something else - it doesn't have to be a real email
