@@ -49,13 +49,9 @@ server {
     location = / {
         return 301 /ipa/ui/;
     }
-    # Also redirect /ipa/ to the UI
-    location /ipa/ {
-        return 301 /ipa/ui/;
-    }
 
-    # IPA URLs start with /ipa/ui
-    location /ipa/ui/ {
+    # IPA URLs start with /ipa
+    location /ipa {
         # Access is restricted to the admin CIDR
         allow {{ admin_allowed_cidr }};
         deny all;
@@ -65,19 +61,24 @@ server {
         proxy_pass https://{{ freeipa_server }};
     }
 
-    # Keycloak URLs start auth /auth
+    # Keycloak URLs start with /auth
     location /auth {
         proxy_set_header  Host $http_host;
         proxy_set_header  X-Real-IP $remote_addr;
         proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header  X-Forwarded-Proto $scheme;
         proxy_pass http://{{ hostvars[groups.keycloak_servers | first].ansible_fqdn }}:8080;
+    }
 
-        # Restrict access to the admin pages
-        # We still need to allow world access to non-admin for OpenID Connect and SAML auth to work
-        location /auth/admin {
-            allow {{ admin_allowed_cidr }};
-            deny all;
-        }
+    # Keycloak admin URLs start with /auth/admin
+    location /auth/admin {
+        allow {{ admin_allowed_cidr }};
+        deny all;
+
+        proxy_set_header  Host $http_host;
+        proxy_set_header  X-Real-IP $remote_addr;
+        proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-Proto $scheme;
+        proxy_pass http://{{ hostvars[groups.keycloak_servers | first].ansible_fqdn }}:8080;
     }
 }
