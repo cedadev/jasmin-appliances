@@ -1,20 +1,49 @@
 ---
-# This playbook uses the Ansible OpenStack modules to create a cluster
-# using a number of baremetal compute node instances, and configure it
-# for a SLURM partition
+
 - hosts: openstack
   tasks:
     - import_tasks: tasks/install-dependencies.yml
+
+    # Add the identity stack to the cluster and configure it as the gateway
+    - include_role:
+        name: jasmin.cluster-infra
+      vars:
+        cluster_name: "{{ identity_stack_name }}"
+        cluster_stack_update: false
+        cluster_gw_group: "{{ identity_gw_group_name }}"
+
+    # Provision the SLURM infrastructure
     - import_tasks: tasks/infra/provision.yml
       vars:
         # These are the groups to use when no fixed IP is given
         cluster_groups: "{{ slurm_groups_no_ip }}"
-        # This is the gateway group to use when a fixed IP is given
-        cluster_gw_group_fixed_ip: "{{ slurm_gw_group_name }}"
         # These are the groups to use when a fixed IP is given
         cluster_groups_fixed_ip: "{{ slurm_groups_fixed_ip }}"
         # Tag to assign to  the cluster
         cluster_tag: "{{ cluster_type.slurm }}"
+
+# Gather facts for all hosts
+- hosts: cluster
+  tasks: []
+
+- hosts: slurm
+  become: true
+  tasks:
+    - include_tasks: tasks/network/firewall.yml
+    - include_tasks: tasks/slurm/upgrade_os_packages.yml
+      vars:
+        openhpc_slurm_control_host: "{{ groups['slurm_login'] | first }}"
+    # Join the hosts to the FreeIPA realm
+    - include_tasks: tasks/identity/freeipa/client.yml
+
+# Set the permissions for the cluster in FreeIPA
+- hosts: freeipa_servers
+  become: true
+  tasks:
+    - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
+  vars:
+    # Users in the cluster group should get SSH access
+    permit_user_ssh: true
 
 - hosts: openstack
   tasks:
@@ -23,17 +52,6 @@
       when:
         - storage_name is defined
         - cluster_state | default('present') | lower == 'present'
-
-- hosts: cluster
-  become: true
-  tasks:
-    - import_tasks: tasks/cluster-hosts.yml 
-    - import_tasks: tasks/cluster-firewalld.yml 
-
-- hosts: cluster
-  become: true  
-  roles:
-    - role: resmo.ntp
 
 - import_playbook: nfs.yml
   when:
@@ -50,74 +68,27 @@
     - hostvars.localhost.storage_type is defined
     - hostvars.localhost.storage_type == 'beegfs'
 
-- hosts:
-    - "login"
-    - "compute"
+- hosts: slurm
   become: true
   pre_tasks:
-
-    - name: Ensure user home dir root exists
-      file:
-        path: "{{ jasmin_homedir }}"
-        state: directory
-      run_once: true
-
-  roles:
-    # Run the user creation once to create the user home directories
-    - role: singleplatform-eng.users
-      users: "{{ jasmin_users }}"
-      groups_to_create: "{{ jasmin_groups }}"
-      run_once: true
-
-    # Run the user creation again (without home dir) on all nodes
-    - role: singleplatform-eng.users
-      users: "{{ jasmin_users }}"
-      groups_to_create: "{{ jasmin_groups }}"
-      users_create_homedirs: false
-
-        
-- hosts:
-    - "login"
-    - "compute"
-  become: true
-  pre_tasks:
-
-    - name: Ensure the OpenHPC package repo rpm is present
+    - name: Install OpenHPC repository
       yum:
-        name: "https://github.com/openhpc/ohpc/releases/download/v1.3.GA/ohpc-release-1.3-1.el7.x86_64.rpm"
+        name: "{{ openhpc_repo_url }}"
         state: present
-
-    - name: Ensure latest python is present
-      yum:
-        name: python
-        state: latest
-
   roles:
     - role: stackhpc.openhpc
       openhpc_enable:
-        control: "{{ inventory_hostname in groups['login'] }}"
-        batch: "{{ inventory_hostname in groups['compute'] }}"
+        control: "{{ inventory_hostname in groups['slurm_login'] }}"
+        batch: "{{ inventory_hostname in groups['slurm_compute'] }}"
         runtime: true
       openhpc_cluster_name: "{{ cluster_name }}"
-      openhpc_packages: "{{ slurm_packages }}"
-      openhpc_slurm_partitions: "{{ slurm_partitions }}"
-      openhpc_slurm_control_host: "{{ groups['login'] | first }}"
+      # Put all the compute nodes into a single partition
+      openhpc_slurm_partitions:
+        - name: "compute"
+          num_nodes: "{{ groups['slurm_compute'] | length }}"
+      openhpc_slurm_control_host: "{{ groups['slurm_login'] | first }}"
 
-# Add user creation tool `sladduser` to the login node for admin users
-- hosts: "login"
-  become: true
-  tasks:
-    - import_tasks: tasks/slurm/install-sladduser.yml
-
-- import_playbook: validation.yml
-  when:
-    - validation is defined
-    - validation | bool
-
-# Delete the gateway if required
-- hosts: openstack
-  tasks:
-    - import_tasks: tasks/infra/cleanup-gateway.yml
-      vars:
-        cluster_tag: "{{ cluster_type.slurm }}"
-        cluster_groups: "{{ slurm_groups_no_ip }}"
+# - import_playbook: validation.yml
+#   when:
+#     - validation is defined
+#     - validation | bool

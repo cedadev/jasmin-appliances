@@ -1,0 +1,80 @@
+---
+
+- name: Install Nginx
+  yum:
+    name: nginx
+    state: latest
+
+- name: Create Nginx SSL directory
+  file:
+    path: /etc/nginx/ssl
+    state: directory
+
+- name: Create Ephemeral Diffie-Helman parameters file
+  command: openssl dhparam -dsaparam -out /etc/nginx/ssl/dhparam.pem 4096
+  args:
+    creates: /etc/nginx/ssl/dhparam.pem
+
+# We fetch the SSL certificate from Let's Encrypt using certbot
+- name: Install certbot
+  yum:
+    name:
+      - certbot
+      - python2-certbot-nginx
+    state: latest
+
+# In order for Let's Encrypt to verify the http-01 challenge presented by
+# certbot, we need to start Nginx and open the firewall
+- name: Ensure Nginx is started
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Open HTTP(S) ports in firewall
+  firewalld:
+    service: "{{ service }}"
+    state: enabled
+    immediate: yes
+    permanent: yes
+  loop:
+    - http
+    - https
+  loop_control:
+    loop_var: service
+
+- name: Fetch SSL certificate
+  command: >
+    certbot
+      --non-interactive
+      --nginx
+      certonly
+      -d {{ gateway_external_domain }}
+      --register-unsafely-without-email
+      --agree-tos
+  args:
+    creates: /etc/letsencrypt/live/{{ gateway_external_domain }}/privkey.pem
+
+# Run twice a day as per documentation
+- name: Configure certbot auto-renewal
+  cron:
+    name: "Renew certbot certificates"
+    job: "certbot renew"
+    hour: "0,12"
+    # Pick a random minute
+    minute: "{{ 60 | random(seed = inventory_hostname) }}"
+
+- name: Install main Nginx configuration
+  template:
+    src: templates/identity/nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+
+- name: Install FreeIPA site configuration
+  template:
+    src: templates/identity/identity_site.conf.j2
+    dest: /etc/nginx/conf.d/identity.conf
+
+- name: Restart Nginx
+  service:
+    name: nginx
+    state: restarted

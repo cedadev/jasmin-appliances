@@ -1,3 +1,0 @@
----
-cluster_name: "nfs"
-nfs_volume_size: 10

@@ -1,0 +1,41 @@
+openhpc_repo_url: "https://github.com/openhpc/ohpc/releases/download/v1.3.GA/ohpc-release-1.3-1.el7.x86_64.rpm"
+
+# A list of OpenHPC runtime libraries to install on compute and control nodes
+openhpc_packages:
+  - strace
+  - flex
+  - bison
+  - cfitsio
+  - cfitsio-devel
+  - cfitsio-docs
+  - wcslib
+  - wcslib-utils
+  - wcslib-devel
+  - wcstools
+  - ncurses
+  - ncurses-devel
+  - readline
+  - readline-devel
+  - boost
+  - boost-devel
+  - boost-python
+  - boost-math
+  - boost-doc
+  # OpenHPC bits
+  - gnu7-compilers-ohpc
+  - openblas-gnu7-ohpc
+  - scalapack-gnu7-openmpi3-ohpc
+  - hdf5-gnu7-ohpc
+  - python-scipy-gnu7-openmpi3-ohpc
+  - fftw-gnu7-openmpi3-ohpc
+  - openmpi3-gnu7-ohpc
+  - imb-gnu7-openmpi3-ohpc
+  - phdf5-gnu7-openmpi3-ohpc
+  - python34
+  - python34-devel
+  - python-virtualenv
+  - emacs
+  - vim
+
+# kdump not required
+kdump_enable: false

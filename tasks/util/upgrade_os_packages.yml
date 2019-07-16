@@ -1,0 +1,44 @@
+---
+
+# These tasks update the operating system packages
+# Where required, the node and any services are restarted
+
+- block:
+    - name: Upgrade all packages
+      yum:
+        name: '*'
+        state: latest
+
+    - name: Check if a reboot is required
+      command: needs-restarting -r
+      changed_when: false
+      failed_when: false
+      register: reboot_required
+
+    - name: Reboot hosts if required
+      block:
+        # Reboot any gateway hosts first in order to avoid race conditions issuing the
+        # reboot command to other nodes
+        # The 'cluster_gateway_host' variable is set by jasmin.cluster-infra on the gateway host only
+        - name: Reboot gateway hosts
+          reboot:
+          when: cluster_gateway_host | default(false) | bool
+
+        - name: Reboot all other hosts
+          reboot:
+          when: not (cluster_gateway_host | default(false) | bool)
+      when: reboot_required.rc != 0
+
+    - name: Check if any services need restarting
+      command: needs-restarting -s
+      changed_when: false
+      failed_when: false
+      register: service_restart_required
+
+    - name: Restart services
+      service:
+        name: "{{ item }}"
+        state: restarted
+      when: service_restart_required.stdout
+      with_items: "{{ service_restart_required.stdout.split() }}"
+  when: cluster_upgrade_system_packages | default(false) | bool

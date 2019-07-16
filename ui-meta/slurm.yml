@@ -4,23 +4,33 @@ description: "Batch cluster running the Slurm workload manager."
 logo: https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Slurm_logo.svg/158px-Slurm_logo.svg.png
 
 parameters:
-  - name: "cluster_num_workers"
-    label: "Worker nodes"
-    description: "The number of worker nodes in the cluster."
-    kind: "integer"
+  - name: identity_stack_name
+    label: "Identity manager"
+    description: >
+      The identity manager for managing access to the cluster.
+    kind: "cloud.cluster"
     options:
-      min: 1
+      tag: identity
+    immutable: true
 
   - name: "storage_name"
     label: "Shared storage"
     description: |
       The storage cluster to use for shared storage.
 
-      This storage is mounted at `/jasmin`, and is used for home directories.
+      This storage is mounted at `/home/users`, and is used for user home directories.
     kind: "cloud.cluster"
     options:
       tag: storage
     immutable: true
+
+  - name: "cluster_num_workers"
+    label: "Worker nodes"
+    description: "The number of worker nodes in the cluster."
+    kind: "integer"
+    options:
+      min: 1
+    default: 3
 
   - name: "cluster_login_flavor"
     label: "Login node size"
@@ -28,6 +38,7 @@ parameters:
     kind: "cloud.size"
     options:
       min_ram: 1024
+      min_disk: 10
     immutable: true
 
   - name: "cluster_compute_flavor"
@@ -36,6 +47,7 @@ parameters:
     kind: "cloud.size"
     options:
       min_ram: 1024
+      min_disk: 10
     immutable: true
 
   - name: "cluster_fixed_ip"
@@ -43,8 +55,7 @@ parameters:
     description: |
       The external IP to attach to the login node.
 
-      If not selected, the cluster will have no permanent external IP.
-      However, an IP must still be available to use for deployment and will be released afterwards.
+      If not selected, the cluster can still be accessed via an SSH bastion.
     kind: "cloud.ip"
     required: false
     immutable: true

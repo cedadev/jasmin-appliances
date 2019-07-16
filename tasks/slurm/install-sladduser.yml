@@ -1,5 +1,0 @@
-- name: Copy sladduser to /usr/bin
-  template:
-    src: sladduser.j2
-    dest: /usr/bin/sladduser
-    mode: 755

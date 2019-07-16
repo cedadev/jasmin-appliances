@@ -16,4 +16,4 @@
       pip:
         requirements: "{{ playbook_dir }}/requirements.txt"
         virtualenv: "{{ ansible_venv_path }}"
-  when: "ansible_venv_path | default(None, true)"
+  when: "ansible_venv_path | length > 0"

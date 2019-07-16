@@ -1,12 +1,55 @@
 ---
+#####
+## Playbook that provisions and then configures a Kubernetes
+## cluster on OpenStack before installing the Pangeo stack
+#####
+
 # Reuse Kubernetes playbook to create a cluster
 - import_playbook: k8s-infra.yml
 
-# Install addons via the master
-- hosts: kube-masters
-  roles:
-    - role: jasmin.pangeo-helm
-      pangeo_admin_users: ["{{ pangeo_username }}"]
-      pangeo_users: ["{{ pangeo_username }}"]
-  become: yes
-...
+# Create a FreeIPA group for the notebook users
+- hosts: freeipa_servers
+  become: true
+  tasks:
+    - set_fact:
+        pangeo_notebook_users_group: "{{ cluster_name | lower | replace('-', '_') }}_notebook_users"
+
+    - name: Create notebook users group
+      ipa_group:
+        cn: "{{ pangeo_notebook_users_group }}"
+        description: "Notebook users for Pangeo cluster '{{ cluster_name }}'"
+        # If deleting the cluster, also delete the group
+        state: "{{ cluster_state | default('present') }}"
+        ipa_host: "{{ ansible_fqdn }}"
+        ipa_pass: "{{ freeipa_admin_password }}"
+
+# Helm will have been installed on the first host in the cluster
+- hosts: "{{ groups.get('rke_hosts', []) | first | default('!all') }}"
+  become: true
+  pre_tasks:
+    # Create a persistent secret token for Pangeo
+    - include_tasks: tasks/util/persistent_random_fact.yml
+      vars:
+        fact_name: pangeo_secret_token
+        random_string_length: 40
+  tasks:
+    # Install the Pangeo repo
+    - name: Install Pangeo Helm repository
+      command: helm repo add pangeo https://pangeo-data.github.io/helm-chart/
+
+    # Set facts that we need for the Helm chart
+    - set_fact:
+        pangeo_notebook_users_group: "{{ hostvars[groups.freeipa_servers | first].pangeo_notebook_users_group }}"
+
+    # Install the Pangeo chart
+    - include_role:
+        name: jasmin.helm
+        tasks_from: chart.yml
+      vars:
+        helm_release_name: pangeo
+        helm_release_chart: pangeo/pangeo
+        helm_release_version: 19.05.31-bcc66da
+        helm_release_namespace: pangeo
+        helm_release_values_template: templates/helm/pangeo.yml
+        helm_release_recreate_pods: yes
+        helm_release_force: yes

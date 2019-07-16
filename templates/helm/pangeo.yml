@@ -1,0 +1,64 @@
+jupyterhub:
+  # We authenticate using the FreeIPA LDAP database
+  # We use LDAP for two reasons:
+  #   1. The LDAP authenticator supports controlling access by group membership
+  #      The oauthenticator doesn't understand OpenID Connect so can't use the groups claim
+  #   2. There is a bug in NSX that means we can't loop back into the same tenancy via external IPs
+  auth:
+    type: ldap
+    ldap:
+      server:
+        address: "{{ freeipa_server }}"
+      dn:
+        templates:
+          - "uid={username},cn=users,cn=accounts,{{ freeipa_ldap_domain }}"
+      allowedGroups:
+        - "cn=admins,cn=groups,cn=accounts,{{ freeipa_ldap_domain }}"
+        - "cn={{ pangeo_notebook_users_group }},cn=groups,cn=accounts,{{ freeipa_ldap_domain }}"
+    admin:
+      access: true
+      users: [admin]
+  hub:
+    db:
+      type: sqlite-pvc
+      pvc:
+        storageClassName: standard
+  singleuser:
+    image:
+      name: pangeo/pangeo-notebook
+      tag: "2019.06.25"
+    startTimeout: 1000
+    storage:
+      type: dynamic
+      capacity: "{{ pangeo_notebook_storage | default(10) }}Gi"
+      dynamic:
+        storageClass: standard
+    cloudMetadata:
+      enabled: true
+    cpu:
+      limit: {{ pangeo_notebook_cpu | default(1) }}
+      guarantee: {{ pangeo_notebook_cpu | default(1) }}
+    memory:
+      limit: "{{ pangeo_notebook_mem | default(2) }}G"
+      guarantee: "{{ pangeo_notebook_mem | default(2) }}G"
+  # Disable the userScheduler and userPlaceholder as they only make sense
+  # on clusters which autoscale
+  scheduling:
+    userScheduler:
+      enabled: false
+    userPlaceholder:
+      enabled: false
+  proxy:
+    service:
+      type: ClusterIP
+    secretToken: "{{ ansible_local.pangeo_secret_token }}"
+  ingress:
+    enabled: true
+    hosts: ["{{ pangeo_domain | default('pangeo.' + cluster_fixed_ip + '.nip.io', true) }}"]
+    # Get a certificate from the letsencrypt issuer
+    annotations:
+      certmanager.k8s.io/cluster-issuer: letsencrypt
+      certmanager.k8s.io/acme-challenge-type: http01
+    tls:
+      - hosts: ["{{ pangeo_domain | default('pangeo.' + cluster_fixed_ip + '.nip.io', true) }}"]
+        secretName: pangeo-tls

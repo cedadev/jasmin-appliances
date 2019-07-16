@@ -1,27 +1,31 @@
 ---
 
-k8s_gw_group_name: "kube-masters"
+k8s_gw_group_name: "master"
 
 k8s_group_masters:
   name: "{{ k8s_gw_group_name }}"
-  user: "{{ cluster_deploy_user }}"
-  node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: 1
   flavor: "{{ cluster_master_flavor }}"
-  root_volume_size: 0
+  root_volume_size: "{{ cluster_root_volume_size }}"
+  inventory_groups:
+    - rke_hosts
+    - rke_masters
+  facts:
+    kubernetes_dashboard_domain: "{{ kubernetes_dashboard_domain | default('dashboard.' + cluster_fixed_ip + '.nip.io', true) }}"
 
 k8s_group_workers:
-  name: "kube-workers"
-  user: "{{ cluster_deploy_user }}"
-  node_resource: "Cluster::Node"
+  name: "worker"
   nodenet_resource: "Cluster::NodeNet1"
   num_nodes: "{{ cluster_num_workers }}"
   flavor: "{{ cluster_worker_flavor }}"
-  root_volume_size: 0
+  root_volume_size: "{{ cluster_root_volume_size }}"
+  inventory_groups:
+    - rke_hosts
+    - rke_workers
 
 k8s_groups_fixed_ip:
-  - "{{ k8s_group_masters | combine(cluster_gw_fip_mixin) }}"
+  - "{{ k8s_group_masters | combine(cluster_fip_mixin) }}"
   - "{{ k8s_group_workers }}"
 
 k8s_groups_no_ip:

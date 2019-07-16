@@ -1,0 +1,31 @@
+---
+
+# These tasks upgrade the OS packages on a Kubernetes host
+# They make an effort to drain the host first to avoid application downtime where possible
+
+# Check whether there are any updates, so we don't drain nodes unnecessarily
+- name: Check for available updates
+  yum:
+    list: updates
+    update_cache: true
+  register: yum_list_updates
+
+- block:
+    # Try to drain pods from the host - if the drain times out, continue anyway
+    #   --delete-local-data allows the draining of pods using emptyDir volumes
+    - name: Drain pods from host
+      command: >
+        kubectl drain {{ ansible_hostname }}
+          --ignore-daemonsets
+          --delete-local-data
+          --timeout=300s
+      delegate_to: "{{ ansible_play_hosts[0] }}"
+      register: kubectl_drain
+      failed_when: kubectl_drain.rc != 0 and 'did not complete within' not in kubectl_drain.stderr
+
+    - include_tasks: tasks/util/upgrade_os_packages.yml
+
+    - name: Uncordon host
+      command: kubectl uncordon {{ ansible_hostname }}
+      delegate_to: "{{ ansible_play_hosts[0] }}"
+  when: yum_list_updates.results | length > 0

@@ -1,32 +1,42 @@
 ---
 
-# This playbook uses the Ansible OpenStack modules to create a cluster
-# using a number of baremetal compute node instances, and configure it
-# for a NFS server
-
 - hosts: openstack
   tasks:
     - import_tasks: tasks/install-dependencies.yml
+
+    # Add the identity stack to the cluster and configure it as the gateway
+    - include_role:
+        name: jasmin.cluster-infra
+      vars:
+        cluster_name: "{{ identity_stack_name }}"
+        cluster_stack_update: false
+        cluster_gw_group: "{{ identity_gw_group_name }}"
+
+    # Provision the cluster infrastructure
     - import_tasks: tasks/infra/provision.yml
       vars:
         cluster_groups: "{{ nfs_groups }}"
         cluster_tag: "{{ cluster_type.storage }}"
 
+# Gather facts for all hosts
 - hosts: cluster
-  become: true
-  tasks:
-    - import_tasks: tasks/cluster-hosts.yml
-    - import_tasks: tasks/cluster-firewalld.yml
-
-- import_playbook: nfs.yml
+  tasks: []
 
 - hosts: nfs_servers
+  become: true
   tasks:
-    - include: tasks/update.yml
+    - import_tasks: tasks/network/firewall.yml
+    - include: tasks/util/upgrade_os_packages.yml
+    # Join the nfs_servers to the FreeIPA realm
+    - include_tasks: tasks/identity/freeipa/client.yml
 
-- hosts: openstack
+# Set the permissions for the cluster in FreeIPA
+- hosts: freeipa_servers
+  become: true
   tasks:
-    - import_tasks: tasks/infra/cleanup-gateway.yml
-      vars:
-        cluster_groups: "{{ nfs_groups }}"
-        cluster_tag: "{{ cluster_type.storage }}"
+    - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
+  vars:
+    # We don't need a group to permit users access to these hosts
+    create_users_group: false
+
+- import_playbook: nfs.yml

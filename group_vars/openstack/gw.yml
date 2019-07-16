@@ -4,18 +4,15 @@ deploy_gw_group_name: "deploy-gw"
 
 deploy_gw_group:
   name: "{{ deploy_gw_group_name }}"
-  user: "{{ cluster_deploy_user }}"
-  node_resource: "Cluster::Node"
   nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP"
   nodenet_fips:
-    - uuid: "{{ cluster_gw_fip_id }}"
-      ip: "{{ cluster_gw_fip_ip }}"
+    - uuid: "{{ cluster_fip_id }}"
+      ip: "{{ cluster_fip_ip }}"
   num_nodes: 1
   flavor: "j1.tiny"
-  root_volume_size: 0
 
-cluster_gw_fip_mixin:
+cluster_fip_mixin:
   nodenet_resource: "Cluster::NodeNet1WithPreallocatedFIP"
   nodenet_fips:
-    - uuid: "{{ cluster_gw_fip_id }}"
-      ip: "{{ cluster_gw_fip_ip }}"
+    - uuid: "{{ cluster_fip_id }}"
+      ip: "{{ cluster_fip_ip }}"

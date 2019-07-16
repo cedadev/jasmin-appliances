@@ -4,8 +4,9 @@
   include_role:
     name: jasmin.cluster-infra
   vars:
-    cluster_stack_update_only: true
+    cluster_populate_inventory: false
     # Just pass through cluster_groups from above
   when:
     - cluster_state | default('present') | lower == 'present'
+    - cluster_gw_group is defined
     - cluster_gw_group == deploy_gw_group_name

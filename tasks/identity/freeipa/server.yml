@@ -1,0 +1,98 @@
+---
+
+- name: Install FreeIPA packages
+  yum:
+    name:
+      - freeipa-server
+      - bind
+      - bind-dyndb-ldap
+      - ipa-server-dns
+    state: latest
+
+# This is required by ipa-server-install if IPv6 is enabled in the kernel
+- name: Enable IPv6 for loopback interface
+  sysctl:
+    name: net.ipv6.conf.lo.disable_ipv6
+    value: "0"
+
+- name: Generate Directory Server password
+  include_tasks: tasks/util/persistent_random_fact.yml
+  vars:
+    fact_name: freeipa_ds_password
+    random_string_length: 40
+
+- name: Configure FreeIPA server
+  command: >
+    ipa-server-install
+      --unattended
+      --realm {{ freeipa_realm | quote }}
+      --domain {{ freeipa_realm | lower | quote }}
+      --setup-dns
+      --no-forwarders
+      --ds-password {{ ansible_local.freeipa_ds_password | quote }}
+      --admin-password {{ freeipa_admin_password | quote }}
+  register: ipa_server_install
+  changed_when: ipa_server_install.rc == 0
+  failed_when: >
+    ipa_server_install.rc != 0 and
+    'already exists in DNS' not in ipa_server_install.stderr
+
+- name: Get FreeIPA LDAP domain
+  set_fact:
+    freeipa_ldap_domain: >-
+      {%- for part in (freeipa_realm | lower).split('.') -%}
+        dc={{ part }}{%- if not loop.last -%},{%- endif -%}
+      {%- endfor -%}
+
+- name: Update admin password
+  ldap_passwd:
+    dn: "uid=admin,cn=users,cn=accounts,{{ freeipa_ldap_domain }}"
+    passwd: "{{ freeipa_admin_password }}"
+    server_uri: "ldaps://{{ ansible_fqdn }}"
+    bind_dn: "cn=Directory Manager"
+    bind_pw: "{{ ansible_local.freeipa_ds_password }}"
+
+# "novalocal" isn't a valid email domain, which prevents the creation of new users
+# So set something else - it doesn't have to be a real email
+# Also set the default login shell to bash
+- name: Configure user defaults
+  ipa_config:
+    ipadefaultemaildomain: jasmin.cloud
+    ipadefaultloginshell: /bin/bash
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
+
+# ipa_config doesn't have an option to configure the default home directory
+# We also need to use Kerberos authentication
+- block:
+    - name: Get Kerberos ticket
+      shell: kinit admin <<< {{ freeipa_admin_password | quote }}
+
+    - name: Configure default home directory
+      command: ipa config-mod --homedirectory={{ jasmin_homedir }}
+      register: ipa_config_mod
+      changed_when: ipa_config_mod.rc == 0
+      failed_when: >
+        ipa_config_mod.rc != 0 and
+        'no modifications to be performed' not in ipa_config_mod.stderr
+  always:
+    - name: Destroy Kerberos ticket
+      command: kdestroy
+
+- name: Create allow all rule for admins
+  ipa_hbacrule:
+    cn: allow_all_admins
+    description: Allow admins to access any host from any host
+    state: enabled
+    hostcategory: all
+    servicecategory: all
+    usergroup: [admins]
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
+
+- name: Disable default blanket allow all rule
+  ipa_hbacrule:
+    cn: allow_all
+    state: disabled
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_admin_password }}"

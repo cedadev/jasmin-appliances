@@ -1,0 +1,22 @@
+---
+
+# These tasks use local facts to manage a persistent random fact,
+# i.e. the value is random but persists across playbook runs
+
+- block:
+    - name: Ensure facts.d directory exists
+      file:
+        path: /etc/ansible/facts.d
+        state: directory
+
+    - name: Write facts.d file containing random string
+      copy:
+        content: "{{ ([chars | list] * random_string_length) | map('random') | join | to_json }}"
+        dest: /etc/ansible/facts.d/{{ fact_name }}.fact
+        mode: "u=rw,g=,o="
+      vars:
+        chars: "{{ random_string_chars | default('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') }}"
+
+    - name: Reload facts
+      setup:
+  when: fact_name not in ansible_local

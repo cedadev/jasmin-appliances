@@ -1,0 +1,54 @@
+---
+
+# These tasks create an Openstack trust for interacting with the OS API
+#
+# The trust needs to be created on the Openstack host, but is persisted as a local fact on
+# the cluster nodes so it is not re-generated unnecessarily
+#
+# If there is an existing trust, it is reused
+
+# Get the existing trust from the first host where one is defined
+- name: Get existing Openstack trust
+  set_fact:
+    openstack_trust_id: "{{ ansible_local.openstack_trust_id }}"
+    openstack_project_id: "{{ ansible_local.openstack_project_id }}"
+  run_once: true
+  when: "'openstack_trust_id' in ansible_local"
+
+- name: Create new Openstack trust
+  block:
+    - name: Create Openstack trust
+      os_keystone_trust:
+        trustee_user_id: "{{ openstack_trustee_id }}"
+        impersonation: true
+        roles:
+          - name: _member_
+      delegate_to: "{{ groups.openstack | first }}"
+      become: no
+      run_once: yes
+      register: openstack_trust
+
+    - name: Set Openstack trust facts
+      set_fact:
+        openstack_trust_id: "{{ openstack_trust.trust_id }}"
+        openstack_project_id: "{{ openstack_trust.project_id }}"
+  when: openstack_trust_id is not defined
+
+# Persist the trust in local facts for next time
+- name: Ensure facts.d directory exists
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+
+- name: Write facts.d files for trust facts
+  copy:
+    content: "{{ item.value | to_json }}"
+    dest: /etc/ansible/facts.d/{{ item.name }}.fact
+    mode: "u=rw,g=,o="
+  loop:
+    - name: openstack_trust_id
+      value: "{{ openstack_trust_id }}"
+    - name: openstack_project_id
+      value: "{{ openstack_project_id }}"
+  loop_control:
+    label: "{{ item.name }}"

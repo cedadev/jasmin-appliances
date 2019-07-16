@@ -5,67 +5,10 @@
 # of yum update -y). Should default to false if not given.
 cluster_upgrade_system_packages: false
 
-# Jasmin Homedir
-jasmin_homedir: "/jasmin"
-
 # Default nfs configuration
 nfs_fstype: "xfs"
 nfs_disk_location: "/dev/sdb"
 nfs_export: "/srv/home"
 
-# Cloud provider to use for Kubernetes clusters
-cloud_provider: openstack
-
-# Define a list of SLURM partitions to create.
-slurm_partitions:
-  - name: "caas"
-    groups:
-      - name: "compute" # Corresponds with group name in openstack/slurm
-        num_nodes: "{{ groups['compute'] | length }}"
-
-# A list of OpenHPC runtime libraries to install on compute and control nodes
-slurm_packages:
-  - strace
-  - flex
-  - bison
-  - cfitsio
-  - cfitsio-devel
-  - cfitsio-docs
-  - wcslib
-  - wcslib-utils
-  - wcslib-devel
-  - wcstools
-  - ncurses
-  - ncurses-devel
-  - readline
-  - readline-devel
-  - boost
-  - boost-devel
-  - boost-python
-  - boost-math
-  - boost-doc
-  # OpenHPC bits
-  - gnu7-compilers-ohpc
-  - openblas-gnu7-ohpc
-  - scalapack-gnu7-openmpi3-ohpc
-  - hdf5-gnu7-ohpc
-  - python-scipy-gnu7-openmpi3-ohpc
-  - fftw-gnu7-openmpi3-ohpc
-  - openmpi3-gnu7-ohpc
-  - imb-gnu7-openmpi3-ohpc
-  - phdf5-gnu7-openmpi3-ohpc
-  - python34
-  - python34-devel
-  - python-virtualenv
-  - emacs
-  - vim
-
-# kdump not required
-kdump_enable: false
-
-# Groups and users
-jasmin_group_name: "jasmin"
-jasmin_groups:
-  - name: "{{ jasmin_group_name }}"
-    gid: 2000
-jasmin_users: []
+# Jasmin Homedir
+jasmin_homedir: "/home/users"

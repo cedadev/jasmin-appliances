@@ -1,0 +1,87 @@
+---
+
+# Provision the cluster infrastructure
+- hosts: openstack
+  tasks:
+    - import_tasks: tasks/install-dependencies.yml
+    - import_tasks: tasks/infra/provision.yml
+      vars:
+        # These are the groups to use when no fixed IP is given
+        cluster_groups: "{{ identity_groups_no_ip }}"
+        # This is the gateway group to use when a fixed IP is given
+        cluster_gw_group_fixed_ip: "{{ identity_gw_group_name }}"
+        # These are the groups to use when a fixed IP is given
+        cluster_groups_fixed_ip: "{{ identity_groups_fixed_ip }}"
+        # Tag to assign to the cluster
+        cluster_tag: "{{ cluster_type.identity }}"
+
+- hosts: cluster
+  become: true
+  tasks:
+    - import_tasks: tasks/network/firewall.yml
+
+# Apply patches on the identity servers only
+- hosts: identity_servers
+  become: true
+  tasks:
+    - include_tasks: tasks/util/upgrade_os_packages.yml
+
+- hosts: freeipa_servers
+  become: true
+  tasks:
+    - include_tasks: tasks/identity/freeipa/server.yml
+
+# Enroll the Keycloak and gateway servers as FreeIPA clients
+- hosts: keycloak_servers,gateway_servers
+  become: true
+  tasks:
+    - include_tasks: tasks/identity/freeipa/client.yml
+
+# Set the permissions for the cluster in FreeIPA
+- hosts: freeipa_servers
+  become: true
+  tasks:
+    - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
+      vars:
+        # We don't need a group to permit users access to these hosts
+        create_users_group: false
+
+    # Create a rule that permits all users SSH access to the gateway hosts
+    # This allows use as a jump host for accessing clusters without an IP
+    - name: Permit all users to access gateway hosts
+      ipa_hbacrule:
+        cn: "{{ cluster_name | lower | replace('-', '_') }}_gateway_allow_all"
+        description: Allow all users to access gateway host
+        state: enabled
+        host: >-
+          {{
+            hostvars |
+              dict2items |
+              selectattr('key', 'in', groups.gateway_servers) |
+              map(attribute = 'value') |
+              map(attribute = 'ansible_fqdn') |
+              list
+          }}
+        servicecategory: all
+        usercategory: all
+        ipa_host: "{{ ansible_fqdn }}"
+        ipa_pass: "{{ freeipa_admin_password }}"
+
+- hosts: keycloak_servers
+  become: true
+  tasks:
+    # Use a persistent random string for the Keycloak local admin password
+    # All interaction will be by logging in with the FreeIPA admin
+    - include_tasks: tasks/util/persistent_random_fact.yml
+      vars:
+        fact_name: keycloak_admin_password
+        random_string_length: 40
+
+    - include_tasks: tasks/identity/keycloak/server.yml
+      vars:
+        gateway_external_domain: "{{ hostvars[groups.gateway_servers | first].gateway_external_domain }}"
+
+- hosts: gateway_servers
+  become: true
+  tasks:
+    - include_tasks: tasks/identity/proxy.yml

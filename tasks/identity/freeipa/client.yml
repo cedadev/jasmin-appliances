@@ -1,0 +1,97 @@
+---
+
+- name: Set FreeIPA facts
+  set_fact:
+    freeipa_server: "{{ hostvars[groups.freeipa_servers | first].ansible_fqdn }}"
+    freeipa_realm: "{{ hostvars[groups.freeipa_servers | first].freeipa_realm }}"
+    freeipa_admin_password: "{{ hostvars[groups.freeipa_servers | first].freeipa_admin_password }}"
+
+- name: Set FreeIPA facts (2)
+  set_fact:
+    freeipa_ldap_domain: >-
+      {%- for part in (freeipa_realm | lower).split('.') -%}
+        dc={{ part }}{%- if not loop.last -%},{%- endif -%}
+      {%- endfor -%}
+
+- name: Add FreeIPA server as DNS resolver
+  lineinfile:
+    path: /etc/resolv.conf
+    regexp: '{{ freeipa_server_ip | replace(".", "\.") }}'
+    line: "nameserver {{ freeipa_server_ip }}"
+    insertbefore: '^nameserver'
+    firstmatch: yes
+  vars:
+    freeipa_server_ip: "{{ hostvars[groups.freeipa_servers | first].ansible_default_ipv4.address }}"
+
+- name: Install FreeIPA client packages
+  yum:
+    name: freeipa-client
+    state: latest
+
+- name: Configure FreeIPA client
+  command: >
+    ipa-client-install
+      --unattended
+      --mkhomedir
+      --enable-dns-updates
+      --force-join
+      --server {{ freeipa_server | quote }}
+      --fixed-primary
+      --realm {{ freeipa_realm | quote }}
+      --domain {{ freeipa_realm | lower | quote }}
+      --principal admin
+      --password {{ freeipa_admin_password | quote }}
+  register: ipa_client_install
+  changed_when: ipa_client_install.rc == 0
+  failed_when: >
+    ipa_client_install.rc != 0 and
+    'IPA client is already configured' not in ipa_client_install.stderr
+
+# By default, ipa-client-install enables challenge-response authentication
+# In most cases, this is basically password authentication, so disable it
+- name: Disable password-based SSH authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^{{ item.name }}'
+    line: "{{ item.name }} {{ item.value }}"
+  loop:
+    - name: PasswordAuthentication
+      value: "no"
+    - name: ChallengeResponseAuthentication
+      value: "no"
+  loop_control:
+    label: "{{ item.name }}"
+  register: sshd_configure_passwords
+
+- name: Restart sshd
+  service:
+    name: sshd
+    state: restarted
+  when: sshd_configure_passwords is changed
+
+- name: Configure SSSD
+  ini_file:
+    path: /etc/sssd/sssd.conf
+    section: "domain/{{ freeipa_realm | lower }}"
+    option: "{{ item.name }}"
+    value: "{{ item.value }}"
+  loop:
+    # Set the cache timeout for users and groups at 5 mins
+    - name: entry_cache_timeout
+      value: 300
+    - name: entry_cache_user_timeout
+      value: 300
+    - name: entry_cache_group_timeout
+      value: 300
+    # Allow enumeration of users and groups
+    - name: enumerate
+      value: "true"
+  loop_control:
+    label: "{{ item.name }}"
+  register: sssd_configure
+
+- name: Restart SSSD
+  service:
+    name: sssd
+    state: restarted
+  when: sssd_configure is changed

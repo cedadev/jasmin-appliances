@@ -1,15 +1,26 @@
 name: "kubernetes"
 label: "Kubernetes"
-description: "Single-master Kubernetes cluster using kubeadm."
-logo: https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png
+description: >
+  Single-master Kubernetes cluster using Rancher Kubernetes Engine (RKE).
+logo: https://user-images.githubusercontent.com/13452123/59425960-e5d17680-8dce-11e9-86c4-ffe3cbff6701.png
 
 parameters:
-  - name: "cluster_version"
+  - name: "identity_stack_name"
+    label: "Identity manager"
+    description: >
+      The identity manager for managing access to the cluster.
+    kind: "cloud.cluster"
+    options:
+      tag: identity
+    immutable: true
+
+  - name: "kubernetes_version"
     label: "Version"
     description: "The Kubernetes version to use."
     kind: "choice"
     options:
-      choices: ["1.13", "1.14"]
+      choices: ["1.11", "1.12", "1.13", "1.14"]
+    default: "1.13"
 
   - name: "cluster_num_workers"
     label: "Worker nodes"
@@ -17,6 +28,7 @@ parameters:
     kind: "integer"
     options:
       min: 1
+    default: 3
 
   - name: "cluster_master_flavor"
     label: "Master size"
@@ -38,10 +50,10 @@ parameters:
 
   - name: "cluster_root_volume_size"
     label: "Root volume size (GB)"
-    description: "The size of the root volume of cluster nodes."
+    description: The size of the root volume of cluster nodes.
     kind: "integer"
     options:
-      min: 10
+      min: 20
     immutable: true
     default: 40
 
@@ -50,8 +62,15 @@ parameters:
     description: |
       The external IP to attach to the master node.
 
-      If not selected, the cluster will have no permanent external IP.
-      However, an IP must still be available to use for deployment and will be released afterwards.
+      This IP can be used to access the Kubernetes API using `kubectl`.
     kind: "cloud.ip"
-    required: false
     immutable: true
+
+  - name: kubernetes_dashboard_enable
+    label: Kubernetes dashboard
+    description: >-
+      If selected, the [Kubernetes dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
+      will be deployed and made available at `dashboard.<ip>.nip.io`.
+    kind: "boolean"
+    options:
+      checkboxLabel: "Enable Kubernetes dashboard?"

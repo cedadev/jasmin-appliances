@@ -1,0 +1,25 @@
+---
+
+# Check if sinfo is available
+# If it isn't, we won't attempt to drain and we will do all hosts in one batch
+- name: Check if sinfo is available
+  command: which sinfo
+  run_once: true
+  register: sinfo_available
+  changed_when: false
+  failed_when: false
+
+# If kubectl isn't available, just upgrade packages on all hosts
+- include_tasks: tasks/util/upgrade_os_packages.yml
+  when: sinfo_available.rc != 0
+
+# If kubectl is available process the hosts in batches, attempting to drain before upgrading
+- include_tasks: drain_and_upgrade.yml
+  when:
+    - cluster_upgrade_system_packages | default(false) | bool
+    - sinfo_available.rc == 0
+    - inventory_hostname in batch_hosts
+  # Make sure we take out no more than 20% of hosts at once
+  loop: "{{ ansible_play_hosts | batch([(ansible_play_hosts | count) / 5 | round(0, 'floor') | int, 1] | max) | list }}"
+  loop_control:
+    loop_var: batch_hosts

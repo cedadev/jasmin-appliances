@@ -1,0 +1,90 @@
+---
+
+# Tasks to create FreeIPA groups and rules for a cluster
+
+- name: Sanitise cluster name for use in groups
+  set_fact:
+    cluster_name_sanitised: "{{ cluster_name | lower | replace('-', '_') }}"
+
+- name: Set FreeIPA group facts
+  set_fact:
+    host_group_name: "{{ cluster_name_sanitised }}_hosts"
+    host_group_description: "Hosts for cluster '{{ cluster_name }}'"
+    user_group_name: "{{ cluster_name_sanitised }}_users"
+    user_group_description: "Users for cluster '{{ cluster_name }}'"
+    hbac_rule_name: "{{ cluster_name_sanitised }}_allow_users"
+    hbac_rule_description: "Allow cluster users SSH access to cluster hosts for '{{ cluster_name }}'"
+
+# Before updating the host group for the cluster, store the current hosts
+- name: Get previous hosts in host group
+  ipa_hostgroup:
+    cn: "{{ host_group_name }}"
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
+  register: hostgroup_previous
+  # It is OK if the group doesn't exist
+  ignore_errors: yes
+
+- name: Set group hosts facts
+  set_fact:
+    hostgroup_previous_hosts: "{{ hostgroup_previous.hostgroup.member_host | default([]) }}"
+    # Map a list of inventory hostnames to FQDNs for the current cluster hosts
+    hostgroup_hosts: >-
+      {{
+        hostvars |
+          dict2items |
+          selectattr('key', 'in', groups.get('cluster_' + cluster_name, [])) |
+          map(attribute = 'value') |
+          map(attribute = 'ansible_fqdn') |
+          list
+      }}
+
+# Remove any hosts that no longer exist from FreeIPA
+- name: Remove non-existent hosts
+  ipa_host:
+    fqdn: "{{ host_fqdn }}"
+    state: absent
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
+  loop: "{{ hostgroup_previous_hosts | difference(hostgroup_hosts) }}"
+  loop_control:
+    loop_var: host_fqdn
+
+- name: Create/update host group
+  ipa_hostgroup:
+    cn: "{{ host_group_name }}"
+    description: "{{ host_group_description }}"
+    # Map a list of inventory hostnames for the cluster hosts to their FQDNs
+    host: "{{ hostgroup_hosts }}"
+    # If deleting the cluster, also delete the hostgroup
+    state: "{{ cluster_state | default('present') }}"
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
+
+- name: Create users group
+  ipa_group:
+    cn: "{{ user_group_name }}"
+    description: "{{ user_group_description }}"
+    # If deleting the cluster, also delete the group
+    state: "{{ cluster_state | default('present') }}"
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
+  when: create_users_group | default(true)
+
+- name: Grant users group access to host group
+  ipa_hbacrule:
+    cn: "{{ hbac_rule_name }}"
+    description: "{{ hbac_rule_description }}"
+    hostgroup:
+      - "{{ host_group_name }}"
+    servicecategory: all
+    usergroup:
+      - "{{ user_group_name }}"
+    # If deleting the cluster, also delete the rule
+    state: "{{ cluster_state | default('present') }}"
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ freeipa_admin_password }}"
+  when:
+    - create_users_group | default(true)
+    - permit_user_ssh | default(false)
+
