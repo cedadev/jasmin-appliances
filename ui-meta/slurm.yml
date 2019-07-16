@@ -18,7 +18,7 @@ parameters:
     description: |
       The storage cluster to use for shared storage.
 
-      This storage is mounted at `/home`, and is used for user home directories.
+      This storage is mounted at `/home/users`, and is used for user home directories.
     kind: "cloud.cluster"
     options:
       tag: storage
