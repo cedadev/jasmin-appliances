@@ -70,6 +70,11 @@
 
     - name: Configure default home directory
       command: ipa config-mod --homedirectory={{ jasmin_homedir }}
+      register: ipa_config_mod
+      changed_when: ipa_config_mod.rc == 0
+      failed_when: >
+        ipa_config_mod.rc != 0 and
+        'no modifications to be performed' not in ipa_config_mod.stderr
   always:
     - name: Destroy Kerberos ticket
       command: kdestroy
