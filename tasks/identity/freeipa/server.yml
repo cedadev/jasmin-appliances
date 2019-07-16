@@ -62,6 +62,18 @@
     ipa_host: "{{ ansible_fqdn }}"
     ipa_pass: "{{ freeipa_admin_password }}"
 
+# ipa_config doesn't have an option to configure the default home directory
+# We also need to use Kerberos authentication
+- block:
+    - name: Get Kerberos ticket
+      shell: kinit admin <<< {{ freeipa_admin_password | quote }}
+
+    - name: Configure default home directory
+      command: ipa config-mod --homedirectory={{ jasmin_homedir }}
+  always:
+    - name: Destroy Kerberos ticket
+      command: kdestroy
+
 - name: Create allow all rule for admins
   ipa_hbacrule:
     cn: allow_all_admins

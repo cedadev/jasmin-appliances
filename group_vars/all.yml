@@ -9,3 +9,6 @@ cluster_upgrade_system_packages: false
 nfs_fstype: "xfs"
 nfs_disk_location: "/dev/sdb"
 nfs_export: "/srv/home"
+
+# Jasmin Homedir
+jasmin_homedir: "/home/users"

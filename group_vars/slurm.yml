@@ -1,8 +1,5 @@
 openhpc_repo_url: "https://github.com/openhpc/ohpc/releases/download/v1.3.GA/ohpc-release-1.3-1.el7.x86_64.rpm"
 
-# Jasmin Homedir
-jasmin_homedir: "/home"
-
 # A list of OpenHPC runtime libraries to install on compute and control nodes
 openhpc_packages:
   - strace
