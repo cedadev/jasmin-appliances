@@ -55,7 +55,7 @@ parameters:
     description: |
       The external IP to attach to the login node.
 
-      If not selected, you will need to access the cluster via a separate SSH bastion.
+      If not selected, the cluster can still be accessed via an SSH bastion.
     kind: "cloud.ip"
     required: false
     immutable: true
