@@ -15,7 +15,7 @@ parameters:
 
   - name: "gluster_volume_size"
     label: "Volume size (GB)"
-    description: "Gluster storage server volume size per node."
+    description: "The size of the data volume for each node."
     kind: "integer"
     options:
       min: 10
@@ -23,15 +23,15 @@ parameters:
 
   - name: "gluster_server_flavor"
     label: "Server size"
-    description: "The size to use for Gluster nodes."
+    description: "The size to use for nodes."
     kind: "cloud.size"
     options:
       min_ram: 2048
     immutable: true
 
   - name: "gluster_num_nodes"
-    label: "Number of storage nodes"
-    description: "Number of Gluster storage nodes."
+    label: "Number of nodes"
+    description: "Number of nodes in the cluster."
     kind: "integer"
     options:
       min: 3
