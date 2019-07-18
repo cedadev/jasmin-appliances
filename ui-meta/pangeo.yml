@@ -4,7 +4,7 @@ description: "The Pangeo software stack running on Kubernetes."
 logo: "https://raw.githubusercontent.com/pangeo-data/branding/master/logo/pangeo_simple_logo.png"
 
 parameters:
-  - name: identity_stack_name
+  - name: "identity_stack_name"
     label: "Identity manager"
     description: >
       The identity manager for managing access to the cluster.
@@ -13,15 +13,15 @@ parameters:
       tag: identity
     immutable: true
 
-  - name: kubernetes_version
+  - name: "kubernetes_version"
     label: "Version"
     description: "The Kubernetes version to use."
     kind: "choice"
     options:
-      choices: ["1.11", "1.12", "1.13", "1.14"]
-    default: "1.13"
+      choices: ["1.11", "1.12", "1.13", "1.14", "1.15"]
+    default: "1.14"
 
-  - name: cluster_num_workers
+  - name: "cluster_num_workers"
     label: "Worker nodes"
     description: "The number of worker nodes in the cluster."
     kind: "integer"
@@ -29,7 +29,7 @@ parameters:
       min: 1
     default: 3
 
-  - name: cluster_master_flavor
+  - name: "cluster_master_flavor"
     label: "Master size"
     description: "The size to use for the master node."
     kind: "cloud.size"
@@ -38,7 +38,7 @@ parameters:
       min_ram: 2048
     immutable: true
 
-  - name: cluster_worker_flavor
+  - name: "cluster_worker_flavor"
     label: "Worker size"
     description: "The size to use for the worker nodes."
     kind: "cloud.size"
@@ -47,7 +47,7 @@ parameters:
       min_ram: 8192
     immutable: true
 
-  - name: cluster_root_volume_size
+  - name: "cluster_root_volume_size"
     label: "Root volume size (GB)"
     description: The size of the root volume of cluster nodes.
     kind: "integer"
@@ -56,7 +56,7 @@ parameters:
     immutable: true
     default: 40
 
-  - name: cluster_fixed_ip
+  - name: "cluster_fixed_ip"
     label: "External IP"
     description: The external IP to attach to the master node.
     kind: "cloud.ip"
