@@ -237,6 +237,8 @@
         helm_release_values_template: templates/helm/keycloak-gatekeeper.yml
         helm_release_state: "{% if kubernetes_dashboard_enable | default(true) | bool %}present{% else %}absent{% endif %}"
         gatekeeper_discovery_url: "{{ hostvars[groups.keycloak_servers | first].keycloak_oidc_issuer_url }}"
+        # If using Let's Encrypt staging server, we need to skip TLS verification for the IdP
+        gatekeeper_provider_skip_tls_verify: "{{ letsencrypt_staging | default(false) | bool }}"
         gatekeeper_client_id: "{{ hostvars[groups.keycloak_servers | first].keycloak_client_id }}"
         gatekeeper_client_secret: "{{ hostvars[groups.keycloak_servers | first].keycloak_client_secret }}"
         gatekeeper_upstream: https://kubernetes-dashboard
