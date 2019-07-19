@@ -37,21 +37,6 @@
     ipa_server_install.rc != 0 and
     'already exists in DNS' not in ipa_server_install.stderr
 
-- name: Get FreeIPA LDAP domain
-  set_fact:
-    freeipa_ldap_domain: >-
-      {%- for part in (freeipa_realm | lower).split('.') -%}
-        dc={{ part }}{%- if not loop.last -%},{%- endif -%}
-      {%- endfor -%}
-
-- name: Update admin password
-  ldap_passwd:
-    dn: "uid=admin,cn=users,cn=accounts,{{ freeipa_ldap_domain }}"
-    passwd: "{{ freeipa_admin_password }}"
-    server_uri: "ldaps://{{ ansible_fqdn }}"
-    bind_dn: "cn=Directory Manager"
-    bind_pw: "{{ ansible_local.freeipa_ds_password }}"
-
 # "novalocal" isn't a valid email domain, which prevents the creation of new users
 # So set something else - it doesn't have to be a real email
 # Also set the default login shell to bash
