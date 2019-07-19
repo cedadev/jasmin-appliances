@@ -200,7 +200,7 @@
           name: letsencrypt
         spec:
           acme:
-            server: https://acme-v02.api.letsencrypt.org/directory
+            server: https://acme{% if letsencrypt_staging | default(false) | bool %}-staging{% endif %}-v02.api.letsencrypt.org/directory
             privateKeySecretRef:
               name: letsencrypt
             # Enable the HTTP-01 challenge provider
