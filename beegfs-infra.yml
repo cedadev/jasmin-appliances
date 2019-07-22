@@ -39,6 +39,38 @@
     # We don't need a group to permit users access to these hosts
     create_users_group: false
 
-- import_playbook: beegfs.yml
-  vars:
-    beegfs_name: "{{ cluster_name }}"
+- hosts: beegfs_servers
+  become: true
+  roles:
+    # Note: The BeeGFS clients are likely to be drawn from across a multi-stack
+    # platform deployment. This playbook assumes the existence of a meta-group,
+    # beegfs_clients, which contains all clients in the cluster.
+    - role: stackhpc.beegfs
+      beegfs_enable:
+        admon: false
+        mgmt: "{{ inventory_hostname in groups.beegfs_mds }}"
+        meta: "{{ inventory_hostname in groups.beegfs_mds }}"
+        oss: "{{ inventory_hostname in groups.beegfs_oss }}"
+        tuning: "{{ inventory_hostname in groups.beegfs_oss }}"
+        client: false
+      beegfs_state: present
+      beegfs_rdma: false
+      beegfs_interfaces: ["{{ ansible_default_ipv4.interface }}"]
+      beegfs_mgmt_host: "{{ groups.beegfs_mds | first }}"
+      # Specify the device on which the metadata should live
+      beegfs_meta_dev: "{{ cluster_attached_volumes.0.device }}"
+      beegfs_meta_fstype: xfs
+      # This is a list of devices for BeeGFS to use
+      beegfs_oss_devices: "{{ cluster_attached_volumes | map(attribute = 'device') | list }}"
+      # Generate a list of port numbers for the devices, starting from 8003 and incremented by 100
+      #   E.g. 8003, 8103, 8203, ...
+      beegfs_oss_ports: "{{ range(8003, 8003 + (cluster_attached_volumes | count) * 100, 100) | list }}"
+      # We need to end up with a list of dicts, each with a dev and port key
+      beegfs_oss: >
+        {{
+          beegfs_oss_devices |
+            json_query('[*].{key: `dev`, value: @}') |
+            zip(beegfs_oss_ports | json_query('[*].{key: `port`, value: @}')) |
+            map('items2dict') |
+            list
+        }}
