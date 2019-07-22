@@ -12,6 +12,13 @@
         cluster_stack_update: false
         cluster_gw_group: "{{ identity_gw_group_name }}"
 
+    # Add the storage stack to the cluster
+    - include_role:
+        name: jasmin.cluster-infra
+      vars:
+        cluster_name: "{{ storage_name }}"
+        cluster_stack_update: false
+
     # Provision the SLURM infrastructure
     - import_tasks: tasks/infra/provision.yml
       vars:
@@ -45,32 +52,13 @@
     # Users in the cluster group should get SSH access
     permit_user_ssh: true
 
-- hosts: openstack
-  tasks:
-    - name: Import configuration from storage stack
-      import_tasks: tasks/storage_stack.yml
-      when:
-        - storage_name is defined
-        - cluster_state | default('present') | lower == 'present'
-
-- import_playbook: nfs.yml
-  when:
-    - hostvars.localhost.storage_type is defined
-    - hostvars.localhost.storage_type == 'nfs'
-
-- import_playbook: gluster.yml
-  when:
-    - hostvars.localhost.storage_type is defined
-    - hostvars.localhost.storage_type == 'gluster'
-
-- import_playbook: beegfs.yml
-  when:
-    - hostvars.localhost.storage_type is defined
-    - hostvars.localhost.storage_type == 'beegfs'
-
 - hosts: slurm
   become: true
   pre_tasks:
+    # Mount the storage
+    - name: Mount shared storage
+      include_tasks: tasks/storage/client.yml
+
     - name: Install OpenHPC repository
       yum:
         name: "{{ openhpc_repo_url }}"

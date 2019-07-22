@@ -1,11 +1,5 @@
 ---
 
-gluster_cluster_info:
-  storage_type: "gluster"
-  gluster_servers: "$PRIMARY_IPS"
-  vars:
-    gluster_cluster_volume_name: "{{ cluster_name }}"
-
 gluster_groups:
   - "{{ gluster_group_servers }}"
 
@@ -17,6 +11,11 @@ gluster_group_servers:
   additional_volumes:
     - name: data
       size: "{{ gluster_volume_size | default(10) }}"
-  info: "{{ gluster_cluster_info | to_json }}"
+      device: /dev/sdb
   inventory_groups:
     - gluster_servers
+  facts:
+    # These are things that clients need to know
+    gluster_cluster_transport_interface: eth0
+    gluster_cluster_transport_mode: tcp
+    gluster_cluster_volume_name: "{{ cluster_name }}"

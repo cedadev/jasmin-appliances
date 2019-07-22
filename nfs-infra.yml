@@ -39,4 +39,28 @@
     # We don't need a group to permit users access to these hosts
     create_users_group: false
 
-- import_playbook: nfs.yml
+- hosts: nfs_servers
+  become: true
+  pre_tasks:
+    # Prevent nfs-server from failing to start after reboot: IPv6 is disabled via
+    # sysctl in the JASMIN CentOS 7 image, but initramfs doesn't include this
+    # sysctl setting. This prevents rpcbind (on which nfs-server depends) from
+    # starting on boot. See https://access.redhat.com/solutions/2798411 for more
+    # details. Unfortunately the Red Hat solution is incomplete, as dracut doesn't
+    # include /etc/sysctl* by default, so we modify dracut.conf before rebuilding.
+    - name: Add sysctl configuration to dracut.conf
+      lineinfile:
+        path: /etc/dracut.conf
+        line: install_items="/etc/sysctl.conf /etc/sysctl.d/*"
+      register: dracut_configure
+
+    - name: Rebuild initramfs
+      command: dracut -f
+      when: dracut_configure is changed
+  roles:
+    - role: stackhpc.cluster-nfs
+      become: true
+      nfs_enable:
+        server: true
+        clients: false
+      nfs_disk_location: "{{ cluster_attached_volumes.0.device }}"
