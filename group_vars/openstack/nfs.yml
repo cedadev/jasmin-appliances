@@ -1,11 +1,5 @@
 ---
 
-nfs_cluster_info:
-  storage_type: "nfs"
-  nfs_servers: "$PRIMARY_IPS"
-  vars:
-    nfs_export: "/srv/home"
-
 nfs_groups:
   - "{{ nfs_group_server }}"
 
@@ -17,6 +11,8 @@ nfs_group_server:
   additional_volumes:
     - name: data
       size: "{{ nfs_volume_size | default(10) }}"
-  info: "{{ nfs_cluster_info | to_json }}"
+      device: /dev/sdb
   inventory_groups:
     - nfs_servers
+  facts:
+    nfs_export: /srv

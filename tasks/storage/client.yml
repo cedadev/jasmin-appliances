@@ -1,0 +1,30 @@
+---
+# These tasks mount storage from the configured storage stack
+
+# If the stack is an NFS stack, nfs_servers will be present in the groups
+- name: Configure NFS client
+  include_role:
+    name: stackhpc.cluster-nfs
+  vars:
+    nfs_enable:
+      server: false
+      clients: true
+    nfs_server: "{{ hostvars[groups.nfs_servers | first].ansible_fqdn }}"
+    nfs_export: "{{ hostvars[groups.nfs_servers | first].nfs_export }}"
+    nfs_client_mnt_point: "{{ jasmin_homedir }}"
+  when: "'nfs_servers' in groups"
+
+# If the stack is a Gluster stack, gluster_servers will be present in the groups
+- name: Configure Gluster client
+  include_role:
+    name: stackhpc.gluster-cluster
+  vars:
+    gluster_enable:
+      servers: false
+      clients: true
+    gluster_cluster_client_mntpoint: "{{ jasmin_homedir }}"
+    gluster_cluster_storage_group_name: gluster_servers
+    gluster_cluster_transport_mode: "{{ hostvars[groups.gluster_servers | first].gluster_cluster_transport_mode }}"
+    gluster_cluster_transport_interface: "{{ hostvars[groups.gluster_servers | first].gluster_cluster_transport_interface }}"
+    gluster_cluster_volume_name: "{{ hostvars[groups.gluster_servers | first].gluster_cluster_volume_name }}"
+  when: "'gluster_servers' in groups"
