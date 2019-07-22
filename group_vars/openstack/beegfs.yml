@@ -1,11 +1,5 @@
 ---
 
-beegfs_cluster_info:
-  storage_type: "beegfs"
-  beegfs_servers: "$PRIMARY_IPS"
-  group: mds
-  vars: {}
-
 beegfs_groups:
   - "{{ beegfs_group_mds }}"
   - "{{ beegfs_group_oss }}"
@@ -19,7 +13,6 @@ beegfs_group_mds:
     - name: mds
       size: "{{ beegfs_mds_volume_size | default(2) }}"
       device: /dev/sdb
-  info: "{{ beegfs_cluster_info | to_json }}"
   inventory_groups:
     - beegfs_servers
     - beegfs_mds
