@@ -41,6 +41,28 @@
 
 - hosts: beegfs_servers
   become: true
+  # The beegfs role has a weird behaviour where if you specify beegfs_meta_dev,
+  # it will attempt to unmount it every time the playbook runs
+  # So just format the disks here
+  pre_tasks:
+    - block:
+        - name: Format metadata filesystem
+          filesystem:
+            dev: "{{ cluster_attached_volumes.0.device }}"
+            fstype: xfs
+
+        - name: Ensure metadata mountpoint exists
+          file:
+            path: "/data/beegfs/beegfs_meta"
+            state: directory
+
+        - name: Mount metadata filesystem
+          mount:
+            src: "{{ cluster_attached_volumes.0.device }}"
+            path: "/data/beegfs/beegfs_meta"
+            fstype: xfs
+            state: mounted
+      when: inventory_hostname in groups.beegfs_mds
   roles:
     # Note: The BeeGFS clients are likely to be drawn from across a multi-stack
     # platform deployment. This playbook assumes the existence of a meta-group,
@@ -57,9 +79,7 @@
       beegfs_rdma: false
       beegfs_interfaces: ["{{ ansible_default_ipv4.interface }}"]
       beegfs_mgmt_host: "{{ groups.beegfs_mds | first }}"
-      # Specify the device on which the metadata should live
-      beegfs_meta_dev: "{{ cluster_attached_volumes.0.device }}"
-      beegfs_meta_fstype: xfs
+      beegfs_meta_path: "/data/beegfs/beegfs_meta"
       # This is a list of devices for BeeGFS to use
       beegfs_oss_devices: "{{ cluster_attached_volumes | map(attribute = 'device') | list }}"
       # Generate a list of port numbers for the devices, starting from 8003 and incremented by 100
