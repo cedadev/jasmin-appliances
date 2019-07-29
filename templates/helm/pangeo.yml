@@ -8,7 +8,8 @@ jupyterhub:
     type: ldap
     ldap:
       server:
-        address: "{{ freeipa_server }}"
+        # Use the IP address as the DNS resolution isn't always reliable
+        address: "{{ hostvars[groups.freeipa_servers | first].ansible_default_ipv4.address }}"
       dn:
         templates:
           - "uid={username},cn=users,cn=accounts,{{ freeipa_ldap_domain }}"
