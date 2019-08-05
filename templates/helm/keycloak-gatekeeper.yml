@@ -25,6 +25,9 @@ ingress:
   annotations:
     certmanager.k8s.io/cluster-issuer: letsencrypt
     certmanager.k8s.io/acme-challenge-type: http01
+    {% if gatekeeper_allowed_cidrs is defined and gatekeeper_allowed_cidrs %}
+    nginx.ingress.kubernetes.io/whitelist-source-range: "{{ gatekeeper_allowed_cidrs | join(',') }}"
+    {% endif %}
   hosts:
     - host: "{{ gatekeeper_domain }}"
       paths: ["/"]

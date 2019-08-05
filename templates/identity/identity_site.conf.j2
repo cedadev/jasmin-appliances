@@ -53,7 +53,9 @@ server {
     # IPA URLs start with /ipa
     location /ipa {
         # Access is restricted to the admin CIDR
-        allow {{ admin_allowed_cidr }};
+        {% for cidr in admin_allowed_cidrs %}
+        allow {{ cidr }};
+        {% endfor %}
         deny all;
 
         # FreeIPA uses the Referer header to avoid MITM attacks, so spoof it...
@@ -72,7 +74,10 @@ server {
 
     # Keycloak admin URLs start with /auth/admin
     location /auth/admin {
-        allow {{ admin_allowed_cidr }};
+        # Access is restricted to the admin CIDR
+        {% for cidr in admin_allowed_cidrs %}
+        allow {{ cidr }};
+        {% endfor %}
         deny all;
 
         proxy_set_header  Host $http_host;
