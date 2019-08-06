@@ -28,6 +28,7 @@ ingress:
     {% if gatekeeper_allowed_cidrs is defined and gatekeeper_allowed_cidrs -%}
     nginx.ingress.kubernetes.io/whitelist-source-range: "{{ gatekeeper_allowed_cidrs | join(',') }}"
     {%- endif %}
+
   hosts:
     - host: "{{ gatekeeper_domain }}"
       paths: ["/"]
