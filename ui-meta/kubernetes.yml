@@ -79,6 +79,7 @@ parameters:
     kind: "list"
     options:
       min_length: 1
+      add_item_text: Add another CIDR
       item:
         kind: "string"
         options:
@@ -86,6 +87,8 @@ parameters:
           pattern: '^(([1-9]?[0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([1-9]?[0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\/([1-2]?[0-9]|3[0-2])$'
           # This is the error message given in the HTML input
           title: Value must be an IP range in CIDR notation, e.g. 192.168.0.0/16.
+          # Placeholder for each new field - use an example CIDR
+          placeholder: 192.168.0.0/16
 
   - name: kubernetes_dashboard_enable
     label: Kubernetes dashboard
