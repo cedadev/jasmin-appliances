@@ -33,7 +33,6 @@ parameters:
     kind: "list"
     options:
       min_length: 1
-      add_item_text: Add another CIDR
       item:
         kind: "string"
         options:
