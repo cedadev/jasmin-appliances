@@ -139,7 +139,31 @@
 - hosts: rke_masters
   become: true
   tasks:
-    # helm/kubectl commands need to run on the first host in the play
+    # The CIDRs from the last time we ran will be in ansible_local
+    # Compare them to the current CIDRs and adjust as necessary
+    - name: Open Kubernetes API for given CIDRs
+      firewalld:
+        rich_rule: >-
+          rule family="ipv4"
+          source address="{{ item }}"
+          port port="6443" protocol="tcp" accept
+        permanent: true
+        immediate: true
+        state: "{{ 'enabled' if item in admin_allowed_cidrs else 'disabled' }}"
+      loop: "{{ ansible_local.admin_allowed_cidrs | default([]) | union(admin_allowed_cidrs) | unique | list }}"
+
+    # Store the current allowed CIDRs for next time
+    - name: Ensure facts.d directory exists
+      file:
+        path: /etc/ansible/facts.d
+        state: directory
+
+    - name: Write facts.d file containing allowed CIDRs
+      copy:
+        content: "{{ admin_allowed_cidrs | to_json }}"
+        dest: /etc/ansible/facts.d/admin_allowed_cidrs.fact
+        mode: "u=rw,g=,o="
+
     - include_role:
         name: jasmin.helm
 
@@ -244,3 +268,4 @@
         gatekeeper_upstream: https://kubernetes-dashboard
         gatekeeper_encryption_key: "{{ ansible_local.kubernetes_dashboard_proxy_encryption_key }}"
         gatekeeper_domain: "{{ kubernetes_dashboard_domain }}"
+        gatekeeper_allowed_cidrs: "{{ admin_allowed_cidrs }}"

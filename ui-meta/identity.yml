@@ -20,22 +20,28 @@ parameters:
       secret: true
       confirm: true
 
-  - name: admin_allowed_cidr
-    label: "Admin IP range"
+  - name: admin_allowed_cidrs
+    label: "Admin IP ranges"
     description: |
-      The IP range from which admins will access the FreeIPA and Keycloak web interfaces, in
+      The IP ranges from which admins will access the FreeIPA and Keycloak web interfaces, in
       [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation).
 
-      Any attempt to access the admin interfaces from an IP address that is not in this range
+      Any attempt to access the admin interfaces from an IP address that is not in these ranges
       will be blocked.
 
       If you are not sure what value to use here, contact your local network administrator.
-    kind: "string"
+    kind: "list"
     options:
-      # This pattern matches a CIDR
-      pattern: '^(([1-9]?[0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([1-9]?[0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\/([1-2]?[0-9]|3[0-2])$'
-      # This is the error message given in the HTML input
-      title: Value must be an IP range in CIDR notation, e.g. 192.168.0.0/16.
+      min_length: 1
+      item:
+        kind: "string"
+        options:
+          # This pattern matches a CIDR
+          pattern: '^(([1-9]?[0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([1-9]?[0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\/([1-2]?[0-9]|3[0-2])$'
+          # This is the error message given in the HTML input
+          title: Value must be an IP range in CIDR notation, e.g. 192.168.0.0/16.
+          # Placeholder for each new field - use an example CIDR
+          placeholder: 192.168.0.0/16
 
   - name: freeipa_server_flavor
     label: FreeIPA size
