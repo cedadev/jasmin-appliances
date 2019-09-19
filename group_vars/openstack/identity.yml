@@ -23,7 +23,7 @@ identity_group_freeipa_server:
     - freeipa_servers
   facts:
     freeipa_admin_password: "{{ admin_password }}"
-    freeipa_realm: "NOVALOCAL"
+    freeipa_realm: "TENANT.LOCAL"
 
 identity_group_keycloak_server:
   name: keycloak

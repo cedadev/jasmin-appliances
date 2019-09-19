@@ -29,9 +29,10 @@
         # Tag to assign to  the cluster
         cluster_tag: "{{ cluster_type.slurm }}"
 
-# Gather facts for all hosts
 - hosts: cluster
-  tasks: []
+  become: true
+  tasks:
+    - import_tasks: tasks/network/hosts.yml
 
 - hosts: slurm
   become: true
