@@ -18,9 +18,10 @@
         cluster_groups: "{{ beegfs_groups }}"
         cluster_tag: "{{ cluster_type.storage }}"
 
-# Gather facts for all hosts
 - hosts: cluster
-  tasks: []
+  become: true
+  tasks:
+    - import_tasks: tasks/network/hosts.yml
 
 - hosts: beegfs_servers
   become: true

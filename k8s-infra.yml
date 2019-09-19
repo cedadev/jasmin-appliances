@@ -27,9 +27,10 @@
         # Tag to assign to the cluster
         cluster_tag: "{{ cluster_type.kubernetes }}"
 
-# Gather facts for all hosts
 - hosts: cluster
-  tasks: []
+  become: true
+  tasks:
+    - import_tasks: tasks/network/hosts.yml
 
 - hosts: rke_hosts
   become: true

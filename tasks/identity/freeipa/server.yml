@@ -6,7 +6,6 @@
       - freeipa-server
       - bind
       - bind-dyndb-ldap
-      - ipa-server-dns
     state: latest
 
 # This is required by ipa-server-install if IPv6 is enabled in the kernel
@@ -27,15 +26,13 @@
       --unattended
       --realm {{ freeipa_realm | quote }}
       --domain {{ freeipa_realm | lower | quote }}
-      --setup-dns
-      --no-forwarders
       --ds-password {{ ansible_local.freeipa_ds_password | quote }}
       --admin-password {{ freeipa_admin_password | quote }}
   register: ipa_server_install
   changed_when: ipa_server_install.rc == 0
   failed_when: >
     ipa_server_install.rc != 0 and
-    'already exists in DNS' not in ipa_server_install.stderr
+    'IPA server is already configured' not in ipa_server_install.stderr
 
 # "novalocal" isn't a valid email domain, which prevents the creation of new users
 # So set something else - it doesn't have to be a real email

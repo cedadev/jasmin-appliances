@@ -18,6 +18,7 @@
 - hosts: cluster
   become: true
   tasks:
+    - import_tasks: tasks/network/hosts.yml
     - import_tasks: tasks/network/firewall.yml
 
 # Apply patches on the identity servers only
