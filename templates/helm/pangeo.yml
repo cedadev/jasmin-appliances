@@ -1,4 +1,4 @@
-{% set default_pangeo_domain = "pangeo.{{ cluster_fixed_ip | replace('.', '-') }}.sslip.io" %}
+{% set default_pangeo_domain = "pangeo." + (cluster_fixed_ip | replace('.', '-')) + ".sslip.io" %}
 jupyterhub:
   # We authenticate using the FreeIPA LDAP database
   # We use LDAP for two reasons:
