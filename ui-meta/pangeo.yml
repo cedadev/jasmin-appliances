@@ -94,10 +94,24 @@ parameters:
     label: Kubernetes dashboard
     description: >-
       If selected, the [Kubernetes dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
-      will be deployed and made available at `dashboard.<ip>.nip.io`.
+      will be deployed and made available at the given domain.
     kind: "boolean"
     options:
       checkboxLabel: "Enable Kubernetes dashboard?"
+
+  - name: kubernetes_dashboard_domain
+    label: Dashboard domain
+    description: |
+      The domain to use to access the Kubernetes dashboard, if enabled (optional).
+
+      If not given, `dashboard.<dashed-ip>.sslip.io` will be used.
+
+      If given, a DNS entry for the domain pointing to the selected IP
+      must already exist. A DNS entry will **not** be created for you,
+      and the lack of a correct DNS entry will cause configuration to fail.
+    kind: string
+    immutable: true
+    required: false
 
   - name: pangeo_notebook_cpu
     label: Notebook CPUs
@@ -131,7 +145,7 @@ parameters:
     description: |
       The domain to use to access Pangeo (optional).
 
-      If not given, `pangeo.<ip>.nip.io` will be used, which requires no action.
+      If not given, `pangeo.<dashed-ip>.sslip.io` will be used, which requires no action.
 
       If given, a DNS entry for the domain pointing to the selected IP
       must already exist. A DNS entry will **not** be created for you,

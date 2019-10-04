@@ -2,6 +2,8 @@
 
 identity_gw_group_name: "gateway"
 
+default_gateway_external_domain: "{{ cluster_fixed_ip | replace('.', '-') }}.sslip.io"
+
 identity_group_gateway:
   name: "{{ identity_gw_group_name }}"
   nodenet_resource: "Cluster::NodeNet1"
@@ -11,7 +13,7 @@ identity_group_gateway:
     - identity_servers
     - gateway_servers
   facts:
-    gateway_external_domain: "{{ gateway_external_domain | default(cluster_fixed_ip + '.nip.io', true) }}"
+    gateway_external_domain: "{{ gateway_external_domain | default(default_gateway_external_domain, true) }}"
 
 identity_group_freeipa_server:
   name: freeipa
