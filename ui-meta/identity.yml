@@ -19,6 +19,7 @@ parameters:
     options:
       secret: true
       confirm: true
+      min_length: 8
 
   - name: admin_allowed_cidrs
     label: "Admin IP ranges"
