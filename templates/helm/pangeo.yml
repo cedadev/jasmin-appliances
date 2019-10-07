@@ -1,3 +1,4 @@
+{% set default_pangeo_domain = "pangeo." + (cluster_fixed_ip | replace('.', '-')) + ".sslip.io" %}
 jupyterhub:
   # We authenticate using the FreeIPA LDAP database
   # We use LDAP for two reasons:
@@ -55,11 +56,11 @@ jupyterhub:
     secretToken: "{{ ansible_local.pangeo_secret_token }}"
   ingress:
     enabled: true
-    hosts: ["{{ pangeo_domain | default('pangeo.' + cluster_fixed_ip + '.nip.io', true) }}"]
+    hosts: ["{{ pangeo_domain | default(default_pangeo_domain, true) }}"]
     # Get a certificate from the letsencrypt issuer
     annotations:
       certmanager.k8s.io/cluster-issuer: letsencrypt
       certmanager.k8s.io/acme-challenge-type: http01
     tls:
-      - hosts: ["{{ pangeo_domain | default('pangeo.' + cluster_fixed_ip + '.nip.io', true) }}"]
+      - hosts: ["{{ pangeo_domain | default(default_pangeo_domain, true) }}"]
         secretName: pangeo-tls

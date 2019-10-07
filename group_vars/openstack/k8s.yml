@@ -2,6 +2,8 @@
 
 k8s_gw_group_name: "master"
 
+default_kubernetes_dashboard_domain: "dashboard.{{ cluster_fixed_ip | replace('.', '-') }}.sslip.io"
+
 k8s_group_masters:
   name: "{{ k8s_gw_group_name }}"
   nodenet_resource: "Cluster::NodeNet1"
@@ -12,7 +14,7 @@ k8s_group_masters:
     - rke_hosts
     - rke_masters
   facts:
-    kubernetes_dashboard_domain: "{{ kubernetes_dashboard_domain | default('dashboard.' + cluster_fixed_ip + '.nip.io', true) }}"
+    kubernetes_dashboard_domain: "{{ kubernetes_dashboard_domain | default(default_kubernetes_dashboard_domain, true) }}"
 
 k8s_group_workers:
   name: "worker"
