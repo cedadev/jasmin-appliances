@@ -1,6 +1,6 @@
 ---
 
-cluster_image_base: "centos-7-20190104"
+cluster_image_base: "centos-7-20190816"
 cluster_floating_network: "NERCvSE"
 cluster_deploy_user: "root"
 cluster_delegate_role: _member_
