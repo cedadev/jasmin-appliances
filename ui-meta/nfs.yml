@@ -29,3 +29,4 @@ parameters:
       min_ram: 1024
       min_disk: 10
     immutable: true
+    default: 22  # This is j2.small (2 CPUs, 2GB RAM)

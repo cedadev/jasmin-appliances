@@ -40,6 +40,7 @@ parameters:
       min_ram: 1024
       min_disk: 10
     immutable: true
+    default: 22  # This is j2.small (2 CPUs, 2GB RAM)
 
   - name: "cluster_compute_flavor"
     label: "Compute node size"
@@ -49,6 +50,7 @@ parameters:
       min_ram: 1024
       min_disk: 10
     immutable: true
+    default: 0f36773c-63f3-4126-b91a-e274777b7827  # This is j3.large (8 CPUs, 16GB RAM)
 
   - name: "cluster_fixed_ip"
     label: "External IP"
