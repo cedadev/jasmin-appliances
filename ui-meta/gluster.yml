@@ -28,6 +28,7 @@ parameters:
     options:
       min_ram: 2048
     immutable: true
+    default: 23  # This is j3.small (2 CPUs, 4GB RAM)
 
   - name: "gluster_num_nodes"
     label: "Number of nodes"
