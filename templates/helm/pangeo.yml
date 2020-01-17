@@ -1,10 +1,8 @@
 {% set default_pangeo_domain = "pangeo." + (cluster_fixed_ip | replace('.', '-')) + ".sslip.io" %}
 jupyterhub:
-  # We authenticate using the FreeIPA LDAP database
-  # We use LDAP for two reasons:
-  #   1. The LDAP authenticator supports controlling access by group membership
-  #      The oauthenticator doesn't understand OpenID Connect so can't use the groups claim
-  #   2. There is a bug in NSX that means we can't loop back into the same tenancy via external IPs
+  # Authenticate using the FreeIPA LDAP database
+  # We use LDAP because the LDAP authenticator supports controlling access by group membership
+  # The oauthenticator doesn't understand OpenID Connect so can't use the groups claim
   auth:
     type: ldap
     ldap:
@@ -25,10 +23,14 @@ jupyterhub:
       type: sqlite-pvc
       pvc:
         storageClassName: standard
+    services:
+      dask-gateway:
+        url: http://web-public-{{ helm_release_name }}-dask-gateway
+        apiToken: "{{ ansible_local.pangeo_dask_gateway_api_token }}"
   singleuser:
     image:
       name: pangeo/pangeo-notebook
-      tag: "2019.06.25"
+      tag: "2019.12.08"
     startTimeout: 1000
     storage:
       type: dynamic
@@ -59,8 +61,24 @@ jupyterhub:
     hosts: ["{{ pangeo_domain | default(default_pangeo_domain, true) }}"]
     # Get a certificate from the letsencrypt issuer
     annotations:
-      certmanager.k8s.io/cluster-issuer: letsencrypt
-      certmanager.k8s.io/acme-challenge-type: http01
+      cert-manager.io/cluster-issuer: letsencrypt
     tls:
       - hosts: ["{{ pangeo_domain | default(default_pangeo_domain, true) }}"]
         secretName: pangeo-tls
+
+dask-gateway:
+  gateway:
+    proxyToken: "{{ ansible_local.pangeo_dask_gateway_proxy_token }}"
+    auth:
+      jupyterhub:
+        apiToken: "{{ ansible_local.pangeo_dask_gateway_api_token }}"
+    clusterManager:
+      image:
+        name: pangeo/pangeo-notebook
+        tag: "2019.12.08"
+  schedulerProxy:
+    service:
+      type: ClusterIP
+  webProxy:
+    service:
+      type: ClusterIP

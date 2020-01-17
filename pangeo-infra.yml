@@ -27,11 +27,16 @@
 - hosts: "{{ groups.get('rke_hosts', []) | first | default('!all') }}"
   become: true
   pre_tasks:
-    # Create a persistent secret token for Pangeo
-    - include_tasks: tasks/util/persistent_random_fact.yml
+    # Create persistent secrets for Pangeo
+    - name: Generate Pangeo secrets
+      include_tasks: tasks/util/persistent_random_fact.yml
       vars:
-        fact_name: pangeo_secret_token
-        random_string_length: 40
+        fact_name: "{{ item }}"
+        random_fact_bytes: 32
+      loop:
+        - pangeo_secret_token
+        - pangeo_dask_gateway_proxy_token
+        - pangeo_dask_gateway_api_token
   tasks:
     # Install the Pangeo repo
     - name: Install Pangeo Helm repository
@@ -48,7 +53,7 @@
       vars:
         helm_release_name: pangeo
         helm_release_chart: pangeo/pangeo
-        helm_release_version: 19.05.31-bcc66da
+        helm_release_version: 20.01.15-e3086c1
         helm_release_namespace: pangeo
         helm_release_values_template: templates/helm/pangeo.yml
         helm_release_recreate_pods: yes
