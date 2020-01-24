@@ -57,6 +57,15 @@
       failed_when: >
         ipa_config_mod.rc != 0 and
         'no modifications to be performed' not in ipa_config_mod.stderr
+
+    - name: Set password expiry for admin user
+      # Just pick a date ages in the future
+      command: ipa user-mod admin --setattr=krbPasswordExpiration=21000101000000Z
+      register: ipa_user_mod
+      changed_when: ipa_user_mod.rc == 0
+      failed_when: >
+        ipa_user_mod.rc != 0 and
+        'no modifications to be performed' not in ipa_user_mod.stderr
   always:
     - name: Destroy Kerberos ticket
       command: kdestroy
