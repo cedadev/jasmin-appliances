@@ -85,6 +85,18 @@
       --user {{ keycloak_admin_user }}
       --password {{ keycloak_admin_password | quote }}
 
+- name: Get GID for admins group in Keycloak
+  keycloak_group:
+    name: admins
+    state: present
+    auth_keycloak_url: http://localhost:8080/auth
+    auth_realm: master
+    auth_username: "{{ keycloak_admin_user }}"
+    auth_password: "{{ keycloak_admin_password }}"
+  register: keycloak_admins_group
+
+- debug: var=keycloak_admins_group
+
 - name: Grant FreeIPA admins group admin access in Keycloak
   command: >
     /opt/keycloak/latest/bin/kcadm.sh add-roles
