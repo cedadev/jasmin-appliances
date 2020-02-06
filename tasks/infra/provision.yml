@@ -97,23 +97,29 @@
 
 - name: Create cluster image
   block:
-    - name: Get cluster base image info
+    - name: Get available images
       os_image_facts:
-        image: "{{ cluster_image_base }}"
+
+    - name: Find cluster base image
+      set_fact:
+        # to/from_json required - see https://github.com/ansible/ansible/issues/27299#issuecomment-331068246
+        cluster_image_base: "{{ openstack_image | to_json | from_json | json_query(cluster_image_query) | first }}"
+      vars:
+        cluster_image_query: "[?starts_with(name, '{{ cluster_image_prefix }}')]"
 
     - name: Create volume from base image
       os_volume:
         display_name: "cluster-image-{{ cluster_name }}"
-        image: "{{ cluster_image_base }}"
+        image: "{{ cluster_image_base.name }}"
         # Convert from bytes to GiB
-        size: "{{ (openstack_image.size / 1024 / 1024 / 1024) | round(0, 'ceil') | int }}"
+        size: "{{ (cluster_image_base.size / 1024 / 1024 / 1024) | round(0, 'ceil') | int }}"
       register: cluster_image_volume
 
     - name: Create cluster image from volume
       os_volume_upload_to_image:
         volume_id: "{{ cluster_image_volume.id }}"
         image_name: "{{ cluster_image }}"
-        disk_format: "{{ openstack_image.disk_format }}"
+        disk_format: "{{ cluster_image_base.disk_format }}"
 
     - name: Add cluster_image tag to image
       os_image:
