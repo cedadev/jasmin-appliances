@@ -36,7 +36,7 @@
   become: true
   tasks:
     # Make sure that we have an Openstack trust
-    # It is important to do this before the token expires
+    # It is important to do this early, before the token expires
     # This is created on the Openstack host but persisted on the cluster nodes
     # These tasks set the openstack_trust_id and openstack_project_id variables
     - include_tasks: tasks/util/os_trust.yml
