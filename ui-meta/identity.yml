@@ -31,7 +31,8 @@ parameters:
       will be blocked.
 
       If you are not sure what value to use here, contact your local network administrator. To allow
-      any address to access the FreeAPI and Keycloak admin interfaces, use `0.0.0.0/0`.
+      any address to access the FreeAPI and Keycloak admin interfaces use `0.0.0.0/0`, however **this
+      is not recommended**.
     kind: "list"
     options:
       min_length: 1
