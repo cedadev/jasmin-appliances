@@ -78,7 +78,8 @@ parameters:
 
       This does not affect access to the Jupyter notebook interface.
 
-      If you are not sure what value to use here, contact your local network administrator.
+      If you are not sure what value to use here, contact your local network administrator. To allow
+      any address to access the Kubernetes API and dashboard, use `0.0.0.0/0`.
     kind: "list"
     options:
       min_length: 1
