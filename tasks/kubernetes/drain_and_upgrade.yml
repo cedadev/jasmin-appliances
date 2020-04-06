@@ -11,17 +11,15 @@
   register: yum_list_updates
 
 - block:
-    # Try to drain pods from the host - if the drain times out, continue anyway
+    # Try to drain pods from the host - if the drain fails, we did our best and continue anyway
+    # We don't want an app with a pod disruption budget that doesn't allow a pod to be deleted
+    # to block the drain and cause that node to fail
     #   --delete-local-data allows the draining of pods using emptyDir volumes
     - name: Drain pods from host
-      command: >
-        kubectl drain {{ ansible_hostname }}
-          --ignore-daemonsets
-          --delete-local-data
-          --timeout=300s
+      command: kubectl drain {{ ansible_hostname }} --ignore-daemonsets --delete-local-data --timeout=300s
       delegate_to: "{{ ansible_play_hosts[0] }}"
       register: kubectl_drain
-      failed_when: kubectl_drain.rc != 0 and 'did not complete within' not in kubectl_drain.stderr
+      ignore_errors: yes
 
     - include_tasks: tasks/util/upgrade_os_packages.yml
 
