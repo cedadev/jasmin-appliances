@@ -26,4 +26,7 @@
     - name: Uncordon host
       command: kubectl uncordon {{ ansible_hostname }}
       delegate_to: "{{ ansible_play_hosts[0] }}"
+      # If the drain failed, don't worry if the uncordon also fails
+      register: kubectl_uncordon
+      failed_when: kubectl_uncordon is failed and kubectl_drain is not failed
   when: yum_list_updates.results | length > 0
