@@ -84,5 +84,4 @@ parameters:
       must already exist. A DNS entry will **not** be created for you,
       and the lack of a correct DNS entry will cause configuration to fail.
     kind: string
-    immutable: true
     required: false
