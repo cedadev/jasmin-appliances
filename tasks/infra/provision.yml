@@ -111,8 +111,8 @@
       os_volume:
         display_name: "cluster-image-{{ cluster_name }}"
         image: "{{ cluster_image_base.name }}"
-        # Convert from bytes to GiB
-        size: "{{ (cluster_image_base.size / 1024 / 1024 / 1024) | round(0, 'ceil') | int }}"
+        # Convert from bytes to GiB, then moderate to the minimum size
+        size: "{{ [cluster_image_volume_min_size, (cluster_image_base.size / 1024 / 1024 / 1024) | round(0, 'ceil') | int] | max }}"
       register: cluster_image_volume
 
     - name: Create cluster image from volume
