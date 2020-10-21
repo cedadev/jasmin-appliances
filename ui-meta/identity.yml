@@ -51,7 +51,6 @@ parameters:
     description: The size to use for the FreeIPA server.
     kind: "cloud.size"
     immutable: true
-    default: 22  # This is j2.small
     options:
       min_ram: 2048
       min_disk: 10
@@ -61,7 +60,6 @@ parameters:
     description: The size to use for the Keycloak server.
     kind: "cloud.size"
     immutable: true
-    default: 22  # This is j2.small
     options:
       min_ram: 1024
       min_disk: 10
@@ -71,7 +69,6 @@ parameters:
     description: The size to use for the gateway server.
     kind: "cloud.size"
     immutable: true
-    default: 11  # This is j1.tiny
 
   - name: gateway_external_domain
     label: Gateway domain
