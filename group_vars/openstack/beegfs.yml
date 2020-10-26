@@ -12,7 +12,6 @@ beegfs_group_mds:
   additional_volumes:
     - name: mds
       size: "{{ beegfs_mds_volume_size | default(2) }}"
-      device: /dev/sdb
   inventory_groups:
     - beegfs_servers
     - beegfs_mds
@@ -25,7 +24,6 @@ beegfs_group_oss:
   additional_volumes:
     - name: oss
       size: "{{ beegfs_oss_volume_size | default(10) }}"
-      device: /dev/sdb
   inventory_groups:
     - beegfs_servers
     - beegfs_oss
