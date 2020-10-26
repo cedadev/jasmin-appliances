@@ -4,7 +4,7 @@ cluster_image_prefix: "centos-7-"
 cluster_deploy_user: "root"
 
 # When making the volume that will become the cluster image, use this minimum size
-cluster_image_volume_min_size: 3
+cluster_image_volume_min_size: 5
 
 cluster_type:
   storage: "storage"
