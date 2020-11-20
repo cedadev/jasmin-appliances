@@ -174,6 +174,8 @@
           url: https://charts.jetstack.io
         - name: cedadev
           url: https://cedadev.github.io/helm-charts
+        - name: ingress-nginx
+          url: https://kubernetes.github.io/ingress-nginx
       loop_control:
         label: "{{ item.name }}"
 
@@ -184,7 +186,7 @@
         tasks_from: chart.yml
       vars:
         helm_release_name: nginx-ingress
-        helm_release_chart: stable/nginx-ingress
+        helm_release_chart: ingress-nginx/ingress-nginx
         helm_release_namespace: nginx-ingress
         helm_release_values_template: templates/helm/nginx-ingress.yml
 
