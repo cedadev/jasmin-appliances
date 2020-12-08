@@ -9,8 +9,8 @@ rbac:
 controller:
   hostNetwork: true
   kind: DaemonSet
-  daemonset:
-    useHostPort: true
+  hostPort:
+    enabled: true
   # Increase the proxy buffer size
   #   https://github.com/int128/kubernetes-dashboard-proxy/issues/2
   config:
