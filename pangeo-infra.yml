@@ -56,5 +56,3 @@
         helm_release_version: 20.01.15-e3086c1
         helm_release_namespace: pangeo
         helm_release_values_template: templates/helm/pangeo.yml
-        helm_release_recreate_pods: yes
-        helm_release_force: yes
