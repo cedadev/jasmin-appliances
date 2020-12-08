@@ -35,7 +35,8 @@ parameters:
     kind: "cloud.size"
     options:
       min_cpus: 2
-      min_ram: 2048
+      min_ram: 4096
+      min_disk: 10
     immutable: true
 
   - name: "cluster_worker_flavor"
@@ -45,6 +46,7 @@ parameters:
     options:
       min_cpus: 4
       min_ram: 8192
+      min_disk: 10
     immutable: true
 
   - name: "cluster_root_volume_size"

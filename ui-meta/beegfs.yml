@@ -27,6 +27,7 @@ parameters:
     kind: "cloud.size"
     options:
       min_ram: 2048
+      min_disk: 10
     immutable: true
 
   - name: "beegfs_oss_volume_size"
@@ -43,6 +44,7 @@ parameters:
     kind: "cloud.size"
     options:
       min_ram: 2048
+      min_disk: 10
     immutable: true
 
   - name: "beegfs_oss_num_nodes"

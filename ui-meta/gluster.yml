@@ -27,6 +27,7 @@ parameters:
     kind: "cloud.size"
     options:
       min_ram: 2048
+      min_disk: 10
     immutable: true
 
   - name: "gluster_num_nodes"
