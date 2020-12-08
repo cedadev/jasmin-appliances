@@ -8,7 +8,7 @@
   version: 914cece0283cccba3a3c9ade382229e6c67f6d24
 - name: jasmin.helm
   src: https://github.com/cedadev/helm-ansible
-  version: a1928de4008a5b844e7944d2d044f0b6bdc6efee
+  version: 15aa4bb15dfbad19658cb5667306c1764ee2847b
 - name: stackhpc.beegfs
   src: https://github.com/stackhpc/ansible-role-beegfs.git
   version: 21acbbeced9beeaa7bf16b53ac28dbebbf312b10
