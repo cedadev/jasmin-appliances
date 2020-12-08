@@ -12,12 +12,12 @@
 - name: stackhpc.beegfs
   src: https://github.com/stackhpc/ansible-role-beegfs.git
   version: 21acbbeced9beeaa7bf16b53ac28dbebbf312b10
-- name: stackhpc.gluster-cluster
-  src: https://github.com/stackhpc/ansible-role-gluster-cluster.git
-  version: 3e1390c39fec2ddc2aa7eb8d02148f7e1628d41e
+- name: jasmin.gluster
+  src: https://github.com/cedadev/jasmin-gluster-ansible
+  version: 37e0856d19a90adf5b59d9c8f5a58f7a34800da2
 - name: stackhpc.openhpc
   src: https://github.com/stackhpc/ansible-role-openhpc.git
-  version: 3df7f67a501bbb325f3e8a93fc0d65c9d82020d4
+  version: d9ebf499b27f455afec5fcb960d5c54e180d8306
 - name: stackhpc.cluster-nfs
   src: https://github.com/stackhpc/ansible-role-cluster-nfs.git
-  version: efcaabab27aa5851bfdd30b0a49ac487f8800345
+  version: 38a5f5d9920ecd9fc4784ba21d6fc714e4225402

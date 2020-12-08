@@ -74,7 +74,6 @@
       # Put all the compute nodes into a single partition
       openhpc_slurm_partitions:
         - name: "compute"
-          num_nodes: "{{ groups['slurm_compute'] | length }}"
       openhpc_slurm_control_host: "{{ groups['slurm_login'] | first }}"
 
 # - import_playbook: validation.yml
