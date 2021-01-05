@@ -25,20 +25,22 @@ jupyterhub:
         storageClassName: standard
     services:
       dask-gateway:
-        url: http://web-public-{{ helm_release_name }}-dask-gateway
         apiToken: "{{ ansible_local.pangeo_dask_gateway_api_token }}"
+    # Disable hub networkpolicy support for now as it doesn't play nicely with dask-gateway
+    # This is fixed on master but not in a release as of 04/01/2021
+    # https://github.com/dask/helm-chart/issues/142
+    networkPolicy:
+      enabled: false
   singleuser:
-    image:
-      name: pangeo/pangeo-notebook
-      tag: "2019.12.08"
+    # image:
+    #   name: pangeo/pangeo-notebook
+    #   tag: "2019.12.08"
     startTimeout: 1000
     storage:
       type: dynamic
       capacity: "{{ pangeo_notebook_storage | default(10) }}Gi"
       dynamic:
         storageClass: standard
-    cloudMetadata:
-      enabled: true
     cpu:
       limit: {{ pangeo_notebook_cpu | default(1) }}
       guarantee: {{ pangeo_notebook_cpu | default(1) }}
@@ -68,17 +70,6 @@ jupyterhub:
 
 dask-gateway:
   gateway:
-    proxyToken: "{{ ansible_local.pangeo_dask_gateway_proxy_token }}"
     auth:
       jupyterhub:
         apiToken: "{{ ansible_local.pangeo_dask_gateway_api_token }}"
-    clusterManager:
-      image:
-        name: pangeo/pangeo-notebook
-        tag: "2019.12.08"
-  schedulerProxy:
-    service:
-      type: ClusterIP
-  webProxy:
-    service:
-      type: ClusterIP

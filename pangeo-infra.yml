@@ -35,12 +35,33 @@
         random_fact_bytes: 32
       loop:
         - pangeo_secret_token
-        - pangeo_dask_gateway_proxy_token
         - pangeo_dask_gateway_api_token
   tasks:
-    # Install the Pangeo repo
-    - name: Install Pangeo Helm repository
-      command: helm repo add pangeo https://pangeo-data.github.io/helm-chart/
+    # Detect the chart used by the existing Pangeo installation
+    - name: Detect chart for pangeo release
+      shell: helm list --all-namespaces | grep -e "^pangeo" | awk '{ print $9; }' | awk -F"-" '{ print $1; }'
+      changed_when: false
+      register: pangeo_current_chart_cmd
+
+    - name: Set pangeo current chart fact
+      set_fact:
+        pangeo_current_chart: "{{ pangeo_current_chart_cmd.stdout }}"
+
+    - name: Remove legacy Pangeo installation
+      include_role:
+        name: jasmin.helm
+        tasks_from: chart.yml
+      vars:
+        helm_release_name: pangeo
+        helm_release_namespace: pangeo
+        helm_release_state: absent
+      when:
+        - pangeo_current_chart is defined
+        - pangeo_current_chart == "pangeo"
+
+    # Install the Dask repo
+    - name: Install Dask Helm repository
+      command: helm repo add --force-update dask https://helm.dask.org/
 
     # Set facts that we need for the Helm chart
     - set_fact:
@@ -52,7 +73,7 @@
         tasks_from: chart.yml
       vars:
         helm_release_name: pangeo
-        helm_release_chart: pangeo/pangeo
-        helm_release_version: 20.01.15-e3086c1
+        helm_release_chart: dask/daskhub
+        helm_release_version: "4.5.6"
         helm_release_namespace: pangeo
         helm_release_values_template: templates/helm/pangeo.yml
