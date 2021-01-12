@@ -32,9 +32,9 @@ jupyterhub:
     networkPolicy:
       enabled: false
   singleuser:
-    # image:
-    #   name: pangeo/pangeo-notebook
-    #   tag: "2019.12.08"
+    image:
+      name: pangeo/pangeo-notebook
+      tag: "2021.01.11"
     startTimeout: 1000
     storage:
       type: dynamic
@@ -73,3 +73,8 @@ dask-gateway:
     auth:
       jupyterhub:
         apiToken: "{{ ansible_local.pangeo_dask_gateway_api_token }}"
+    # Use the Pangeo image for Dask schedulers and workers
+    backend:
+      image:
+        name: pangeo/pangeo-notebook
+        tag: "2021.01.11"
