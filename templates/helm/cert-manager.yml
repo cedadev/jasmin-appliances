@@ -1,0 +1,5 @@
+# This is required to allow the kube-apiserver to access the webhook
+# Not entirely sure why
+webhook:
+  hostNetwork: true
+  securePort: 10260  # Default is 10250 which collides with kubelet
