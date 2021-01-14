@@ -47,6 +47,11 @@ jupyterhub:
     memory:
       limit: "{{ pangeo_notebook_mem | default(2) }}G"
       guarantee: "{{ pangeo_notebook_mem | default(2) }}G"
+    # Disable hub networkpolicy support for now as it doesn't play nicely with dask-gateway
+    # This is fixed on master but not in a release as of 04/01/2021
+    # https://github.com/dask/helm-chart/issues/142
+    networkPolicy:
+      enabled: false
   # Disable the userScheduler and userPlaceholder as they only make sense
   # on clusters which autoscale
   scheduling:
@@ -58,6 +63,12 @@ jupyterhub:
     service:
       type: ClusterIP
     secretToken: "{{ ansible_local.pangeo_secret_token }}"
+    chp:
+      # Disable hub networkpolicy support for now as it doesn't play nicely with dask-gateway
+      # This is fixed on master but not in a release as of 04/01/2021
+      # https://github.com/dask/helm-chart/issues/142
+      networkPolicy:
+        enabled: false
   ingress:
     enabled: true
     hosts: ["{{ pangeo_domain | default(default_pangeo_domain, true) }}"]

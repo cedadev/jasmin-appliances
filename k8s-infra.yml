@@ -91,6 +91,17 @@
       set_fact:
         rke_node_roles: [worker]
       when: inventory_hostname in groups.rke_workers
+
+    # Fix required for now - allow IP masquerading in firewalld
+    # https://github.com/rancher/rancher/issues/28840#issuecomment-756714369
+    - name: Enable IP masquerading
+      firewalld:
+        masquerade: "yes"
+        zone: "{{ item }}"
+        state: enabled
+        permanent: yes
+        immediate: yes
+      loop: [public, trusted]
   roles:
     # Install Kubernetes using RKE
     - role: jasmin.rke
