@@ -243,7 +243,7 @@
           set_fact:
             cert_manager_current_version: v0.14.3
       when:
-        - cert_manager_current_version | bool
+        - "cert_manager_current_version is match('v\\d+\\.\\d+\\.\\d+')"
         - "cert_manager_current_version is version('v0.14', '<')"
 
     - name: Install cert-manager CRDs
