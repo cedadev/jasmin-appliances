@@ -9,11 +9,11 @@
   changed_when: false
   failed_when: false
 
-# If kubectl isn't available, just upgrade packages on all hosts
+# If sinfo isn't available, just upgrade packages on all hosts
 - include_tasks: tasks/util/upgrade_os_packages.yml
   when: sinfo_available.rc != 0
 
-# If kubectl is available process the hosts in batches, attempting to drain before upgrading
+# If sinfo is available process the hosts in batches, attempting to drain before upgrading
 - include_tasks: drain_and_upgrade.yml
   when:
     - cluster_upgrade_system_packages | default(false) | bool

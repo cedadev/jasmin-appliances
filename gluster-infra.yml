@@ -63,7 +63,7 @@
       command: dracut -f
       when: dracut_configure is changed
   roles:
-    - role: stackhpc.gluster-cluster
+    - role: jasmin.gluster
       gluster_enable:
         servers: true
         clients: false

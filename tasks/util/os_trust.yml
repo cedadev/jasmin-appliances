@@ -22,7 +22,7 @@
         trustee_user_id: "{{ openstack_trustee_id }}"
         impersonation: true
         roles:
-          - name: _member_
+          - name: "{{ cluster_delegate_role }}"
       delegate_to: "{{ groups.openstack | first }}"
       become: no
       run_once: yes

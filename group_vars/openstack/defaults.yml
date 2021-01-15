@@ -1,9 +1,10 @@
 ---
 
 cluster_image_prefix: "centos-7-"
-cluster_floating_network: "NERCvSE"
 cluster_deploy_user: "root"
-cluster_delegate_role: _member_
+
+# When making the volume that will become the cluster image, use this minimum size
+cluster_image_volume_min_size: 5
 
 cluster_type:
   storage: "storage"

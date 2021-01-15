@@ -11,7 +11,6 @@ nfs_group_server:
   additional_volumes:
     - name: data
       size: "{{ nfs_volume_size | default(10) }}"
-      device: /dev/sdb
   inventory_groups:
     - nfs_servers
   facts:

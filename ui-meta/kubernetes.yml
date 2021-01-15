@@ -19,8 +19,8 @@ parameters:
     description: "The Kubernetes version to use."
     kind: "choice"
     options:
-      choices: ["1.15", "1.16", "1.17"]
-    default: "1.17"
+      choices: ["1.17", "1.18", "1.19"]
+    default: "1.19"
 
   - name: "cluster_num_workers"
     label: "Worker nodes"
@@ -36,9 +36,9 @@ parameters:
     kind: "cloud.size"
     options:
       min_cpus: 2
-      min_ram: 2048
+      min_ram: 4096
+      min_disk: 10
     immutable: true
-    default: 15  # This is j3.medium (4 CPUs, 8GB RAM)
 
   - name: "cluster_worker_flavor"
     label: "Worker size"
@@ -46,9 +46,9 @@ parameters:
     kind: "cloud.size"
     options:
       min_cpus: 2
-      min_ram: 2048
+      min_ram: 4096
+      min_disk: 10
     immutable: true
-    default: 0f36773c-63f3-4126-b91a-e274777b7827  # This is j3.large (8 CPUs, 16GB RAM)
 
   - name: "cluster_root_volume_size"
     label: "Root volume size (GB)"

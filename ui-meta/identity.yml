@@ -51,7 +51,6 @@ parameters:
     description: The size to use for the FreeIPA server.
     kind: "cloud.size"
     immutable: true
-    default: 23  # This is j3.small
     options:
       min_ram: 4096
       min_disk: 10
@@ -61,9 +60,8 @@ parameters:
     description: The size to use for the Keycloak server.
     kind: "cloud.size"
     immutable: true
-    default: 22  # This is j2.small
     options:
-      min_ram: 2048
+      min_ram: 4096
       min_disk: 10
 
   - name: identity_gateway_flavor
@@ -71,7 +69,9 @@ parameters:
     description: The size to use for the gateway server.
     kind: "cloud.size"
     immutable: true
-    default: 11  # This is j1.tiny
+    options:
+      min_ram: 1024
+      min_disk: 10
 
   - name: gateway_external_domain
     label: Gateway domain
@@ -84,5 +84,4 @@ parameters:
       must already exist. A DNS entry will **not** be created for you,
       and the lack of a correct DNS entry will cause configuration to fail.
     kind: string
-    immutable: true
     required: false

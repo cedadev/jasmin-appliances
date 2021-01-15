@@ -25,26 +25,33 @@ jupyterhub:
         storageClassName: standard
     services:
       dask-gateway:
-        url: http://web-public-{{ helm_release_name }}-dask-gateway
         apiToken: "{{ ansible_local.pangeo_dask_gateway_api_token }}"
+    # Disable hub networkpolicy support for now as it doesn't play nicely with dask-gateway
+    # This is fixed on master but not in a release as of 04/01/2021
+    # https://github.com/dask/helm-chart/issues/142
+    networkPolicy:
+      enabled: false
   singleuser:
     image:
       name: pangeo/pangeo-notebook
-      tag: "2019.12.08"
+      tag: "2021.01.11"
     startTimeout: 1000
     storage:
       type: dynamic
       capacity: "{{ pangeo_notebook_storage | default(10) }}Gi"
       dynamic:
         storageClass: standard
-    cloudMetadata:
-      enabled: true
     cpu:
       limit: {{ pangeo_notebook_cpu | default(1) }}
       guarantee: {{ pangeo_notebook_cpu | default(1) }}
     memory:
       limit: "{{ pangeo_notebook_mem | default(2) }}G"
       guarantee: "{{ pangeo_notebook_mem | default(2) }}G"
+    # Disable hub networkpolicy support for now as it doesn't play nicely with dask-gateway
+    # This is fixed on master but not in a release as of 04/01/2021
+    # https://github.com/dask/helm-chart/issues/142
+    networkPolicy:
+      enabled: false
   # Disable the userScheduler and userPlaceholder as they only make sense
   # on clusters which autoscale
   scheduling:
@@ -56,6 +63,12 @@ jupyterhub:
     service:
       type: ClusterIP
     secretToken: "{{ ansible_local.pangeo_secret_token }}"
+    chp:
+      # Disable hub networkpolicy support for now as it doesn't play nicely with dask-gateway
+      # This is fixed on master but not in a release as of 04/01/2021
+      # https://github.com/dask/helm-chart/issues/142
+      networkPolicy:
+        enabled: false
   ingress:
     enabled: true
     hosts: ["{{ pangeo_domain | default(default_pangeo_domain, true) }}"]
@@ -68,17 +81,11 @@ jupyterhub:
 
 dask-gateway:
   gateway:
-    proxyToken: "{{ ansible_local.pangeo_dask_gateway_proxy_token }}"
     auth:
       jupyterhub:
         apiToken: "{{ ansible_local.pangeo_dask_gateway_api_token }}"
-    clusterManager:
+    # Use the Pangeo image for Dask schedulers and workers
+    backend:
       image:
         name: pangeo/pangeo-notebook
-        tag: "2019.12.08"
-  schedulerProxy:
-    service:
-      type: ClusterIP
-  webProxy:
-    service:
-      type: ClusterIP
+        tag: "2021.01.11"

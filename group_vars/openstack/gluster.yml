@@ -11,7 +11,6 @@ gluster_group_servers:
   additional_volumes:
     - name: data
       size: "{{ gluster_volume_size | default(10) }}"
-      device: /dev/sdb
   inventory_groups:
     - gluster_servers
   facts:

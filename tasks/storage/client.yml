@@ -17,7 +17,7 @@
 # If the stack is a Gluster stack, gluster_servers will be present in the groups
 - name: Configure Gluster client
   include_role:
-    name: stackhpc.gluster-cluster
+    name: jasmin.gluster
   vars:
     gluster_enable:
       servers: false
