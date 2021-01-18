@@ -89,3 +89,20 @@ dask-gateway:
       image:
         name: pangeo/pangeo-notebook
         tag: "2021.01.11"
+    extraConfig:
+      # Note that the key name here doesn't matter. Values in the
+      # `extraConfig` map are concatenated, sorted by key name.
+      clusteroptions: |
+        from dask_gateway_server.options import Options, Integer, Float, String
+
+        def option_handler(options):
+            return {
+                "worker_cores": options.worker_cores,
+                "worker_memory": "%fG" % options.worker_memory,
+            }
+
+        c.Backend.cluster_options = Options(
+            Integer("worker_cores", 1, min = 1, max = 8, label = "Worker CPUs"),
+            Float("worker_memory", 2, min = 1, max = 16, label="Worker Memory (GiB)"),
+            handler = option_handler,
+        )
