@@ -2,6 +2,11 @@
 
 # Playbook to open firewall access to all hosts on the local IP subnet
 
+- name: Ensure firewalld is installed
+  yum:
+    name: firewalld
+    state: latest
+
 - name: Ensure firewalld is started
   service:
     name: firewalld
