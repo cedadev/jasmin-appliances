@@ -75,6 +75,9 @@ jupyterhub:
     # Get a certificate from the letsencrypt issuer
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt
+      # Disable the maximum client body size for requests
+      # https://github.com/jupyterlab/jupyterlab/issues/4214
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
     tls:
       - hosts: ["{{ pangeo_domain | default(default_pangeo_domain, true) }}"]
         secretName: pangeo-tls
