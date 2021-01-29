@@ -135,6 +135,10 @@
     - cluster_state | default('present') | lower == 'present'
     - not cluster_image_exists
 
+- name: Remove signature_verified tag
+  command: "openstack image unset {{ cluster_image }} --property signature_verified"
+  ignore_errors: true
+
 # If cluster_state=absent, it doesn't matter that no groups are set
 - name: Provision infrastructure
   include_role:
