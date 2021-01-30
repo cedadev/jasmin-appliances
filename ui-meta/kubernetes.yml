@@ -55,9 +55,10 @@ parameters:
     description: The size of the root volume of cluster nodes.
     kind: "integer"
     options:
-      min: 20
+      min: 0
     immutable: true
-    default: 40
+    default: 0
+    required: false
 
   - name: "cluster_fixed_ip"
     label: "External IP"
