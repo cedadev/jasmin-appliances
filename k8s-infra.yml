@@ -40,6 +40,7 @@
     # This is created on the Openstack host but persisted on the cluster nodes
     # These tasks set the openstack_trust_id and openstack_project_id variables
     - include_tasks: tasks/util/os_trust.yml
+    - include_tasks: tasks/network/firewall.yml
     - include_tasks: tasks/kubernetes/upgrade_os_packages.yml
     # Before installing Kubernetes, enroll as a FreeIPA client
     - include_tasks: tasks/identity/freeipa/client.yml
