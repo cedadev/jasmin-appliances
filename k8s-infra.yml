@@ -82,6 +82,8 @@
 - hosts: rke_hosts
   become: true
   any_errors_fatal: true
+  environment:
+    PATH: '/usr/local/bin/:{{ ansible_env.PATH }}'
   pre_tasks:
     - name: Set RKE node roles (masters)
       set_fact:
@@ -148,6 +150,8 @@
 
 - hosts: rke_masters
   become: true
+  environment:
+    PATH: '/usr/local/bin/:{{ ansible_env.PATH }}'
   tasks:
     # The CIDRs from the last time we ran will be in ansible_local
     # Compare them to the current CIDRs and adjust as necessary
