@@ -85,4 +85,5 @@
 - hosts: gateway_servers
   become: true
   tasks:
+    - include_tasks: tasks/identity/disable_selinux.yml
     - include_tasks: tasks/identity/proxy.yml
