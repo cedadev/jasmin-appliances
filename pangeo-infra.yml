@@ -26,6 +26,8 @@
 # Helm will have been installed on the first host in the cluster
 - hosts: "{{ groups.get('rke_hosts', []) | first | default('!all') }}"
   become: true
+  environment:
+    PATH: '/usr/local/bin/:{{ ansible_env.PATH }}'
   pre_tasks:
     # Create persistent secrets for Pangeo
     - name: Generate Pangeo secrets
