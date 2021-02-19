@@ -59,6 +59,7 @@
     # Mount the storage
     - name: Mount shared storage
       include_tasks: tasks/storage/client.yml
+    - include_tasks: tasks/storage/selinux.yml
 
     - name: Install OpenHPC repository
       yum:
