@@ -1,6 +1,4 @@
 - name: Set correct SELinux booleans
-  seboolean:
-    name: use_nfs_home_dirs
-    persistent: yes
-    state: yes
-  when: "'nfs_servers' in groups"
+  selinux_permissive:
+    name: oddjob_mkhomedir_t
+    permissive: yes
