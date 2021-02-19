@@ -124,11 +124,14 @@ def main():
             wait,
             timeout
         )
+        # Wait for the image to become active and the volume to become available again
+        volume_id = module.params['volume_id']
         if wait:
             start = time.time()
             while time.time() < start + timeout:
                 image = cloud.image.get_image(image.id)
-                if image.status.lower() == 'active':
+                volume = cloud.block_storage.get_volume(volume_id)
+                if image.status.lower() == 'active' and volume.status.lower() == 'available':
                     break
             else:
                 raise TimeoutError('Timed out waiting for image.')
