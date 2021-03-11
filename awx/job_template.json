@@ -1,0 +1,236 @@
+[
+  {
+    "asset_type": "job_template",
+    "name": "BeeGFS",
+    "description": "https://raw.githubusercontent.com/cedadev/jasmin-appliances/master/ui-meta/beegfs.yml",
+    "project": "Jasmin Appliances",
+    "playbook": "beegfs-infra.yml",
+    "ask_variables_on_launch": true,
+    "ask_inventory_on_launch": true,
+    "ask_credential_on_launch": true,
+    "asset_relation": {
+      "survey_spec": {},
+      "notification_templates_error": [],
+      "notification_templates_success": [],
+      "schedules": [],
+      "labels": [],
+      "credentials": [],
+      "roles": [
+        {
+          "name": "Admin",
+          "user": [
+            "admin"
+          ],
+          "team": []
+        },
+        {
+          "name": "Execute",
+          "user": [],
+          "team": [
+            "demo"
+          ]
+        },
+        {
+          "name": "Read",
+          "user": [],
+          "team": []
+        }
+      ]
+    }
+  },
+  {
+    "asset_type": "job_template",
+    "name": "Identity",
+    "description": "https://raw.githubusercontent.com/cedadev/jasmin-appliances/master/ui-meta/identity.yml",
+    "project": "Jasmin Appliances",
+    "playbook": "identity-infra.yml",
+    "ask_variables_on_launch": true,
+    "ask_inventory_on_launch": true,
+    "ask_credential_on_launch": true,
+    "asset_relation": {
+      "survey_spec": {},
+      "notification_templates_error": [],
+      "notification_templates_success": [],
+      "schedules": [],
+      "labels": [],
+      "credentials": [],
+      "roles": [
+        {
+          "name": "Admin",
+          "user": [
+            "admin"
+          ],
+          "team": []
+        },
+        {
+          "name": "Execute",
+          "user": [],
+          "team": [
+            "demo"
+          ]
+        },
+        {
+          "name": "Read",
+          "user": [],
+          "team": []
+        }
+      ]
+    }
+  },
+  {
+    "asset_type": "job_template",
+    "name": "Kubernetes",
+    "description": "https://raw.githubusercontent.com/cedadev/jasmin-appliances/master/ui-meta/kubernetes.yml",
+    "project": "Jasmin Appliances",
+    "playbook": "k8s-infra.yml",
+    "ask_variables_on_launch": true,
+    "ask_inventory_on_launch": true,
+    "ask_credential_on_launch": true,
+    "asset_relation": {
+      "survey_spec": {},
+      "notification_templates_error": [],
+      "notification_templates_success": [],
+      "schedules": [],
+      "labels": [],
+      "credentials": [],
+      "roles": [
+        {
+          "name": "Admin",
+          "user": [
+            "admin"
+          ],
+          "team": []
+        },
+        {
+          "name": "Execute",
+          "user": [],
+          "team": [
+            "demo"
+          ]
+        },
+        {
+          "name": "Read",
+          "user": [],
+          "team": []
+        }
+      ]
+    }
+  },
+  {
+    "asset_type": "job_template",
+    "name": "NFS",
+    "description": "https://raw.githubusercontent.com/cedadev/jasmin-appliances/master/ui-meta/nfs.yml",
+    "project": "Jasmin Appliances",
+    "playbook": "nfs-infra.yml",
+    "ask_variables_on_launch": true,
+    "ask_inventory_on_launch": true,
+    "ask_credential_on_launch": true,
+    "asset_relation": {
+      "survey_spec": {},
+      "notification_templates_error": [],
+      "notification_templates_success": [],
+      "schedules": [],
+      "labels": [],
+      "credentials": [],
+      "roles": [
+        {
+          "name": "Admin",
+          "user": [
+            "admin"
+          ],
+          "team": []
+        },
+        {
+          "name": "Execute",
+          "user": [],
+          "team": [
+            "demo"
+          ]
+        },
+        {
+          "name": "Read",
+          "user": [],
+          "team": []
+        }
+      ]
+    }
+  },
+  {
+    "asset_type": "job_template",
+    "name": "Pangeo",
+    "description": "https://raw.githubusercontent.com/cedadev/jasmin-appliances/master/ui-meta/pangeo.yml",
+    "project": "Jasmin Appliances",
+    "playbook": "pangeo-infra.yml",
+    "ask_variables_on_launch": true,
+    "ask_inventory_on_launch": true,
+    "ask_credential_on_launch": true,
+    "asset_relation": {
+      "survey_spec": {},
+      "notification_templates_error": [],
+      "notification_templates_success": [],
+      "schedules": [],
+      "labels": [],
+      "credentials": [],
+      "roles": [
+        {
+          "name": "Admin",
+          "user": [
+            "admin"
+          ],
+          "team": []
+        },
+        {
+          "name": "Execute",
+          "user": [],
+          "team": [
+            "demo"
+          ]
+        },
+        {
+          "name": "Read",
+          "user": [],
+          "team": []
+        }
+      ]
+    }
+  },
+  {
+    "asset_type": "job_template",
+    "name": "Slurm",
+    "description": "https://raw.githubusercontent.com/cedadev/jasmin-appliances/master/ui-meta/slurm.yml",
+    "project": "Jasmin Appliances",
+    "playbook": "slurm-infra.yml",
+    "ask_variables_on_launch": true,
+    "ask_inventory_on_launch": true,
+    "ask_credential_on_launch": true,
+    "asset_relation": {
+      "survey_spec": {},
+      "notification_templates_error": [],
+      "notification_templates_success": [],
+      "schedules": [],
+      "labels": [],
+      "credentials": [],
+      "roles": [
+        {
+          "name": "Admin",
+          "user": [
+            "admin"
+          ],
+          "team": []
+        },
+        {
+          "name": "Execute",
+          "user": [],
+          "team": [
+            "demo"
+          ]
+        },
+        {
+          "name": "Read",
+          "user": [],
+          "team": []
+        }
+      ]
+    }
+  }
+]

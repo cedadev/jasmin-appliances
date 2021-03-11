@@ -1,0 +1,53 @@
+[
+  {
+    "asset_type": "inventory",
+    "name": "openstack",
+    "organization": "Default",
+    "variables": "---\ncluster_deploy_user: centos\ncluster_delegate_role: member\nopenstack_trustee_id: 26444c04f12345e68acc7feae5223ab2\nopenstack_trustee_password: changeme",
+    "asset_relation": {
+      "host": [
+        {
+          "name": "localhost",
+          "variables": "---\nhost: 127.0.0.1\nansible_connection: local"
+        }
+      ],
+      "group": [
+        {
+          "name": "openstack",
+          "sub_groups": [],
+          "hosts": [
+            "localhost"
+          ]
+        }
+      ],
+      "inventory_source": [],
+      "roles": [
+        {
+          "name": "Admin",
+          "user": [],
+          "team": []
+        },
+        {
+          "name": "Update",
+          "user": [],
+          "team": []
+        },
+        {
+          "name": "Ad Hoc",
+          "user": [],
+          "team": []
+        },
+        {
+          "name": "Use",
+          "user": [],
+          "team": []
+        },
+        {
+          "name": "Read",
+          "user": [],
+          "team": []
+        }
+      ]
+    }
+  }
+]

@@ -56,14 +56,41 @@ $ ansible-playbook -i inventory nfs-infra.yml \
     -e @config/auth.yml
 ```
 
-## Backing up and restoring AWX configuration using tower-cli
+## Setup Tower
 
-To backup:
+    git clone https://github.com/ansible/awx.git --depth 1 -b 7.0.0
+    virtualenv venv
+    pip install ansible ansible-tower-cli docker docker-compose
+    cd awx/installer/
+    ansible-playbook -i inventory -e host_port=8888 install.yml
 
-    tower-cli receive --all > awx/backup.json
+Login to AWX:
+
+    cat > ~/.tower_cli.cfg << EOF
+    [general]
+    host = http://10.60.253.30:8888
+    verify_ssl = false
+    username = admin
+    password = password
+    EOF
+
+Cleanup demo aritifacts:
+
+    tower-cli project delete -n "Demo Project"
+    tower-cli job_template delete -n "Demo Job Template"
+    tower-cli credential delete -n "Demo Credential"
+    tower-cli inventory delete -n "Demo Inventory"
 
 To restore:
 
-    tower-cli send awx/backup.json
+    tower-cli send awx/*.json
+
+To backup:
+
+    tower-cli receive --inventory openstack > awx/inventory_openstack
+    tower-cli receive --credential_type openstack > awx/credential_type_openstack
+    tower-cli receive --team all > awx/team
+    tower-cli receive --project all > awx/project
+    tower-cli receive --job_template all > awx/job_template
 
 [caas]: https://github.com/cedadev/jasmin-cluster-as-a-service/projects/1
