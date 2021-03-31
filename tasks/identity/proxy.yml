@@ -62,6 +62,13 @@
     name: moreutils
     state: latest
 
+# Update the cron path so it can find nginx
+- name: Update cron path in crontab
+  cron:
+    name: PATH
+    env: yes
+    job: "/sbin:/bin:/usr/sbin:/usr/bin"
+
 # Run twice a day as per documentation
 - name: Configure certbot auto-renewal
   cron:
