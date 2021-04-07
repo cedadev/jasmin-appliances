@@ -65,9 +65,7 @@
           [
             'http://localhost:8000',
             'urn:ietf:wg:oauth:2.0:oob',
-            {%- if kubernetes_dashboard_enable | default(true) -%}
             'https://{{ hostvars[groups.rke_masters | first].kubernetes_dashboard_domain }}/oauth/callback',
-            {%- endif -%}
           ]
       when: cluster_state | default('present') == 'present'
 
@@ -281,7 +279,6 @@
 
     - name: Install Kubernetes dashboard
       command: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
-      when: kubernetes_dashboard_enable | default(true) | bool
 
     - name: Create Kubernetes dashboard proxy encryption key
       include_tasks: tasks/util/persistent_random_fact.yml
@@ -299,7 +296,7 @@
         helm_release_chart: cedadev/keycloak-gatekeeper
         helm_release_namespace: kubernetes-dashboard
         helm_release_values_template: templates/helm/keycloak-gatekeeper.yml
-        helm_release_state: "{% if kubernetes_dashboard_enable | default(true) | bool %}present{% else %}absent{% endif %}"
+        helm_release_state: present
         gatekeeper_discovery_url: "{{ hostvars[groups.keycloak_servers | first].keycloak_oidc_issuer_url }}"
         # If using Let's Encrypt staging server, we need to skip TLS verification for the IdP
         gatekeeper_provider_skip_tls_verify: "{{ letsencrypt_staging | default(false) | bool }}"

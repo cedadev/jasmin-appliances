@@ -18,8 +18,8 @@ parameters:
     description: "The Kubernetes version to use."
     kind: "choice"
     options:
-      choices: ["1.17", "1.18", "1.19"]
-    default: "1.19"
+      choices: ["1.17", "1.18", "1.19", "1.20"]
+    default: "1.20"
 
   - name: "cluster_num_workers"
     label: "Worker nodes"
@@ -94,19 +94,10 @@ parameters:
           # Placeholder for each new field - use an example CIDR
           placeholder: 192.168.0.0/16
 
-  - name: kubernetes_dashboard_enable
-    label: Kubernetes dashboard
-    description: >-
-      If selected, the [Kubernetes dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
-      will be deployed and made available at the given domain.
-    kind: "boolean"
-    options:
-      checkboxLabel: "Enable Kubernetes dashboard?"
-
   - name: kubernetes_dashboard_domain
     label: Dashboard domain
     description: |
-      The domain to use to access the Kubernetes dashboard, if enabled (optional).
+      The domain to use to access the [Kubernetes dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/).
 
       If not given, `dashboard.<dashed-ip>.sslip.io` will be used.
 
