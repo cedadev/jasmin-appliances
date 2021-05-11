@@ -59,20 +59,21 @@ $ ansible-playbook -i inventory nfs-infra.yml \
 ## Setup Tower
 
     git clone https://github.com/ansible/awx.git --depth 1 -b 7.0.0
-    virtualenv venv
-    pip install ansible ansible-tower-cli docker docker-compose
-    cd awx/installer/
-    ansible-playbook -i inventory -e host_port=8888 install.yml
+    virtualenv-3 venv
+    source venv/bin/activate
+    pip install 'ansible<3.0.0' ansible-tower-cli docker docker-compose
+    ansible-playbook -i awx/installer/inventory -e host_port=8888 awx/installer/install.yml
 
 Login to AWX:
 
     cat > ~/.tower_cli.cfg << EOF
     [general]
-    host = http://10.60.253.30:8888
+    host = http://10.60.210.1:8888
     verify_ssl = false
     username = admin
     password = password
     EOF
+    chmod 600 ~/.tower_cli.cfg
 
 Cleanup demo aritifacts:
 
@@ -83,14 +84,17 @@ Cleanup demo aritifacts:
 
 To restore:
 
-    tower-cli send awx/*.json
+
+    sed -i 's/openstack_trustee_password: changeme/openstack_trustee_password: xxxxxxxxxx/g' awx-backup/inventory_openstack.json
+    tower-cli send awx-backup/*.json
+    git stash
 
 To backup:
 
-    tower-cli receive --inventory openstack > awx/inventory_openstack
-    tower-cli receive --credential_type openstack > awx/credential_type_openstack
-    tower-cli receive --team all > awx/team
-    tower-cli receive --project all > awx/project
-    tower-cli receive --job_template all > awx/job_template
+    tower-cli receive --inventory openstack > awx-backup/inventory_openstack
+    tower-cli receive --credential_type openstack > awx-backup/credential_type_openstack
+    tower-cli receive --team all > awx-backup/team
+    tower-cli receive --project all > awx-backup/project
+    tower-cli receive --job_template all > awx-backup/job_template
 
 [caas]: https://github.com/cedadev/jasmin-cluster-as-a-service/projects/1
