@@ -3,22 +3,23 @@ jupyterhub:
   # Authenticate using the FreeIPA LDAP database
   # We use LDAP because the LDAP authenticator supports controlling access by group membership
   # The oauthenticator doesn't understand OpenID Connect so can't use the groups claim
-  auth:
-    type: ldap
-    ldap:
-      server:
-        # Use the IP address as the DNS resolution isn't always reliable
-        address: "{{ hostvars[groups.freeipa_servers | first].ansible_default_ipv4.address }}"
-      dn:
-        templates:
-          - "uid={username},cn=users,cn=accounts,{{ freeipa_ldap_domain }}"
-      allowedGroups:
-        - "cn=admins,cn=groups,cn=accounts,{{ freeipa_ldap_domain }}"
-        - "cn={{ pangeo_notebook_users_group }},cn=groups,cn=accounts,{{ freeipa_ldap_domain }}"
-    admin:
-      access: true
-      users: [admin]
+  
   hub:
+    config:
+      # change to auth with version 4.5.7
+      Authenticator:
+        admin_users: [admin]
+        JupyterHub:
+          admin_access: true
+          authenticator_class: ldapauthenticator.LDAPAuthenticator
+        LDAPAuthenticator:
+          allowedGroups:
+            - "cn=admins,cn=groups,cn=accounts,{{ freeipa_ldap_domain }}"
+            - "cn={{ pangeo_notebook_users_group }},cn=groups,cn=accounts,{{ freeipa_ldap_domain }}"
+          # Use the IP address as the DNS resolution isn't always reliable
+          server_address: "{{ hostvars[groups.freeipa_servers | first].ansible_default_ipv4.address }}"
+          bind_dn_template: "uid={username},cn=users,cn=accounts,{{ freeipa_ldap_domain }}"
+        
     db:
       type: sqlite-pvc
       pvc:
