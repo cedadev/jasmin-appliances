@@ -74,6 +74,6 @@
       vars:
         helm_release_name: pangeo
         helm_release_chart: dask/daskhub
-        helm_release_version: "2021.6.0"
+        helm_release_version: "2021.6.1"
         helm_release_namespace: pangeo
         helm_release_values_template: templates/helm/pangeo.yml
