@@ -49,7 +49,7 @@ jupyterhub:
   singleuser:
     image:
       name: pangeo/pangeo-notebook
-      tag: "2021.01.11"
+      tag: "upgrade-pangeo-metapackage-2021.08.17"
     startTimeout: 1000
     storage:
       type: dynamic
@@ -106,7 +106,7 @@ dask-gateway:
     backend:
       image:
         name: pangeo/pangeo-notebook
-        tag: "2021.01.11"
+        tag: "upgrade-pangeo-metapackage-2021.08.17"
     extraConfig:
       # Note that the key name here doesn't matter. Values in the
       # `extraConfig` map are concatenated, sorted by key name.
