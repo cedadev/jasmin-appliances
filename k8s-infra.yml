@@ -196,6 +196,7 @@
       vars:
         helm_release_name: nginx-ingress
         helm_release_chart: ingress-nginx/ingress-nginx
+        helm_release_version: "3.35.0"
         helm_release_namespace: nginx-ingress
         helm_release_values_template: templates/helm/nginx-ingress.yml
 
