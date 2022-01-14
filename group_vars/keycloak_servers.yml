@@ -1,9 +1,9 @@
 ---
 
-keycloak_version: "6.0.1"
+keycloak_version: "16.1.0"
 keycloak_archive_name: keycloak-{{ keycloak_version }}.tar.gz
-keycloak_archive_url: https://downloads.jboss.org/keycloak/6.0.1/{{ keycloak_archive_name }}
-keycloak_archive_checksum: sha1:472b37ccc9b5bb3119295c2880db49aada2fe9ed
+keycloak_archive_url: https://github.com/keycloak/keycloak/releases/download/{{ keycloak_version }}/{{ keycloak_archive_name }}
+keycloak_archive_checksum: sha1:876f64dea6e862543c6eb979450b4f1422025b33
 
 keycloak_libdbus_rpm: https://github.com/keycloak/libunix-dbus-java/releases/download/libunix-dbus-java-0.8.0/libunix-dbus-java-0.8.0-1.fc24.x86_64.rpm
 
