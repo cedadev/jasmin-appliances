@@ -1,0 +1,87 @@
+name: "identity"
+label: "Identity Manager"
+description: >
+  Identity manager for clusters using FreeIPA and Keycloak.
+logo: https://user-images.githubusercontent.com/13452123/59352838-8c5b4000-8d19-11e9-9f3c-2de73454f9ab.png
+
+parameters:
+  - name: cluster_fixed_ip
+    label: "External IP"
+    description: The external IP to use for the gateway.
+    kind: "cloud.ip"
+    immutable: true
+
+  - name: admin_password
+    label: "Admin password"
+    description: "Password for the `admin` user."
+    kind: "string"
+    immutable: true
+    options:
+      secret: true
+      confirm: true
+      min_length: 8
+
+  - name: admin_allowed_cidrs
+    label: "Admin IP ranges"
+    description: |
+      The IP ranges from which admins will access the FreeIPA and Keycloak web interfaces, in
+      [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation).
+
+      Any attempt to access the admin interfaces from an IP address that is not in these ranges
+      will be blocked.
+
+      If you are not sure what value to use here, contact your local network administrator. To allow
+      any address to access the FreeAPI and Keycloak admin interfaces use `0.0.0.0/0`, however **this
+      is not recommended**.
+    kind: "list"
+    options:
+      min_length: 1
+      item:
+        kind: "string"
+        options:
+          # This pattern matches a CIDR
+          pattern: '^(([1-9]?[0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\.){3}([1-9]?[0-9]|1[0-9]{2}|2([0-4][0-9]|5[0-5]))\/([1-2]?[0-9]|3[0-2])$'
+          # This is the error message given in the HTML input
+          title: Value must be an IP range in CIDR notation, e.g. 192.168.0.0/16.
+          # Placeholder for each new field - use an example CIDR
+          placeholder: 192.168.0.0/16
+
+  - name: freeipa_server_flavor
+    label: FreeIPA size
+    description: The size to use for the FreeIPA server.
+    kind: "cloud.size"
+    immutable: true
+    options:
+      min_ram: 4096
+      min_disk: 10
+
+  - name: keycloak_server_flavor
+    label: Keycloak size
+    description: The size to use for the Keycloak server.
+    kind: "cloud.size"
+    immutable: true
+    options:
+      min_ram: 4096
+      min_disk: 10
+
+  - name: identity_gateway_flavor
+    label: Gateway size
+    description: The size to use for the gateway server.
+    kind: "cloud.size"
+    immutable: true
+    options:
+      min_ram: 1024
+      min_disk: 10
+
+  - name: gateway_external_domain
+    label: Gateway domain
+    description: |
+      The domain to use for the gateway server (optional).
+
+      If not given, `<dashed-ip>.sslip.io` will be used. No specific DNS entry is required.
+
+      If given, a DNS entry for the domain pointing to the selected IP
+      must already exist. A DNS entry will **not** be created for you,
+      and the lack of a correct DNS entry will cause configuration to fail.
+    kind: string
+    required: false

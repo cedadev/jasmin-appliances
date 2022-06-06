@@ -1,0 +1,39 @@
+name: "gluster"
+label: "Gluster"
+description: "Shared storage cluster using the Gluster filesystem."
+logo: https://user-images.githubusercontent.com/13452123/55539498-ad1f6d80-56b8-11e9-8250-384321e5b94f.jpg
+
+parameters:
+  - name: "identity_stack_name"
+    label: "Identity manager"
+    description: >
+      The identity manager for managing access to the cluster.
+    kind: "cloud.cluster"
+    options:
+      tag: identity
+    immutable: true
+
+  - name: "gluster_volume_size"
+    label: "Volume size (GB)"
+    description: "The size of the data volume for each node."
+    kind: "integer"
+    options:
+      min: 10
+    immutable: true
+
+  - name: "gluster_server_flavor"
+    label: "Server size"
+    description: "The size to use for nodes."
+    kind: "cloud.size"
+    options:
+      min_ram: 2048
+      min_disk: 10
+    immutable: true
+
+  - name: "gluster_num_nodes"
+    label: "Number of nodes"
+    description: "Number of nodes in the cluster."
+    kind: "integer"
+    options:
+      min: 3
+    default: 3
