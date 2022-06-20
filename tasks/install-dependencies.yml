@@ -12,9 +12,7 @@
           - python2-devel
         state: latest
 
-    
-
-#  when: "ansible_venv_path | length > 0"
+  when: "ansible_venv_path | length > 0"
 
 - name: Install community collection
   command: ansible-galaxy collection install community.general
