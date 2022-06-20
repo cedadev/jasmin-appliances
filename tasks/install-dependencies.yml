@@ -5,7 +5,7 @@
     ansible_venv_path: "{{ lookup('env', 'ANSIBLE_VENV_PATH') }}"
 - name: echo venv path
   ansible.builtin.debug:
-    msg: $ANSIBLE_VENV_PATH
+    msg: "'{{ lookup('env', 'ANSIBLE_VENV_PATH') }}'""
 
 - block:
     #- name: Ensure dependencies are installed
