@@ -21,6 +21,6 @@
       
   when: "ansible_venv_path | length > 0"
 
-  - name: Install community collection
-      shell: ansible-galaxy collection install community.general
+- name: Install community collection
+    shell: ansible-galaxy collection install community.general
 
