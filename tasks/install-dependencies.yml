@@ -6,7 +6,7 @@
 
 - block:
     - name: Ensure yum dependencies are installed
-      apt-get:
+      apt:
         name:
           - gcc
           - python2-devel
