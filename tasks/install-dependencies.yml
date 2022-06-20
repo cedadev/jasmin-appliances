@@ -3,18 +3,15 @@
 - name: Get Ansible venv path
   set_fact:
     ansible_venv_path: "{{ lookup('env', 'ANSIBLE_VENV_PATH') }}"
-- name: echo venv path
-  debug:
-    msg: "'{{ lookup('env', 'ANSIBLE_VENV_PATH') }}'"
 
 - block:
-    #- name: Ensure dependencies are installed
-    #  become_user: root
-    #  yum:
-    #    name:
-    #      - gcc
-    #      - python3-devel
-    #    state: latest
+    - name: Ensure dependencies are installed
+      become_user: root
+      yum:
+        name:
+          - gcc
+          - python3-devel
+        state: latest
 
     - name: Ensure Python dependencies are installed
       pip:
@@ -23,11 +20,11 @@
 
   when: "ansible_venv_path | length > 0"
 
-- name: Install community collection
-  command: ansible-galaxy collection install community.general
+#- name: Install community collection
+#  command: ansible-galaxy collection install community.general##
 
-- name: Ensure Python dependencies are installed
-  pip:
-    requirements: "{{ playbook_dir }}/requirements.txt"
+#- name: Ensure Python dependencies are installed
+#  pip:
+#    requirements: "{{ playbook_dir }}/requirements.txt"
 
 
