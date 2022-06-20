@@ -1,7 +1,5 @@
 ---
-collections:
-  - name: community.general
-  
+
 - name: jasmin.cluster-infra
   src: https://github.com/cedadev/jasmin-cluster-infra-ansible
   version: 1edb8472d177cd9154cf6d78649b3d2da11fd1e6
@@ -23,3 +21,7 @@ collections:
 - name: stackhpc.cluster-nfs
   src: https://github.com/stackhpc/ansible-role-cluster-nfs.git
   version: 38a5f5d9920ecd9fc4784ba21d6fc714e4225402
+
+collections:
+  - name: community.general
+  
