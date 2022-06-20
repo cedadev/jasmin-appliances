@@ -1,1 +1,2 @@
-- name: community.general.ipa_hbacrule
+collections:
+- community.general.ipa_hbacrule
