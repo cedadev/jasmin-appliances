@@ -21,4 +21,3 @@
 - name: stackhpc.cluster-nfs
   src: https://github.com/stackhpc/ansible-role-cluster-nfs.git
   version: 38a5f5d9920ecd9fc4784ba21d6fc714e4225402
-- name: community.general
