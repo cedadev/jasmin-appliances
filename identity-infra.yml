@@ -1,9 +1,8 @@
 ---
-
 # Provision the cluster infrastructure
 - hosts: openstack
   tasks:
-    - import_tasks: tasks/install-dependencies.yml
+    - import_tasks: sdfgsfgstasks/install-dependencies.yml
     - import_tasks: tasks/infra/provision.yml
       vars:
         # These are the groups to use when no fixed IP is given
