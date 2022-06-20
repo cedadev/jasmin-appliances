@@ -17,10 +17,8 @@
         requirements: "{{ playbook_dir }}/requirements.txt"
         virtualenv: "{{ ansible_venv_path }}"
 
-    
-      
   when: "ansible_venv_path | length > 0"
 
 - name: Install community collection
-    ansible.builtin.shell: ansible-galaxy collection install community.general
+    command: ansible-galaxy collection install community.general
 
