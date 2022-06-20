@@ -93,7 +93,7 @@
   set_fact:
     # We want to get a boolean out, so use a double-negation to convert
     # The Jinja bool filter does not do what we need
-    cluster_image_exists: "{{ not (not (openstack_image | default(None))) }}"
+    cluster_image_exists: "{{ not (not (openstack.cloud.image | default(None))) }}"
 
 - name: Create cluster image
   block:
@@ -103,7 +103,7 @@
     - name: Find cluster base image
       set_fact:
         # to/from_json required - see https://github.com/ansible/ansible/issues/27299#issuecomment-331068246
-        cluster_image_base: "{{ openstack_image | to_json | from_json | json_query(cluster_image_query) | first }}"
+        cluster_image_base: "{{ openstack.cloud.image | to_json | from_json | json_query(cluster_image_query) | first }}"
       vars:
         cluster_image_query: "[?starts_with(name, '{{ cluster_image_prefix }}')]"
 
