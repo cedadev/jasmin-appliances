@@ -2,6 +2,7 @@
 # Provision the cluster infrastructure
 - hosts: openstack
   tasks:
+    become: true
     - import_tasks: tasks/install-dependencies.yml
     - import_tasks: tasks/infra/provision.yml
       vars:
