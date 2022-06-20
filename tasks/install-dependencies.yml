@@ -6,6 +6,7 @@
 
 - block:
     - name: Ensure dependencies are installed
+      become: true
       yum:
         name:
           - gcc
