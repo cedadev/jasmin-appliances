@@ -3,9 +3,6 @@
 - name: Get Ansible venv path
   set_fact:
     ansible_venv_path: "{{ lookup('env', 'ANSIBLE_VENV_PATH') }}"
-    
-- name: Install community collection
-      shell: "ansible-galaxy collection install community.general"
 
 - block:
     - name: Ensure yum dependencies are installed
@@ -23,3 +20,7 @@
     
       
   when: "ansible_venv_path | length > 0"
+
+  - name: Install community collection
+      shell: ansible-galaxy collection install community.general
+
