@@ -2,7 +2,7 @@
 # Provision the cluster infrastructure
 - hosts: openstack
   tasks:
-    - import_tasks: sdfgsfgstasks/install-dependencies.yml
+    - import_tasks: tasks/install-dependencies.yml
     - import_tasks: tasks/infra/provision.yml
       vars:
         # These are the groups to use when no fixed IP is given
@@ -37,35 +37,11 @@
   tasks:
     - include_tasks: tasks/identity/freeipa/client.yml
 
-# Set the permissions for the cluster in FreeIPA
-- hosts: freeipa_servers
+# split out IPA server role
+- hosts: Install IPA
   become: true
   tasks:
-    - include_tasks: tasks/identity/freeipa/cluster_permissions.yml
-      vars:
-        # We don't need a group to permit users access to these hosts
-        create_users_group: false
-
-    # Create a rule that permits all users SSH access to the gateway hosts
-    # This allows use as a jump host for accessing clusters without an IP
-    - name: Permit all users to access gateway hosts
-      ipa_hbacrule:
-        cn: "{{ cluster_name | lower | replace('-', '_') }}_gateway_allow_all"
-        description: Allow all users to access gateway host
-        state: enabled
-        host: >-
-          {{
-            hostvars |
-              dict2items |
-              selectattr('key', 'in', groups.gateway_servers) |
-              map(attribute = 'value') |
-              map(attribute = 'ansible_fqdn') |
-              list
-          }}
-        servicecategory: all
-        usercategory: all
-        ipa_host: "{{ ansible_fqdn }}"
-        ipa_pass: "{{ freeipa_admin_password }}"
+    - include_tasks: tasks/identity/freeipa/install.yml
 
 - hosts: keycloak_servers
   become: true
