@@ -5,13 +5,13 @@
     ansible_venv_path: "{{ lookup('env', 'ANSIBLE_VENV_PATH') }}"
 
 - block:
-    - name: Ensure dependencies are installed
-      become_user: root
-      yum:
-        name:
-          - gcc
-          - python3-devel
-        state: latest
+    #- name: Ensure dependencies are installed
+    #  become_user: root
+    #  yum:
+    #    name:
+    #      - gcc
+    #      - python3-devel
+    #    state: latest
 
     - name: Ensure Python dependencies are installed
       pip:
