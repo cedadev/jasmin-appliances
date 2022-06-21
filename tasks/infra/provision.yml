@@ -98,7 +98,7 @@
 - name: Create cluster image
   block:
     - name: Get available images
-      os_image_facts:
+      openstack.cloud.image_info:
 
     - name: Find cluster base image
       set_fact:
