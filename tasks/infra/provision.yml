@@ -15,7 +15,7 @@
 
         - name: Set cluster ip facts
           set_fact:
-            #cluster_fip_id: "{{ cluster_fip.floating_ips[0].id }}"
+            cluster_fip_id: "{{ cluster_fip.floating_ips[0].id }}"
             cluster_fip_ip: "{{ cluster_fip.floating_ips[0].floating_ip_address }}"
       when: cluster_fixed_ip is defined
 
@@ -44,7 +44,7 @@
 
         - name: Set cluster ip facts
           set_fact:
-            #cluster_fip_id: "{{ cluster_fip.floating_ips[0].id }}"
+            cluster_fip_id: "{{ cluster_fip.floating_ips[0].id }}"
             cluster_fip_ip: "{{ cluster_fip.floating_ips[0].floating_ip_address }}"
       when:
         - cluster_fixed_ip is not defined
