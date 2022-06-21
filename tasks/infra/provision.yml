@@ -9,6 +9,10 @@
             floating_ip_address: "{{ cluster_fixed_ip }}"
           register: cluster_fip
 
+        - name: Echo the result
+          debug:
+            msg: {{ cluster_fip }}
+
         - name: Set cluster ip facts
           set_fact:
             cluster_fip_id: "{{ cluster_fip.floating_ips[0].id }}"
