@@ -133,7 +133,7 @@
           "jasmin_cluster_image": "1"
 
     - name: Remove volume
-      openstack.cloud.os_volume:
+      os_volume:
         display_name: "{{ cluster_image_volume.volume.display_name }}"
         state: absent
   when:
