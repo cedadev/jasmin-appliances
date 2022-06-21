@@ -110,7 +110,7 @@
         # to/from_json required - see https://github.com/ansible/ansible/issues/27299#issuecomment-331068246
         cluster_image_base: "{{ openstack_image | to_json | from_json | json_query(cluster_image_query) | first }}"
       vars:
-        cluster_image_query: "openstack_image.name[?starts_with(name, '{{ cluster_image_prefix }}')]"
+        cluster_image_query: "openstack_image[?starts_with(name, '{{ cluster_image_prefix }}')]"
 
     - name: Create volume from base image
       os_volume:
