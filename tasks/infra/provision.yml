@@ -11,7 +11,7 @@
 
         - name: Echo the result
           debug:
-            var: cluster_fip
+            msg: "{{ cluster_fip }}"
 
         - name: Set cluster ip facts
           set_fact:
