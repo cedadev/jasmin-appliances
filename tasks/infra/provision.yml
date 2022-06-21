@@ -127,13 +127,13 @@
         disk_format: "{{ cluster_image_base.disk_format }}"
 
     - name: Add cluster_image tag to image
-      os_image:
+      openstack.cloud.image:
         name: "{{ cluster_image }}"
         properties:
           "jasmin_cluster_image": "1"
 
     - name: Remove volume
-      os_volume:
+      openstack.cloud.os_volume:
         display_name: "{{ cluster_image_volume.volume.display_name }}"
         state: absent
   when:
