@@ -6,8 +6,8 @@
         - name: Find cluster floating ip
           #os_network_find_fip:
           openstack.cloud.floating_ip_info:
-            floating_network: "{{ cluster_floating_network }}"
-            ip: "{{ cluster_fixed_ip }}"
+            network: "{{ cluster_floating_network }}"
+            floating_ip_address: "{{ cluster_fixed_ip }}"
           register: cluster_fip
 
         - name: Set cluster ip facts
