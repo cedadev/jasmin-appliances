@@ -113,7 +113,7 @@
         cluster_image_query: "openstack_image[?starts_with(name, '{{ cluster_image_prefix }}')]"
 
     - name: Create volume from base image
-      os_volume:
+      openstack.cloud.volume:
         display_name: "cluster-image-{{ cluster_name }}"
         image: "{{ cluster_image_base.name }}"
         # Convert from bytes to GiB, then moderate to the minimum size
@@ -133,8 +133,8 @@
     #      "jasmin_cluster_image": "1"
 
     - name: Remove volume
-      os_volume:
-        display_name: "{{ cluster_image_volume.volume.display_name }}"
+      openstack.cloud.volume:
+        display_name: "{{ cluster_image_volume.display_name }}"
         state: absent
   when:
     - cluster_state | default('present') | lower == 'present'
