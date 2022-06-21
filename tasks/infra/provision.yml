@@ -11,7 +11,7 @@
 
         - name: Set cluster ip facts
           set_fact:
-            #cluster_fip_id: "{{ cluster_fip.floating_ip_ }}"
+            cluster_fip_id: "{{ cluster_fip.floating_ips.id }}"
             cluster_fip_ip: "{{ cluster_fip.floating_ips.floating_ip_address }}"
       when: cluster_fixed_ip is defined
 
@@ -40,8 +40,8 @@
 
         - name: Set cluster ip facts
           set_fact:
-            #cluster_fip_id: "{{ cluster_fip.id }}"
-            cluster_fip_ip: "{{ cluster_fip.floating_ip_address }}"
+            cluster_fip_id: "{{ cluster_fip.floating_ips.id }}"
+            cluster_fip_ip: "{{ cluster_fip.floating_ips.floating_ip_address }}"
       when:
         - cluster_fixed_ip is not defined
         - cluster_gw_ssh_proxy_command is not defined
