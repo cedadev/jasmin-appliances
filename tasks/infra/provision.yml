@@ -103,6 +103,7 @@
   block:
     - name: Get available images
       openstack.cloud.image_info:
+      register: openstack_image
 
     - name: Find cluster base image
       set_fact:
