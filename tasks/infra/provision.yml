@@ -7,6 +7,7 @@
           openstack.cloud.floating_ip_info:
             floating_network: "{{ cluster_floating_network }}"
             floating_ip_address: "{{ cluster_fixed_ip }}"
+            interface: "internal"
           register: cluster_fip
 
         - name: Echo the result
