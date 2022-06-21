@@ -90,7 +90,7 @@
     cluster_image: "cluster-{{ cluster_name }}"
 
 - name: Check if cluster image exists
-  os_image_facts:
+  openstack.cloud.image_info:
     image: "{{ cluster_image }}"
 
 - name: Set cluster_image_exists fact
