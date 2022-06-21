@@ -92,6 +92,7 @@
 - name: Check if cluster image exists
   openstack.cloud.image_info:
     image: "{{ cluster_image }}"
+  register: openstack_image
 
 - name: Set cluster_image_exists fact
   set_fact:
