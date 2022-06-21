@@ -12,7 +12,7 @@
         - name: Set cluster ip facts
           set_fact:
             #cluster_fip_id: "{{ cluster_fip.floating_ip_ }}"
-            cluster_fip_ip: "{{ cluster_fip.floating_ip_address }}"
+            cluster_fip_ip: "{{ cluster_fip.floating_ips.floating_ip_address }}"
       when: cluster_fixed_ip is defined
 
     # If no fixed IP is given, that means we are using either:
@@ -33,9 +33,9 @@
           when: openstack_stack_outputs is defined
 
         - name: Find gateway floating ip
-          os_network_find_fip:
+          openstack.cloud.floating_ip_info:
             floating_network: "{{ cluster_floating_network }}"
-            ip: "{{ cluster_existing_gw_ip | default(omit) }}"
+            floating_ip_address: "{{ cluster_existing_gw_ip | default(omit) }}"
           register: cluster_fip
 
         - name: Set cluster ip facts
