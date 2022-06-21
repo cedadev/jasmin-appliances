@@ -138,7 +138,7 @@
 
     - name: Remove volume
       openstack.cloud.volume:
-        display_name: "{{ cluster_image_volume.display_name }}"
+        display_name: "{{ cluster_image_volume.volume.name }}"
         state: absent
   when:
     - cluster_state | default('present') | lower == 'present'
