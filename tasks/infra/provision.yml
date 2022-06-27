@@ -93,17 +93,15 @@
   openstack.cloud.image_info:
     image: "{{ cluster_image }}"
   register: openstack_image
+    when: not openstack_image == 'null'
 
 - name: Set cluster_image_exists fact
   set_fact:
     # We want to get a boolean out, so use a double-negation to convert
     # The Jinja bool filter does not do what we need
-    #cluster_image_exists: "{{ not (not (openstack_image | default(False))) }}"
+    cluster_image_exists: "{{ not (not (openstack_image | default(False))) }}"
     # Check if the openstack image is returing "null"
-    cluster_image_exists: False #"{{ not ( openstack_image == 'null' ) | default(False) }}""
-    when: openstack_image == 'null'
-    cluster_image_exists: True #"{{ not ( openstack_image == 'null' ) | default(False) }}""
-    when: openstack_image != 'null'
+    #cluster_image_exists: "{{ not ( openstack_image == 'null' )}}"
 
 
 - name: Create cluster image
