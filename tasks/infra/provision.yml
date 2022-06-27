@@ -93,7 +93,6 @@
   openstack.cloud.image_info:
     image: "{{ cluster_image }}"
   register: openstack_image
-    when: not openstack_image == 'null'
 
 - name: Set cluster_image_exists fact
   set_fact:
