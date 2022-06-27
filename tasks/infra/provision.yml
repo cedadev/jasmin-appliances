@@ -103,7 +103,7 @@
     cluster_image_exists: true
     when: openstack_image is not null
   debug:
-    var: cluster_image_exists
+    msg: "{{ cluster_image_exists }}"
 
 - name: Set cluster_image_exists false if images doesn't exist
   set_fact:
@@ -114,7 +114,7 @@
     cluster_image_exists: false
     when: openstack_image is null  
   debug:
-    var: cluster_image_exists
+    msg: "{{ cluster_image_exists }}"
 
 - name: Create cluster image
   block:
