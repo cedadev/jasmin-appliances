@@ -100,7 +100,11 @@
     # The Jinja bool filter does not do what we need
     #cluster_image_exists: "{{ not (not (openstack_image | default(False))) }}"
     # Check if the openstack image is returing "null"
-    cluster_image_exists: not ( openstack_image == "null" ) | default(False)
+    cluster_image_exists: False #"{{ not ( openstack_image == 'null' ) | default(False) }}""
+    when: openstack_image == "null"
+    cluster_image_exists: True #"{{ not ( openstack_image == 'null' ) | default(False) }}""
+    when: openstack_image != "null"
+
 
 - name: Create cluster image
   block:
