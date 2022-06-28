@@ -97,6 +97,7 @@
 - name: Check some facts about openstack image var
   debug:
     msg: "{{ openstack_image }}"
+  debug:
     msg: "{{ openstack_image | type_debug }}"
     
 
