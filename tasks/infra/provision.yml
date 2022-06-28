@@ -120,7 +120,7 @@
 
 - name: Check whether image exists
   set_fact:
-    cluster_image_exists: "{{ openstack_image | ternary(false, true, true) }}"
+    cluster_image_exists: "{{ openstack_image | ternary(true, false, false) }}"
 
 - name: check var
   debug:
