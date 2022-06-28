@@ -99,7 +99,7 @@
     msg: 
       - "{{ openstack_image }}"
       - "{{ openstack_image | type_debug }}"
-      - "key {{ openstack_image.key }} value {{ item.value }}"
+      - "key {{ item.key }} value {{ item.value }}"
     loop: "{{ lookup('ansible.builtin.dict', openstack_image) }}"
     
 
