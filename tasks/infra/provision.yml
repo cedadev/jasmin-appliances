@@ -94,7 +94,7 @@
     image: "{{ cluster_image }}"
   register: openstack_image
 
-- name: Set cluster_image_exists true if image exists
+- name: Set cluster_image_exists true if image doesn't exist
   set_fact:
     # We want to get a boolean out, so use a double-negation to convert
     # The Jinja bool filter does not do what we need
@@ -103,11 +103,8 @@
     cluster_image_exists: true
   when: openstack_image is none
     
-- name: check var
-  debug:
-    msg: "{{ cluster_image_exists }}"
 
-- name: Set cluster_image_exists false if images doesn't exist
+- name: Set cluster_image_exists false if images exists
   set_fact:
     # We want to get a boolean out, so use a double-negation to convert
     # The Jinja bool filter does not do what we need
