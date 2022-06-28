@@ -94,13 +94,16 @@
     image: "{{ cluster_image }}"
   register: openstack_image
 
-- name: Check some facts about openstack image var
-  debug:
-    msg: 
-      - "{{ openstack_image }}"
-      - "{{ openstack_image | type_debug }}"
-      - "key {{ item.key }} value {{ item.value }}"
-    loop: "{{ lookup('ansible.builtin.dict', openstack_image) }}"
+- name: Check if key in openstack_image
+  set_fact:
+    cluster_image_exists: false
+  loop: "{{ lookup('ansible.builtin.dict', openstack_image) }}"
+  when: "'name' in item.key"
+
+- name: Set cluster image true if cluster_image_exists doesn't exist
+  set_fact:
+    cluster_image_exists: true
+  when: cluster_image_exists is not defined
     
 
 # - name: Set cluster_image_exists true if image doesn't exist
