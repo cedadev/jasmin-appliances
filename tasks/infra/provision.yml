@@ -101,7 +101,7 @@
     #cluster_image_exists: "{{ not (not (openstack_image | default(False))) }}"
     # Check if the openstack image is returing "null"
     cluster_image_exists: true
-  when: openstack_image is not none
+  when: openstack_image is none
     
 - name: check var
   debug:
@@ -114,7 +114,7 @@
     #cluster_image_exists: "{{ not (not (openstack_image | default(False))) }}"
     # Check if the openstack image is returing "null"
     cluster_image_exists: false
-  when: openstack_image is none
+  when: openstack_image is not none
 
 - name: check var
   debug:
