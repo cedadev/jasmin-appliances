@@ -97,7 +97,7 @@
 - name: Check some facts about openstack image var
   debug:
     #msg: "{{ 'openstack_image: ' openstack_image }}"
-    msg: "{{ 'openstack_image type' openstack_image | type_debug }}"
+    msg: "{{ openstack_image | type_debug }}"
     
 
 # - name: Set cluster_image_exists true if image doesn't exist
