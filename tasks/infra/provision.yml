@@ -97,9 +97,9 @@
 - name: Check if key in openstack_image
   set_fact:
     cluster_image_exists: false
-  #loop: "{{ lookup('ansible.builtin.dict', openstack_image) }}"
   #when: "'name' in item.value"
-  when: openstack_image.value
+  when: item.value
+  loop: "{{ lookup('ansible.builtin.dict', openstack_image) }}"
 
 # - name: print keys in openstack_image
 #   debug:
