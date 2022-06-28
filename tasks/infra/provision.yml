@@ -96,13 +96,13 @@
 
 - name: Check if key in openstack_image
   set_fact:
-    cluster_image_exists: false
+    cluster_image_exists: true
   loop: "{{ lookup('ansible.builtin.dict', openstack_image) }}"
   when: "'name' in item.key"
 
-- name: Set cluster image true if cluster_image_exists doesn't exist
+- name: Set cluster image false if cluster_image_exists doesn't exist
   set_fact:
-    cluster_image_exists: true
+    cluster_image_exists: false
   when: cluster_image_exists is not defined
     
 
