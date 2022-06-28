@@ -98,7 +98,7 @@
   set_fact:
     cluster_image_exists: true
   loop: "{{ lookup('ansible.builtin.dict', openstack_image) }}"
-  when: "'name' in item.key"
+  when: "'name' in item.value"
 
 - name: print keys in openstack_image
   debug:
