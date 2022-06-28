@@ -94,10 +94,11 @@
     image: "{{ cluster_image }}"
   register: openstack_image
 
-#- name: Check some facts about openstack image var
-#  debug:
-#    msg: "{{ 'openstack_image type' openstack_image.type}}"
-#    msg: 
+- name: Check some facts about openstack image var
+  debug:
+    msg: "{{ 'openstack_image: ' openstack_image }}"
+    msg: "{{ 'openstack_image type' openstack_image.type}}"
+    
 
 # - name: Set cluster_image_exists true if image doesn't exist
 #   set_fact:
@@ -118,9 +119,9 @@
 #     cluster_image_exists: false
 #   when: openstack_image is not none
 
-- name: Check whether image exists
-  set_fact:
-    cluster_image_exists: "{{ openstack_image | ternary(true, false, false) }}"
+#- name: Check whether image exists
+#  set_fact:
+#    cluster_image_exists: "{{ openstack_image | ternary(true, false, false) }}"
 
 - name: check var
   debug:
