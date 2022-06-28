@@ -9,10 +9,6 @@
             floating_ip_address: "{{ cluster_fixed_ip }}"
           register: cluster_fip
 
-        - name: Echo the result
-          debug:
-            msg: "{{ cluster_fip }}"
-
         - name: Set cluster ip facts
           set_fact:
             cluster_fip_id: "{{ cluster_fip.floating_ips[0].id }}"
@@ -97,43 +93,13 @@
 - name: Check if key in openstack_image
   set_fact:
     cluster_image_exists: true
-  #when: "'name' in item.value"
   when: openstack_image.openstack_image
-  #loop: "{{ lookup('ansible.builtin.dict', openstack_image.openstack_image) }}"
-
-# - name: print keys in openstack_image
-#   debug:
-#     msg: "key: {{ item.key }}"
-#   loop: "{{ lookup('ansible.builtin.dict', openstack_image) }}"
+ 
 
 - name: Set cluster image false if cluster_image_exists doesn't exist
   set_fact:
     cluster_image_exists: false
   when: cluster_image_exists is not defined
-    
-
-# - name: Set cluster_image_exists true if image doesn't exist
-#   set_fact:
-#     # We want to get a boolean out, so use a double-negation to convert
-#     # The Jinja bool filter does not do what we need
-#     #cluster_image_exists: "{{ not (not (openstack_image | default(False))) }}"
-#     # Check if the openstack image is returing "null"
-#     cluster_image_exists: true
-#   when: openstack_image is none
-    
-
-# - name: Set cluster_image_exists false if images exists
-#   set_fact:
-#     # We want to get a boolean out, so use a double-negation to convert
-#     # The Jinja bool filter does not do what we need
-#     #cluster_image_exists: "{{ not (not (openstack_image | default(False))) }}"
-#     # Check if the openstack image is returing "null"
-#     cluster_image_exists: false
-#   when: openstack_image is not none
-
-#- name: Check whether image exists
-#  set_fact:
-#    cluster_image_exists: "{{ openstack_image | ternary(true, false, false) }}"
 
 - name: check var
   debug:
@@ -171,10 +137,6 @@
     #    name: "{{ cluster_image }}"
     #    properties:
     #      "jasmin_cluster_image": "1"
-
-    - name: echo volume details
-      debug:
-        msg: "{{ cluster_image_volume }}"
 
     - name: Remove volume
       openstack.cloud.volume:
