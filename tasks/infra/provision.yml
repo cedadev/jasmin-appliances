@@ -99,7 +99,8 @@
     msg: 
       - "{{ openstack_image }}"
       - "{{ openstack_image | type_debug }}"
-      - "{{ openstack_image.key }}"
+      - "key {{ openstack_image.key }} value {{ item.value }}"
+    loop: "{{ lookup('ansible.builtin.dict', openstack_image) }}"
     
 
 # - name: Set cluster_image_exists true if image doesn't exist
