@@ -94,24 +94,33 @@
     image: "{{ cluster_image }}"
   register: openstack_image
 
-- name: Set cluster_image_exists true if image doesn't exist
-  set_fact:
-    # We want to get a boolean out, so use a double-negation to convert
-    # The Jinja bool filter does not do what we need
-    #cluster_image_exists: "{{ not (not (openstack_image | default(False))) }}"
-    # Check if the openstack image is returing "null"
-    cluster_image_exists: true
-  when: openstack_image is none
+#- name: Check some facts about openstack image var
+#  debug:
+#    msg: "{{ 'openstack_image type' openstack_image.type}}"
+#    msg: 
+
+# - name: Set cluster_image_exists true if image doesn't exist
+#   set_fact:
+#     # We want to get a boolean out, so use a double-negation to convert
+#     # The Jinja bool filter does not do what we need
+#     #cluster_image_exists: "{{ not (not (openstack_image | default(False))) }}"
+#     # Check if the openstack image is returing "null"
+#     cluster_image_exists: true
+#   when: openstack_image is none
     
 
-- name: Set cluster_image_exists false if images exists
+# - name: Set cluster_image_exists false if images exists
+#   set_fact:
+#     # We want to get a boolean out, so use a double-negation to convert
+#     # The Jinja bool filter does not do what we need
+#     #cluster_image_exists: "{{ not (not (openstack_image | default(False))) }}"
+#     # Check if the openstack image is returing "null"
+#     cluster_image_exists: false
+#   when: openstack_image is not none
+
+- name: Check whether image exists
   set_fact:
-    # We want to get a boolean out, so use a double-negation to convert
-    # The Jinja bool filter does not do what we need
-    #cluster_image_exists: "{{ not (not (openstack_image | default(False))) }}"
-    # Check if the openstack image is returing "null"
-    cluster_image_exists: false
-  when: openstack_image is not none
+    cluster_image_exists: "{{ ternary(false, true, true) }}"
 
 - name: check var
   debug:
