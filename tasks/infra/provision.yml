@@ -120,7 +120,7 @@
 
 - name: Check whether image exists
   set_fact:
-    cluster_image_exists: "{{ ternary(false, true, true) }}"
+    cluster_image_exists: "{{ enabled | ternary(false, true, true) }}"
 
 - name: check var
   debug:
