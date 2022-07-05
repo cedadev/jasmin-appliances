@@ -121,11 +121,11 @@
         image_name: "{{ cluster_image }}"
         disk_format: "{{ cluster_image_base.disk_format }}"
 
-    - name: Add cluster_image tag to image
-      os_image:
-        name: "{{ cluster_image }}"
-        properties:
-          "jasmin_cluster_image": "1"
+    # - name: Add cluster_image tag to image
+    #   os_image:
+    #     name: "{{ cluster_image }}"
+    #     properties:
+    #       "jasmin_cluster_image": "1"
 
     - name: Remove volume
       os_volume:
