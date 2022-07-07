@@ -196,6 +196,7 @@
       vars:
         helm_release_name: nginx-ingress
         helm_release_chart: ingress-nginx/ingress-nginx
+        helm_release_version: "3.39.0"
         helm_release_namespace: nginx-ingress
         helm_release_values_template: templates/helm/nginx-ingress.yml
 
@@ -286,6 +287,9 @@
         fact_name: kubernetes_dashboard_proxy_encryption_key
         # 16 bytes is important - this is a 128-bit AES-256 key
         random_fact_bytes: 16
+      
+    - name: Add bitnami repo
+      command: helm repo add bitnami https://charts.bitnami.com/bitnami
 
     - name: Install dashboard authenticating proxy
       include_role:
@@ -293,7 +297,7 @@
         tasks_from: chart.yml
       vars:
         helm_release_name: kubernetes-dashboard-proxy
-        helm_release_chart: cedadev/keycloak-gatekeeper
+        helm_release_chart: bitnami/keycloak-gatekeeper
         helm_release_namespace: kubernetes-dashboard
         helm_release_values_template: templates/helm/keycloak-gatekeeper.yml
         helm_release_state: present
