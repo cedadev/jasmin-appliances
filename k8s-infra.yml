@@ -293,7 +293,7 @@
         tasks_from: chart.yml
       vars:
         helm_release_name: kubernetes-dashboard-proxy
-        helm_release_chart: cedadev/keycloak-gatekeeper
+        helm_release_chart: https://cedadev.github.io/helm-charts/keycloak-gatekeeper-0.1.0.tgz
         helm_release_namespace: kubernetes-dashboard
         helm_release_values_template: templates/helm/keycloak-gatekeeper.yml
         helm_release_state: present
