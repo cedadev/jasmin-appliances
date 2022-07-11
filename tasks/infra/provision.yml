@@ -98,12 +98,13 @@
 - name: Create cluster image
   block:
     - name: Get available images
+      register: all_image_facts
       os_image_facts:
 
     - name: Find cluster base image
       set_fact:
         # to/from_json required - see https://github.com/ansible/ansible/issues/27299#issuecomment-331068246
-        cluster_image_base: "{{ image_facts.openstack_image | to_json | from_json | json_query(cluster_image_query) | first }}"
+        cluster_image_base: "{{ all_image_facts.openstack_image | to_json | from_json | json_query(cluster_image_query) | first }}"
       vars:
         cluster_image_query: "[?starts_with(name, '{{ cluster_image_prefix }}')]"
 
