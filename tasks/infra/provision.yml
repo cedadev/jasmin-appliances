@@ -129,7 +129,7 @@
 
     - name: Remove volume
       os_volume:
-        display_name: "{{ cluster_image_volume.name }}"
+        display_name: "{{ cluster_image_volume.volume.name }}"
         state: absent
   when:
     - cluster_state | default('present') | lower == 'present'
