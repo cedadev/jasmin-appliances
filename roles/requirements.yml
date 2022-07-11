@@ -1,24 +1,23 @@
 ---
-
 roles:
-- name: jasmin.cluster-infra
-  src: https://github.com/cedadev/jasmin-cluster-infra-ansible
-  version: 1edb8472d177cd9154cf6d78649b3d2da11fd1e6
-- name: jasmin.rke
-  src: https://github.com/cedadev/rke-ansible
-  version: 019cf761a1234d0bfe35fd34928161d2ec6fa8f1
-- name: jasmin.helm
-  src: https://github.com/cedadev/helm-ansible
-  version: b7884d4a69e023ee570a551622c17bc41ca11389
-- name: stackhpc.beegfs
-  src: https://github.com/stackhpc/ansible-role-beegfs.git
-  version: 21acbbeced9beeaa7bf16b53ac28dbebbf312b10
-- name: jasmin.gluster
-  src: https://github.com/cedadev/jasmin-gluster-ansible
-  version: 37e0856d19a90adf5b59d9c8f5a58f7a34800da2
-- name: stackhpc.openhpc
-  src: https://github.com/stackhpc/ansible-role-openhpc.git
-  version: d9ebf499b27f455afec5fcb960d5c54e180d8306
-- name: stackhpc.cluster-nfs
-  src: https://github.com/stackhpc/ansible-role-cluster-nfs.git
-  version: 38a5f5d9920ecd9fc4784ba21d6fc714e4225402
+  - name: jasmin.cluster-infra
+    src: https://github.com/cedadev/jasmin-cluster-infra-ansible
+    version: vio7
+  - name: jasmin.rke
+    src: https://github.com/cedadev/rke-ansible
+    version: 019cf761a1234d0bfe35fd34928161d2ec6fa8f1
+  - name: jasmin.helm
+    src: https://github.com/cedadev/helm-ansible
+    version: b7884d4a69e023ee570a551622c17bc41ca11389
+  - name: stackhpc.beegfs
+    src: https://github.com/stackhpc/ansible-role-beegfs.git
+    version: 21acbbeced9beeaa7bf16b53ac28dbebbf312b10
+  - name: jasmin.gluster
+    src: https://github.com/cedadev/jasmin-gluster-ansible
+    version: 37e0856d19a90adf5b59d9c8f5a58f7a34800da2
+  - name: stackhpc.openhpc
+    src: https://github.com/stackhpc/ansible-role-openhpc.git
+    version: d9ebf499b27f455afec5fcb960d5c54e180d8306
+  - name: stackhpc.cluster-nfs
+    src: https://github.com/stackhpc/ansible-role-cluster-nfs.git
+    version: 38a5f5d9920ecd9fc4784ba21d6fc714e4225402
