@@ -3,3 +3,4 @@ collections:
   - name: community.general
   - name: community.crypto
   - name: openstack.cloud
+    version: "1.0.0"
