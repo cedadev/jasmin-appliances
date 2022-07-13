@@ -199,7 +199,7 @@ def main():
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     # Reuse existing code to authenticate with Keycloak
-    api = KeycloakAPI(module, get_toke(module.params))
+    api = KeycloakAPI(module, get_token(module.params))
 
     realm = module.params["realm"]
 
