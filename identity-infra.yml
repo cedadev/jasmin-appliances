@@ -1,6 +1,8 @@
 ---
 - hosts: localhost
   gather_facts: yes
+  vars:
+    PATH: "{{ ansible_env.PATH }}:/home/runner/.local/bin"
   tasks:
     - name: Get environment
       debug:
@@ -8,6 +10,7 @@
 
     - name: Install playbook-runtime dependencies.
       ansible.builtin.pip:
+        extra_atgs: "--user"
         name:
           - netaddr
 
