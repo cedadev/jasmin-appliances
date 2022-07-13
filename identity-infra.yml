@@ -2,9 +2,14 @@
 - hosts: localhost
   gather_facts: yes
   tasks:
-  - name: Get environment
-    debug:
-      msg: "{{ ansible_env }}"
+    - name: Get environment
+      debug:
+        msg: "{{ ansible_env }}"
+
+    - name: Install playbook-runtime dependencies.
+      ansible.builtin.pip:
+        name:
+          - netaddr
 
 # Provision the cluster infrastructure
 - hosts: openstack
