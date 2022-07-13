@@ -1,13 +1,16 @@
 #!/usr/bin/python
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
+ANSIBLE_METADATA = {
+    "metadata_version": "1.1",
+    "status": ["preview"],
+    "supported_by": "community",
+}
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: keycloak_component
 
@@ -70,68 +73,68 @@ options:
     required: false
 
 extends_documentation_fragment: keycloak
-'''
+"""
 
 import json
 import traceback
+
 try:
     from collections.abc import Iterable
 except ImportError:
     from collections import Iterable
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import open_url
-from ansible.module_utils.six.moves.urllib.parse import urlencode
-from ansible.module_utils.six.moves.urllib.error import HTTPError
+from ansible.module_utils.identity.keycloak import (KeycloakAPI,
+                                                    keycloak_argument_spec)
 from ansible.module_utils.six import string_types
-from ansible.module_utils.keycloak import KeycloakAPI, keycloak_argument_spec
-
+from ansible.module_utils.six.moves.urllib.error import HTTPError
+from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible.module_utils.urls import open_url
 
 URL_COMPONENTS = "{url}/admin/realms/{realm}/components"
 URL_COMPONENT = URL_COMPONENTS + "/{id}"
 
 
-def make_request(api, url, method = 'GET', msg = '{}', **params):
+def make_request(api, url, method="GET", msg="{}", **params):
     """
     Context manager for making requests
     """
     try:
         return open_url(
-            url, method = method,
-            headers = api.restheaders,
-            validate_certs = api.validate_certs,
+            url,
+            method=method,
+            headers=api.restheaders,
+            validate_certs=api.validate_certs,
             **params
         )
     except Exception as e:
-        api.module.fail_json(msg = msg.format(str(e)), exception = traceback.format_exc())
+        api.module.fail_json(msg=msg.format(str(e)), exception=traceback.format_exc())
 
 
-def get_component(api, realm, name, provider_type, parent_id = None):
+def get_component(api, realm, name, provider_type, parent_id=None):
     """
     Gets the first component that matches the given params, or None if
     one does not exist.
     """
-    params = dict(name = name, type = provider_type)
+    params = dict(name=name, type=provider_type)
     if parent_id is not None:
-        params.update(parent = parent_id)
+        params.update(parent=parent_id)
     try:
         return json.load(
             make_request(
                 api,
-                (URL_COMPONENTS + '?{query}').format(
-                    url = api.baseurl,
-                    realm = realm,
-                    query = urlencode(params)
+                (URL_COMPONENTS + "?{query}").format(
+                    url=api.baseurl, realm=realm, query=urlencode(params)
                 ),
-                msg = "Could not obtain list of components: {}"
+                msg="Could not obtain list of components: {}",
             )
         )[0]
     except IndexError:
         return None
     except ValueError as e:
         api.module.fail_json(
-            msg = 'API returned incorrect JSON: {}'.format(str(e)),
-            exception = traceback.format_exc()
+            msg="API returned incorrect JSON: {}".format(str(e)),
+            exception=traceback.format_exc(),
         )
 
 
@@ -141,10 +144,10 @@ def create_component(api, realm, component):
     """
     make_request(
         api,
-        URL_COMPONENTS.format(url = api.baseurl, realm = realm),
-        method = 'POST',
-        data = json.dumps(component),
-        msg = "Could not create component: {}"
+        URL_COMPONENTS.format(url=api.baseurl, realm=realm),
+        method="POST",
+        data=json.dumps(component),
+        msg="Could not create component: {}",
     )
 
 
@@ -154,10 +157,10 @@ def update_component(api, realm, cid, component):
     """
     make_request(
         api,
-        URL_COMPONENT.format(url = api.baseurl, realm = realm, id = cid),
-        method = 'PUT',
-        data = json.dumps(component),
-        msg = "Could not update component: {}"
+        URL_COMPONENT.format(url=api.baseurl, realm=realm, id=cid),
+        method="PUT",
+        data=json.dumps(component),
+        msg="Could not update component: {}",
     )
 
 
@@ -167,9 +170,9 @@ def delete_component(api, realm, cid):
     """
     make_request(
         api,
-        URL_COMPONENT.format(url = api.baseurl, realm = realm, id = cid),
-        method = 'DELETE',
-        msg = "Could not delete component: {}"
+        URL_COMPONENT.format(url=api.baseurl, realm=realm, id=cid),
+        method="DELETE",
+        msg="Could not delete component: {}",
     )
 
 
@@ -183,85 +186,79 @@ def to_list(value):
 def main():
     argument_spec = keycloak_argument_spec()
     argument_spec.update(
-        realm = dict(type = 'str', default = 'master'),
-        state = dict(default = 'present', choices = ['present', 'absent']),
-        name = dict(type = 'str', required = True),
-        provider_type = dict(type = 'str', required = True),
-        provider_id = dict(type = 'str'),
-        subtype = dict(type = 'str'),
-        parent_id = dict(type = 'str'),
-        config = dict(type = 'dict')
+        realm=dict(type="str", default="master"),
+        state=dict(default="present", choices=["present", "absent"]),
+        name=dict(type="str", required=True),
+        provider_type=dict(type="str", required=True),
+        provider_id=dict(type="str"),
+        subtype=dict(type="str"),
+        parent_id=dict(type="str"),
+        config=dict(type="dict"),
     )
 
-    module = AnsibleModule(argument_spec = argument_spec, supports_check_mode = True)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     # Reuse existing code to authenticate with Keycloak
     api = KeycloakAPI(module)
 
-    realm = module.params['realm']
+    realm = module.params["realm"]
 
     existing = get_component(
         api,
         realm,
-        name = module.params['name'],
-        provider_type = module.params['provider_type'],
-        parent_id = module.params.get('parent_id')
+        name=module.params["name"],
+        provider_type=module.params["provider_type"],
+        parent_id=module.params.get("parent_id"),
     )
 
-    if module.params['state'] == 'present':
+    if module.params["state"] == "present":
         # Merge previous state with the given params to get the target state
         component = dict(
             existing or {},
-            name = module.params['name'],
-            providerType = module.params['provider_type']
+            name=module.params["name"],
+            providerType=module.params["provider_type"],
         )
-        provider_id = module.params.get('provider_id')
+        provider_id = module.params.get("provider_id")
         if provider_id:
-            component['providerId'] = provider_id
-        subtype = module.params.get('subtype')
+            component["providerId"] = provider_id
+        subtype = module.params.get("subtype")
         if subtype:
-            component['subType'] = subtype
-        parent_id = module.params.get('parent_id')
+            component["subType"] = subtype
+        parent_id = module.params.get("parent_id")
         if parent_id:
-            component['parentId'] = parent_id
+            component["parentId"] = parent_id
         # Config is a dict, which we want to merge separately
         # The items in config also need to be lists, so convert any scalar values
         # and make sure any iterables are actually lists
-        config = module.params.get('config', {})
+        config = module.params.get("config", {})
         if config:
-            merged_config = dict((existing or {}).get('config', {}))
-            merged_config.update(module.params['config'])
-            component['config'] = {
-                k: to_list(v)
-                for k, v in merged_config.items()
-            }
+            merged_config = dict((existing or {}).get("config", {}))
+            merged_config.update(module.params["config"])
+            component["config"] = {k: to_list(v) for k, v in merged_config.items()}
 
         if not module.check_mode:
             if existing is None:
                 create_component(api, realm, component)
             else:
-                update_component(api, realm, component.pop('id'), component)
+                update_component(api, realm, component.pop("id"), component)
 
         # Get the new state of the component
         current = get_component(
             api,
             realm,
-            name = component['name'],
-            provider_type = component['providerType'],
-            parent_id = component.get('parentId')
+            name=component["name"],
+            provider_type=component["providerType"],
+            parent_id=component.get("parentId"),
         )
 
-        return module.exit_json(
-            changed = (current != existing),
-            component = current
-        )
+        return module.exit_json(changed=(current != existing), component=current)
     else:
         if existing is None:
-            module.exit_json(changed = False)
+            module.exit_json(changed=False)
         if not module.check_mode:
-            delete_component(api, realm, existing['id'])
-        module.exit_json(changed = True)
+            delete_component(api, realm, existing["id"])
+        module.exit_json(changed=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
