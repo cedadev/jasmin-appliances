@@ -85,7 +85,7 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.identity.keycloak.keycloak import (
-    KeycloakAPI, keycloak_argument_spec)
+    KeycloakAPI, get_token, keycloak_argument_spec)
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -199,7 +199,7 @@ def main():
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     # Reuse existing code to authenticate with Keycloak
-    api = KeycloakAPI(module)
+    api = KeycloakAPI(module, get_toke(module.params))
 
     realm = module.params["realm"]
 
