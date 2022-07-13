@@ -1,4 +1,10 @@
 ---
+- hosts: localhost
+  gather_facts: yes
+  tasks:
+  - name: Get environment
+      debug:
+        msg: "{{ ansible_env }}"
 
 # Provision the cluster infrastructure
 - hosts: openstack
