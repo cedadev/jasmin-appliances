@@ -186,7 +186,7 @@
         - name: ingress-nginx
           url: https://kubernetes.github.io/ingress-nginx
         - name: gogatekepper
-          url: https://quay.io/gogatekeeper
+          url: https://gogatekeeper.github.io/helm-gogatekeeper
       loop_control:
         label: "{{ item.name }}"
 
