@@ -84,8 +84,8 @@ except ImportError:
     from collections import Iterable
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.identity.keycloak import (KeycloakAPI,
-                                                    keycloak_argument_spec)
+from ansible.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI, keycloak_argument_spec)
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.module_utils.six.moves.urllib.parse import urlencode
