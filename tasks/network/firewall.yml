@@ -10,7 +10,7 @@
 
 - name: Detect tenant CIDR
   set_fact:
-    tenant_cidr: "{{ [ansible_default_ipv4.network, ansible_default_ipv4.netmask] | join('/') | ipaddr('net') }}"
+    tenant_cidr: "{{ [ansible_default_ipv4.network, ansible_default_ipv4.netmask] | join('/') | ansible.utils.ipaddr('net') }}"
 
 # The trusted zone allows all traffic
 - name: Allow all traffic from tenant CIDR

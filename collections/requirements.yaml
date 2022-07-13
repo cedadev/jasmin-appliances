@@ -4,3 +4,4 @@ collections:
   - name: community.crypto
   - name: openstack.cloud
   - name: ansible.netcommon
+  - name: ansible.utils
