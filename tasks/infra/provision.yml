@@ -139,7 +139,6 @@
   include_role:
     name: jasmin.cluster-infra
   vars:
-    cluster_heat_tag: "{{ cluster_tag | default(omit) }}"
     cluster_groups: "{{ cluster_infra_groups | default([]) }}"
 
 - name: Remove cluster image
