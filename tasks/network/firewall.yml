@@ -1,5 +1,4 @@
 ---
-
 # Playbook to open firewall access to all hosts on the local IP subnet
 
 - name: Ensure firewalld is started
@@ -14,7 +13,7 @@
 
 # The trusted zone allows all traffic
 - name: Allow all traffic from tenant CIDR
-  firewalld:
+  ansible.posix.firewalld:
     zone: trusted
     source: "{{ tenant_cidr }}"
     state: enabled

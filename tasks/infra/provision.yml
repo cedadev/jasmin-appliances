@@ -85,7 +85,7 @@
     cluster_image: "cluster-{{ cluster_name }}"
 
 - name: Check if cluster image exists
-  os_image_facts:
+  openstack.cloud.os_image_info:
     image: "{{ cluster_image }}"
   register: image_facts
 
@@ -99,7 +99,7 @@
   block:
     - name: Get available images
       register: all_image_facts
-      os_image_facts:
+      openstack.cloud.os_image_info:
 
     - name: Find cluster base image
       set_fact:
@@ -109,7 +109,7 @@
         cluster_image_query: "[?starts_with(name, '{{ cluster_image_prefix }}')]"
 
     - name: Create volume from base image
-      os_volume:
+      openstack.cloud.volume:
         display_name: "cluster-image-{{ cluster_name }}"
         image: "{{ cluster_image_base.name }}"
         # Convert from bytes to GiB, then moderate to the minimum size
@@ -122,14 +122,8 @@
         image_name: "{{ cluster_image }}"
         disk_format: "{{ cluster_image_base.disk_format }}"
 
-    # - name: Add cluster_image tag to image
-    #   os_image:
-    #     name: "{{ cluster_image }}"
-    #     properties:
-    #       "jasmin_cluster_image": "1"
-
     - name: Remove volume
-      os_volume:
+      openstack.cloud.volume:
         display_name: "{{ cluster_image_volume.volume.name }}"
         state: absent
   when:
@@ -144,7 +138,7 @@
     cluster_groups: "{{ cluster_infra_groups | default([]) }}"
 
 - name: Remove cluster image
-  os_image:
+  openstack.cloud.image:
     name: "cluster-{{ cluster_name }}"
     state: absent
   when: cluster_state | default('present') | lower != 'present'

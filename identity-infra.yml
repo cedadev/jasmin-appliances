@@ -56,7 +56,7 @@
     # Create a rule that permits all users SSH access to the gateway hosts
     # This allows use as a jump host for accessing clusters without an IP
     - name: Permit all users to access gateway hosts
-      ipa_hbacrule:
+      community.general.identity.ipa.ipa_hbacrule:
         cn: "{{ cluster_name | lower | replace('-', '_') }}_gateway_allow_all"
         description: Allow all users to access gateway host
         state: enabled

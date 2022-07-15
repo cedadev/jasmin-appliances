@@ -72,7 +72,7 @@
   when: create_users_group | default(true)
 
 - name: Grant users group access to host group
-  ipa_hbacrule:
+  community.general.identity.ipa.ipa_hbacrule:
     cn: "{{ hbac_rule_name }}"
     description: "{{ hbac_rule_description }}"
     hostgroup:

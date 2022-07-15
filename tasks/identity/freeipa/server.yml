@@ -1,5 +1,4 @@
 ---
-
 - name: Install FreeIPA packages
   yum:
     name:
@@ -71,7 +70,7 @@
       command: kdestroy
 
 - name: Create allow all rule for admins
-  ipa_hbacrule:
+  community.general.identity.ipa.ipa_hbacrule:
     cn: allow_all_admins
     description: Allow admins to access any host from any host
     state: enabled
@@ -82,7 +81,7 @@
     ipa_pass: "{{ freeipa_admin_password }}"
 
 - name: Disable default blanket allow all rule
-  ipa_hbacrule:
+  community.general.identity.ipa.ipa_hbacrule:
     cn: allow_all
     state: disabled
     ipa_host: "{{ ansible_fqdn }}"
