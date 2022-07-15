@@ -130,6 +130,10 @@
     - cluster_state | default('present') | lower == 'present'
     - not cluster_image_exists
 
+- name: Is the tag getting here?
+  ansible.builtin.debug:
+    var: cluster_tag
+
 # If cluster_state=absent, it doesn't matter that no groups are set
 - name: Provision infrastructure
   include_role:
