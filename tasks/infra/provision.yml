@@ -135,6 +135,7 @@
   include_role:
     name: jasmin.cluster-infra
   vars:
+    cluster_tag: "{{ cluster_tag }}"
     cluster_groups: "{{ cluster_infra_groups | default([]) }}"
 
 - name: Remove cluster image
