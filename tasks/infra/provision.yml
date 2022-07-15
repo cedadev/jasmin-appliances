@@ -85,7 +85,7 @@
     cluster_image: "cluster-{{ cluster_name }}"
 
 - name: Check if cluster image exists
-  openstack.cloud.os_image_info:
+  openstack.cloud.image_info:
     image: "{{ cluster_image }}"
   register: image_facts
 
@@ -99,7 +99,7 @@
   block:
     - name: Get available images
       register: all_image_facts
-      openstack.cloud.os_image_info:
+      openstack.cloud.image_info:
 
     - name: Find cluster base image
       set_fact:
