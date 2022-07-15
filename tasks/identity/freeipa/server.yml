@@ -9,7 +9,7 @@
 
 # This is required by ipa-server-install if IPv6 is enabled in the kernel
 - name: Enable IPv6 for loopback interface
-  sysctl:
+  ansible.posix.sysctl:
     name: net.ipv6.conf.lo.disable_ipv6
     value: "0"
 
@@ -37,7 +37,7 @@
 # So set something else - it doesn't have to be a real email
 # Also set the default login shell to bash
 - name: Configure user defaults
-  ipa_config:
+  community.general.identity.ipa.ipa_config:
     ipadefaultemaildomain: jasmin.cloud
     ipadefaultloginshell: /bin/bash
     ipa_host: "{{ ansible_fqdn }}"

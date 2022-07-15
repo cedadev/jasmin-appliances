@@ -1,5 +1,4 @@
 ---
-
 - name: Set FreeIPA facts
   set_fact:
     freeipa_server: "{{ hostvars[groups.freeipa_servers | first].ansible_fqdn }}"
@@ -41,7 +40,7 @@
 - name: Disable password-based SSH authentication
   lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: '^{{ item.name }}'
+    regexp: "^{{ item.name }}"
     line: "{{ item.name }} {{ item.value }}"
   loop:
     - name: PasswordAuthentication
@@ -59,7 +58,7 @@
   when: sshd_configure_passwords is changed
 
 - name: Configure SSSD
-  ini_file:
+  community.general.files.ini_file:
     path: /etc/sssd/sssd.conf
     section: "domain/{{ freeipa_realm | lower }}"
     option: "{{ item.name }}"
