@@ -15,8 +15,8 @@ protectedResources:
   {{ gatekeeper_protected_resources | to_nice_yaml(indent=2) | indent(width=2) }}
 {%- endif %}
 
-image:
-  tag: "{{ keycloak_gatekeeper_version }}"
+#image:
+#  tag: "{{ keycloak_gatekeeper_version }}"
 
 fullnameOverride: "{{ helm_release_name }}"
 
