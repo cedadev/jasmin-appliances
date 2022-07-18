@@ -185,7 +185,7 @@
           url: https://cedadev.github.io/helm-charts
         - name: ingress-nginx
           url: https://kubernetes.github.io/ingress-nginx
-        - name: gogatekepper
+        - name: gogatekeeper
           url: https://gogatekeeper.github.io/helm-gogatekeeper
       loop_control:
         label: "{{ item.name }}"
