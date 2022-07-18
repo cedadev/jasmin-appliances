@@ -1,5 +1,4 @@
 ---
-
 - block:
     # If a fixed IP is given, get it's details
     - block:
@@ -86,29 +85,31 @@
     cluster_image: "cluster-{{ cluster_name }}"
 
 - name: Check if cluster image exists
-  os_image_facts:
+  openstack.cloud.image_info:
     image: "{{ cluster_image }}"
+  register: image_facts
 
 - name: Set cluster_image_exists fact
   set_fact:
     # We want to get a boolean out, so use a double-negation to convert
     # The Jinja bool filter does not do what we need
-    cluster_image_exists: "{{ not (not (openstack_image | default(None))) }}"
+    cluster_image_exists: "{{ not (not (image_facts.openstack_image | default(None))) }}"
 
 - name: Create cluster image
   block:
     - name: Get available images
-      os_image_facts:
+      register: all_image_facts
+      openstack.cloud.image_info:
 
     - name: Find cluster base image
       set_fact:
         # to/from_json required - see https://github.com/ansible/ansible/issues/27299#issuecomment-331068246
-        cluster_image_base: "{{ openstack_image | to_json | from_json | json_query(cluster_image_query) | first }}"
+        cluster_image_base: "{{ all_image_facts.openstack_image | to_json | from_json | json_query(cluster_image_query) | first }}"
       vars:
         cluster_image_query: "[?starts_with(name, '{{ cluster_image_prefix }}')]"
 
     - name: Create volume from base image
-      os_volume:
+      openstack.cloud.volume:
         display_name: "cluster-image-{{ cluster_name }}"
         image: "{{ cluster_image_base.name }}"
         # Convert from bytes to GiB, then moderate to the minimum size
@@ -121,15 +122,9 @@
         image_name: "{{ cluster_image }}"
         disk_format: "{{ cluster_image_base.disk_format }}"
 
-    - name: Add cluster_image tag to image
-      os_image:
-        name: "{{ cluster_image }}"
-        properties:
-          "jasmin_cluster_image": "1"
-
     - name: Remove volume
-      os_volume:
-        display_name: "{{ cluster_image_volume.volume.display_name }}"
+      openstack.cloud.volume:
+        display_name: "{{ cluster_image_volume.volume.name }}"
         state: absent
   when:
     - cluster_state | default('present') | lower == 'present'
@@ -143,7 +138,7 @@
     cluster_groups: "{{ cluster_infra_groups | default([]) }}"
 
 - name: Remove cluster image
-  os_image:
+  openstack.cloud.image:
     name: "cluster-{{ cluster_name }}"
     state: absent
   when: cluster_state | default('present') | lower != 'present'
