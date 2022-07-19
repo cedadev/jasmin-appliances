@@ -1,5 +1,4 @@
 ---
-
 # Tasks to create FreeIPA groups and rules for a cluster
 
 - name: Sanitise cluster name for use in groups
@@ -17,7 +16,7 @@
 
 # Before updating the host group for the cluster, store the current hosts
 - name: Get previous hosts in host group
-  ipa_hostgroup:
+  community.general.identity.ipa.ipa_hostgroup:
     cn: "{{ host_group_name }}"
     ipa_host: "{{ ansible_fqdn }}"
     ipa_pass: "{{ freeipa_admin_password }}"
@@ -41,7 +40,7 @@
 
 # Remove any hosts that no longer exist from FreeIPA
 - name: Remove non-existent hosts
-  ipa_host:
+  community.general.identity.ipa.ipa_host:
     fqdn: "{{ host_fqdn }}"
     state: absent
     ipa_host: "{{ ansible_fqdn }}"
@@ -51,7 +50,7 @@
     loop_var: host_fqdn
 
 - name: Create/update host group
-  ipa_hostgroup:
+  community.general.identity.ipa.ipa_hostgroup:
     cn: "{{ host_group_name }}"
     description: "{{ host_group_description }}"
     # Map a list of inventory hostnames for the cluster hosts to their FQDNs
@@ -62,7 +61,7 @@
     ipa_pass: "{{ freeipa_admin_password }}"
 
 - name: Create users group
-  ipa_group:
+  community.general.identity.ipa.ipa_group:
     cn: "{{ user_group_name }}"
     description: "{{ user_group_description }}"
     # If deleting the cluster, also delete the group
@@ -72,7 +71,7 @@
   when: create_users_group | default(true)
 
 - name: Grant users group access to host group
-  ipa_hbacrule:
+  community.general.identity.ipa.ipa_hbacrule:
     cn: "{{ hbac_rule_name }}"
     description: "{{ hbac_rule_description }}"
     hostgroup:
@@ -87,4 +86,3 @@
   when:
     - create_users_group | default(true)
     - permit_user_ssh | default(false)
-

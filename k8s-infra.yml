@@ -90,6 +90,21 @@
         rke_node_roles: [worker]
       when: inventory_hostname in groups.rke_workers
 
+    - name: Set ssh location fact
+      set_fact:
+        rke_key_private_key_loc: "{{ lookup('env', 'HOME') }}"
+
+
+    - name: Create rke private key
+      community.crypto.openssh_keypair:
+        path: "{{ rke_key_private_key_loc }}/id_ssh_rsa"
+        type: rsa
+        size: 2048
+
+    - name: Register private key
+      command: "cat {{ rke_key_private_key_loc }}/id_ssh_rsa"
+      register: key
+
     # Fix required for now - enable IP masquerading in firewalld for the tenancy network
     # https://github.com/rancher/rancher/issues/28840#issuecomment-756714369
     - name: Enable IP masquerading
@@ -111,7 +126,7 @@
         rke_ingress_config: { provider: none }
         # Use the centos user with the cluster SSH key
         rke_ssh_user: centos
-        rke_ssh_private_key: "{{ lookup('file', ansible_ssh_private_key_file) }}"
+        rke_ssh_private_key: "{{ key }}" #"{{ lookup('file', 'rke_key_private_key_loc') }}"
         rke_cloud_provider: openstack
         # Configure the API server to authenticate using Keycloak
         rke_extra_config:
@@ -287,7 +302,6 @@
         fact_name: kubernetes_dashboard_proxy_encryption_key
         # 16 bytes is important - this is a 128-bit AES-256 key
         random_fact_bytes: 16
-
     - name: Install dashboard authenticating proxy
       include_role:
         name: jasmin.helm
