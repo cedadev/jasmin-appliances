@@ -1,5 +1,4 @@
 ---
-
 # These tasks install and configure Keycloak
 
 - name: Create keycloak user
@@ -88,7 +87,7 @@
   vars:
     # local-name allows us to avoid binding namespaces
     xpath_parts:
-      - '*[local-name() = "subsystem" and namespace-uri() = "urn:jboss:domain:undertow:8.0"]'
+      - '*[local-name() = "subsystem" and namespace-uri() = "urn:jboss:domain:undertow:12.0"]'
       - '*[local-name() = "server"]'
       - '*[local-name() = "http-listener"]'
 
