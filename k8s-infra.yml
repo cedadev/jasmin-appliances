@@ -93,7 +93,7 @@
     # Fix required for now - enable IP masquerading in firewalld for the tenancy network
     # https://github.com/rancher/rancher/issues/28840#issuecomment-756714369
     - name: Enable IP masquerading
-      firewalld:
+      ansible.posix.firewalld:
         masquerade: "yes"
         zone: "{{ item }}"
         state: enabled
@@ -149,7 +149,7 @@
     # The CIDRs from the last time we ran will be in ansible_local
     # Compare them to the current CIDRs and adjust as necessary
     - name: Open Kubernetes API for given CIDRs
-      firewalld:
+      ansible.posix.firewalld:
         rich_rule: >-
           rule family="ipv4"
           source address="{{ item }}"
@@ -202,7 +202,7 @@
 
     # Open ports 80 and 443 for the ingress controller
     - name: Open HTTP(S) ports for ingress controller
-      firewalld:
+      ansible.posix.firewalld:
         service: "{{ item }}"
         permanent: true
         immediate: true
