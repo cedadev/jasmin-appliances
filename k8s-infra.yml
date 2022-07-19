@@ -111,7 +111,7 @@
         rke_ingress_config: { provider: none }
         # Use the centos user with the cluster SSH key
         rke_ssh_user: centos
-        rke_ssh_private_key: "{{ lookup('ansible.builtin.env', 'SSH_PRIVATE_KEY_FILE') }}"
+        rke_ssh_private_key_file: "{{ lookup('ansible.builtin.env', 'SSH_PRIVATE_KEY_FILE') }}"
         rke_cloud_provider: openstack
         # Configure the API server to authenticate using Keycloak
         rke_extra_config:
