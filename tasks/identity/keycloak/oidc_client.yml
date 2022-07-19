@@ -1,10 +1,9 @@
 ---
-
 # These tasks register a client application with Keycloak
 # The client secret is returned by setting the keycloak_client_secret fact
 
 - name: Register client application with Keycloak
-  keycloak_client:
+  community.general.keycloak_client:
     realm: master
     client_id: "{{ keycloak_client_id }}"
     name: "{{ keycloak_client_name }}"
