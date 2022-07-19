@@ -3,7 +3,7 @@
 # The client secret is returned by setting the keycloak_client_secret fact
 
 - name: Register client application with Keycloak
-  community.general.keycloak_client:
+  community.general.identity.keycloak.keycloak_client:
     realm: master
     client_id: "{{ keycloak_client_id }}"
     name: "{{ keycloak_client_name }}"
