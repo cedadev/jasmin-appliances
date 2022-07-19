@@ -94,6 +94,12 @@
       set_fact:
         rke_key_private_key_loc: "{{ lookup('env', 'HOME') }}/.ssh/rke_private_key"
 
+    - name: Ensure SSH directory exists
+      file:
+        path: "{{ lookup('env', 'HOME') }}/.ssh "
+        state: directory
+        mode: 0700
+
     - name: Create rke private key
       community.crypto.openssh_keypair:
         path: "{{ rke_key_private_key_loc }}"
