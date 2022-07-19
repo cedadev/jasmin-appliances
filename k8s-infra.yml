@@ -90,6 +90,10 @@
         rke_node_roles: [worker]
       when: inventory_hostname in groups.rke_workers
 
+    - name: Set SSH private key path fact
+      ansible.builtin.set_fact:
+        ssk_private_key_file: "{{ lookup('ansible.builtin.env', 'SSH_PRIVATE_KEY_FILE') }}"
+
     # Fix required for now - enable IP masquerading in firewalld for the tenancy network
     # https://github.com/rancher/rancher/issues/28840#issuecomment-756714369
     - name: Enable IP masquerading
@@ -111,7 +115,7 @@
         rke_ingress_config: { provider: none }
         # Use the centos user with the cluster SSH key
         rke_ssh_user: centos
-        rke_ssh_private_key_file: "{{ lookup('ansible.builtin.env', 'SSH_PRIVATE_KEY_FILE') }}"
+        rke_ssh_private_key: "{{ lookup('ansible.builtin.file', 'ssh_private_key_file') }}"
         rke_cloud_provider: openstack
         # Configure the API server to authenticate using Keycloak
         rke_extra_config:
