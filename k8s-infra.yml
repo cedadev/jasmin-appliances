@@ -92,12 +92,12 @@
 
     - name: Set ssh location fact
       set_fact:
-        rke_key_private_key_loc: "{{ lookup('env', 'HOME') }}/id_ssh_rsa"
+        rke_key_private_key_loc: "{{ lookup('env', 'HOME') }}"
 
 
     - name: Create rke private key
       community.crypto.openssh_keypair:
-        path: "{{ rke_key_private_key_loc }}"
+        path: "{{ rke_key_private_key_loc }}/id_ssh_rsa"
         type: rsa
         size: 2048
 
