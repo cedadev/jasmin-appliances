@@ -92,7 +92,7 @@
 
     - name: Set ssh location fact
       set_fact:
-        rke_key_private_key_loc: "{{ lookup('env', 'HOME') }}/rke_private_key"
+        rke_key_private_key_loc: "{{ lookup('env', 'HOME') }}/id_ssh_rsa"
 
 
     - name: Create rke private key
