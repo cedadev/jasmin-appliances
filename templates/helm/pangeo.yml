@@ -23,7 +23,7 @@ jupyterhub:
     db:
       type: sqlite-pvc
       pvc:
-        storageClassName: standard
+        storageClassName: default
     services:
       dask-gateway:
         apiToken: "{{ ansible_local.pangeo_dask_gateway_api_token }}"
