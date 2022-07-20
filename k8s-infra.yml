@@ -219,28 +219,28 @@
         cert_manager_current_version: "{{ cert_manager_current_version_cmd.stdout }}"
 
     # First step is to upgrade cert-manager to 0.14 where changes happened
-    - name: Upgrade cert-manager to v0.14
+    - name: Upgrade cert-manager to v1.8
       block:
-        - name: Install cert-manager CRDs for v0.14
-          command: kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v0.14.3/cert-manager.crds.yaml
+        - name: Install cert-manager CRDs for v1.8
+          command: kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.crds.yaml
 
         - name: Remove cert-manager deployment before upgrade
           command: kubectl delete -n cert-manager deployment cert-manager cert-manager-cainjector cert-manager-webhook
 
-        - name: Install cert-manager v0.14
+        - name: Install cert-manager v1.8
           include_role:
             name: jasmin.helm
             tasks_from: chart.yml
           vars:
             helm_release_name: cert-manager
             helm_release_chart: jetstack/cert-manager
-            helm_release_version: v0.14.3
+            helm_release_version: v1.8.2
             helm_release_namespace: cert-manager
             helm_release_values_template: templates/helm/cert-manager.yml
 
         - name: Update cert-manager current version fact
           set_fact:
-            cert_manager_current_version: v0.14.3
+            cert_manager_current_version: v1.8.2
       when:
         - "cert_manager_current_version is match('v\\d+\\.\\d+\\.\\d+')"
         - "cert_manager_current_version is version('v0.14', '<')"
