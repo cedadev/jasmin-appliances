@@ -279,7 +279,7 @@
         EOF
 
     - name: Install Kubernetes dashboard
-      command: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+      command: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.0/aio/deploy/recommended.yaml
 
     - name: Create Kubernetes dashboard proxy encryption key
       include_tasks: tasks/util/persistent_random_fact.yml
