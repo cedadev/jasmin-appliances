@@ -9,7 +9,7 @@
       yum:
         name:
           - gcc
-          - python2-devel
+          - python3-devel
         state: latest
 
     - name: Ensure Python dependencies are installed
