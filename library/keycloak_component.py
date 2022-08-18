@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
@@ -74,18 +75,19 @@ extends_documentation_fragment: keycloak
 
 import json
 import traceback
+
 try:
     from collections.abc import Iterable
 except ImportError:
     from collections import Iterable
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import open_url
-from ansible.module_utils.six.moves.urllib.parse import urlencode
-from ansible.module_utils.six.moves.urllib.error import HTTPError
+from ansible.module_utils.keycloak import (KeycloakAPI, get_token,
+                                           keycloak_argument_spec)
 from ansible.module_utils.six import string_types
-from ansible.module_utils.keycloak import KeycloakAPI, keycloak_argument_spec
-
+from ansible.module_utils.six.moves.urllib.error import HTTPError
+from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible.module_utils.urls import open_url
 
 URL_COMPONENTS = "{url}/admin/realms/{realm}/components"
 URL_COMPONENT = URL_COMPONENTS + "/{id}"
@@ -196,7 +198,7 @@ def main():
     module = AnsibleModule(argument_spec = argument_spec, supports_check_mode = True)
 
     # Reuse existing code to authenticate with Keycloak
-    api = KeycloakAPI(module)
+    api = KeycloakAPI(module, get_token(module.params))
 
     realm = module.params['realm']
 
