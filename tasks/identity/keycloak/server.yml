@@ -42,6 +42,8 @@
     state: link
 
 - name: Create Keycloak local admin user
+  vars:
+    extra_path: /usr/lib/jvm/java-11/
   command: >
     /opt/keycloak/latest/bin/add-user-keycloak.sh
       -r master
@@ -88,7 +90,7 @@
   vars:
     # local-name allows us to avoid binding namespaces
     xpath_parts:
-      - '*[local-name() = "subsystem" and namespace-uri() = "urn:jboss:domain:undertow:8.0"]'
+      - '*[local-name() = "subsystem" and namespace-uri() = "urn:jboss:domain:undertow:12.0"]'
       - '*[local-name() = "server"]'
       - '*[local-name() = "http-listener"]'
 
