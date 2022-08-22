@@ -13,6 +13,9 @@
     name: java-11-openjdk
     state: latest
 
+- name: Export java home
+  command: "export JAVA_HOME=/usr/lib/jvm/java-11/"
+
 - name: Ensure Keycloak install directory exists
   file:
     path: /opt/keycloak/{{ keycloak_version }}
@@ -42,8 +45,6 @@
     state: link
 
 - name: Create Keycloak local admin user
-  vars:
-    extra_path: /usr/lib/jvm/java-11/
   command: >
     /opt/keycloak/latest/bin/add-user-keycloak.sh
       -r master
