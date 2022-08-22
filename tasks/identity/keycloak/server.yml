@@ -13,6 +13,10 @@
     name: java-11-openjdk
     state: latest
 
+- name: Get java-11 home dir
+  shell: ls -d /usr/lib/jvm/java-11-openjdk-11*
+  register: java_home
+
 # I don't think this works
 # - name: Export java home
 #   command: "export JAVA_HOME=/usr/lib/jvm/java-11/"
@@ -69,7 +73,7 @@
       [Service]
       Environment=LAUNCH_JBOSS_IN_BACKGROUND=1
       Environment=LOG4J_FORMAT_MSG_NO_LOOKUPS=true
-      Environment=JAVA_HOME=/usr/lib/jvm/java-11
+      Environment=JAVA_HOME="{{ java_home }}"
       User=keycloak
       LimitNOFILE=102642
       ExecStart=/opt/keycloak/latest/bin/standalone.sh -b 0.0.0.0
