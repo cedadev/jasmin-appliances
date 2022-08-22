@@ -4,6 +4,8 @@
 # We assume that the host has already been joined to the FreeIPA realm
 
 - name: Enable LDAP user federation
+  vars:
+    extra_path: /usr/lib/jvm/java-11/
   keycloak_component:
     name: ldap
     provider_type: org.keycloak.storage.UserStorageProvider
@@ -33,6 +35,8 @@
   register: keycloak_ldap
 
 - name: Modify LDAP first name mapper to use givenName
+  vars:
+    extra_path: /usr/lib/jvm/java-11/
   keycloak_component:
     name: "first name"
     provider_type: org.keycloak.storage.ldap.mappers.LDAPStorageMapper
@@ -47,6 +51,8 @@
     auth_password: "{{ keycloak_admin_password }}"
 
 - name: Add LDAP groups mapper
+  vars:
+    extra_path: /usr/lib/jvm/java-11/
   keycloak_component:
     name: groups
     provider_type: org.keycloak.storage.ldap.mappers.LDAPStorageMapper
@@ -76,6 +82,8 @@
   register: keycloak_ldap_groups
 
 - name: Synchronise LDAP groups
+  vars:
+    extra_path: /usr/lib/jvm/java-11/
   command: >
     /opt/keycloak/latest/bin/kcadm.sh create
       user-storage/{{ keycloak_ldap.component.id }}/mappers/{{ keycloak_ldap_groups.component.id }}/sync?direction=fedToKeycloak
@@ -86,6 +94,8 @@
       --password {{ keycloak_admin_password | quote }}
 
 - name: Get GID for admins group in Keycloak
+  vars:
+    extra_path: /usr/lib/jvm/java-11/
   keycloak_group:
     name: admins
     state: present
@@ -96,6 +106,8 @@
   register: keycloak_admins_group
 
 - name: Grant FreeIPA admins group admin access in Keycloak
+  vars:
+    extra_path: /usr/lib/jvm/java-11/
   command: >
     /opt/keycloak/latest/bin/kcadm.sh add-roles
       --gid {{ keycloak_admins_group.group.id }}
