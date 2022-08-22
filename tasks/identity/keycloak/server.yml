@@ -74,7 +74,7 @@
       [Service]
       Environment=LAUNCH_JBOSS_IN_BACKGROUND=1
       Environment=LOG4J_FORMAT_MSG_NO_LOOKUPS=true
-      Environment=JAVA_HOME="{{ java_home.stdout }}"
+      Environment=JAVA_HOME={{ java_home.stdout }}
       User=keycloak
       LimitNOFILE=102642
       ExecStart=/opt/keycloak/latest/bin/standalone.sh -b 0.0.0.0
