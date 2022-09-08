@@ -5,7 +5,7 @@ roles:
     version: vio7
   - name: jasmin.rke
     src: https://github.com/cedadev/rke-ansible
-    version: azimuth-old-ansible-alex
+    version: 019cf761a1234d0bfe35fd34928161d2ec6fa8f1
   - name: jasmin.helm
     src: https://github.com/cedadev/helm-ansible
     version: b7884d4a69e023ee570a551622c17bc41ca11389
