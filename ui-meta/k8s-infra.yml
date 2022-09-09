@@ -3,7 +3,6 @@ label: "Kubernetes"
 description: >
   Single-master Kubernetes cluster using Rancher Kubernetes Engine (RKE).
 logo: https://user-images.githubusercontent.com/13452123/59425960-e5d17680-8dce-11e9-86c4-ffe3cbff6701.png
-
 parameters:
   - name: "identity_stack_name"
     label: "Identity manager"
@@ -19,8 +18,8 @@ parameters:
     description: "The Kubernetes version to use."
     kind: "choice"
     options:
-      choices: ["1.20", "1.21", "1.22"]
-    default: "1.22"
+      choices: ["1.20"]
+    default: "1.20"
 
   - name: "cluster_num_workers"
     label: "Worker nodes"
