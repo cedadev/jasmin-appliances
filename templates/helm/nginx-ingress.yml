@@ -1,5 +1,4 @@
 ---
-
 serviceAccount:
   create: true
 
@@ -31,3 +30,7 @@ controller:
   # Make sure to use the RollingUpdate update strategy
   updateStrategy:
     type: RollingUpdate
+
+  # This ingress will be the default ingress for the cluster.
+  ingressClassResource:
+    default: true
