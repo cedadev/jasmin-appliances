@@ -31,3 +31,5 @@ controller:
   # Make sure to use the RollingUpdate update strategy
   updateStrategy:
     type: RollingUpdate
+  ingressClassResource:
+    default: true
