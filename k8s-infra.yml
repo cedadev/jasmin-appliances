@@ -313,7 +313,7 @@
   tasks:
   - name: Create/update cloud provider config
     template:
-      src: external-cloud-provision/openstack_cloud_provider.conf
+      src: external-cloud-provision/cloud.conf
       dest: "/etc/kubernetes/cloud.conf"
       mode: u=rw,g=r,o=
     register: provider_config
