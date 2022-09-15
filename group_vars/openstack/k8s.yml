@@ -33,3 +33,5 @@ k8s_groups_fixed_ip:
 k8s_groups_no_ip:
   - "{{ k8s_group_masters }}"
   - "{{ k8s_group_workers }}"
+
+openstack_auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
