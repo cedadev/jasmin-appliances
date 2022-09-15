@@ -321,23 +321,13 @@
       register: ccm_conf
 
     - name: Install cloud provider openstack helm repo
-      kubernetes.core.helm_repository:
-        name: cpo
-        repo_url: https://kubernetes.github.io/cloud-provider-openstack
+      command: helm repo install cpo https://kubernetes.github.io/cloud-provider-openstack
 
     - name: Install OCCM
-      kubernetes.core.helm: 
-        name: openstack-ccm 
-        chart_ref: cpo/openstack-cloud-controller-manager
-        release_namespace: kube-system 
-        values_files: 
-          - "{{ rke_config_dir }}/openstack-ccm.yml"
+      command: helm upgrade --install openstack-ccm  cpo/openstack-cloud-controller-manager --namespace kube-system --values"{{ rke_config_dir }}/openstack-ccm.yml"
       
     - name: Install cinder-csi-plugin
-      kubernetes.core.helm: 
-        name: cinder-csi
-        chart_ref: cpo/openstack-cinder-csi
-        release_namespace: kube-system 
+      command: helm upgrade --install cinder-csi cpo/openstack-cinder-csi --namespace kube-system 
 
 # # Install Openstack cloud controller manager and Cinder CSI provisioner
 # - hosts: rke_hosts
