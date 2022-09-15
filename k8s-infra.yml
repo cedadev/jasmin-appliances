@@ -306,3 +306,46 @@
         gatekeeper_encryption_key: "{{ ansible_local.kubernetes_dashboard_proxy_encryption_key }}"
         gatekeeper_domain: "{{ kubernetes_dashboard_domain }}"
         gatekeeper_allowed_cidrs: "{{ admin_allowed_cidrs }}"
+
+# Install Openstack cloud controller manager and Cinder CSI provisioner
+- hosts: rke_hosts
+  become: true 
+  tasks:
+  - name: Create/update cloud provider config
+    template:
+      src: external-cloud-provision/openstack_cloud_provider.conf
+      dest: "/etc/kubernetes/cloud.conf"
+      mode: u=rw,g=r,o=
+    register: provider_config
+
+- hosts: rke_masters
+  become: true 
+  tasks:
+  - name: Create/update OCCM provider config
+    template:
+      src: openstack-ccm.yml
+      dest: "{{ rke_config_dir }}/openstack-ccm.yml"
+      mode: u=rw,g=r,o=
+    register: ccm_conf
+    
+  - name: Install cloud provider openstack helm repo
+    kubernetes.core.helm_repository:
+      name: cpo
+      repo_url: https://kubernetes.github.io/cloud-provider-openstack
+
+  - name: Install OCCM
+    kubernetes.core.helm: 
+      name: openstack-ccm 
+      chart_ref: cpo/openstack-cloud-controller-manager
+      release_namespace: kube-system 
+      values_files: 
+        - {{ rke_config_dir }}/openstack-ccm.yml
+    
+  - name: Install cinder-csi-plugin
+    kubernetes.core.helm: 
+      name: cinder-csi
+      chart_ref: cpo/openstack-cinder-csi
+      release_namespace: kube-system 
+
+
+
