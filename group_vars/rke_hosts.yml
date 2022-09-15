@@ -4,3 +4,5 @@ cert_manager_version: v1.9.1
 
 
 keycloak_gatekeeper_version: "1.5.0"
+
+openstack_auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
