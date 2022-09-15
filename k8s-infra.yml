@@ -43,6 +43,12 @@
     - include_tasks: tasks/kubernetes/upgrade_os_packages.yml
     # Before installing Kubernetes, enroll as a FreeIPA client
     - include_tasks: tasks/identity/freeipa/client.yml
+    - name: Create/update cloud provider config
+      template:
+        src: templates/external-cloud-provision/cloud.conf
+        dest: "/etc/kubernetes/cloud.conf"
+        mode: u=rw,g=r,o=
+      register: provider_config
 
 # Set the permissions for the cluster in FreeIPA
 - hosts: freeipa_servers
@@ -307,45 +313,71 @@
         gatekeeper_domain: "{{ kubernetes_dashboard_domain }}"
         gatekeeper_allowed_cidrs: "{{ admin_allowed_cidrs }}"
 
-# Install Openstack cloud controller manager and Cinder CSI provisioner
-- hosts: rke_hosts
-  become: true 
-  tasks:
-  - name: Create/update cloud provider config
-    template:
-      src: templates/external-cloud-provision/cloud.conf
-      dest: "/etc/kubernetes/cloud.conf"
-      mode: u=rw,g=r,o=
-    register: provider_config
+    - name: Create/update OCCM provider config
+      template:
+        src: templates/external-cloud-provision/openstack-ccm.yml
+        dest: "{{ rke_config_dir }}/openstack-ccm.yml"
+        mode: u=rw,g=r,o=
+      register: ccm_conf
 
-- hosts: rke_masters
-  become: true 
-  tasks:
-  - name: Create/update OCCM provider config
-    template:
-      src: templates/external-cloud-provision/openstack-ccm.yml
-      dest: "{{ rke_config_dir }}/openstack-ccm.yml"
-      mode: u=rw,g=r,o=
-    register: ccm_conf
+    - name: Install cloud provider openstack helm repo
+      kubernetes.core.helm_repository:
+        name: cpo
+        repo_url: https://kubernetes.github.io/cloud-provider-openstack
 
-  - name: Install cloud provider openstack helm repo
-    kubernetes.core.helm_repository:
-      name: cpo
-      repo_url: https://kubernetes.github.io/cloud-provider-openstack
+    - name: Install OCCM
+      kubernetes.core.helm: 
+        name: openstack-ccm 
+        chart_ref: cpo/openstack-cloud-controller-manager
+        release_namespace: kube-system 
+        values_files: 
+          - "{{ rke_config_dir }}/openstack-ccm.yml"
+      
+    - name: Install cinder-csi-plugin
+      kubernetes.core.helm: 
+        name: cinder-csi
+        chart_ref: cpo/openstack-cinder-csi
+        release_namespace: kube-system 
 
-  - name: Install OCCM
-    kubernetes.core.helm: 
-      name: openstack-ccm 
-      chart_ref: cpo/openstack-cloud-controller-manager
-      release_namespace: kube-system 
-      values_files: 
-        - "{{ rke_config_dir }}/openstack-ccm.yml"
+# # Install Openstack cloud controller manager and Cinder CSI provisioner
+# - hosts: rke_hosts
+#   become: true 
+#   tasks:
+#   - name: Create/update cloud provider config
+#     template:
+#       src: templates/external-cloud-provision/cloud.conf
+#       dest: "/etc/kubernetes/cloud.conf"
+#       mode: u=rw,g=r,o=
+#     register: provider_config
+
+# - hosts: rke_hosts
+#   become: true 
+#   tasks:
+#   - name: Create/update OCCM provider config
+#     template:
+#       src: templates/external-cloud-provision/openstack-ccm.yml
+#       dest: "{{ rke_config_dir }}/openstack-ccm.yml"
+#       mode: u=rw,g=r,o=
+#     register: ccm_conf
+
+#   - name: Install cloud provider openstack helm repo
+#     kubernetes.core.helm_repository:
+#       name: cpo
+#       repo_url: https://kubernetes.github.io/cloud-provider-openstack
+
+#   - name: Install OCCM
+#     kubernetes.core.helm: 
+#       name: openstack-ccm 
+#       chart_ref: cpo/openstack-cloud-controller-manager
+#       release_namespace: kube-system 
+#       values_files: 
+#         - "{{ rke_config_dir }}/openstack-ccm.yml"
     
-  - name: Install cinder-csi-plugin
-    kubernetes.core.helm: 
-      name: cinder-csi
-      chart_ref: cpo/openstack-cinder-csi
-      release_namespace: kube-system 
+#   - name: Install cinder-csi-plugin
+#     kubernetes.core.helm: 
+#       name: cinder-csi
+#       chart_ref: cpo/openstack-cinder-csi
+#       release_namespace: kube-system 
 
 
 
