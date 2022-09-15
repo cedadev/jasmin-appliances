@@ -143,7 +143,7 @@
               kind: Group
               name: oidc:{{ hostvars[groups.freeipa_servers | first].user_group_name }}
 
-- hosts: rke_nodes
+- hosts: rke_hosts
   become: true 
   tasks:
     - name: Create/update cloud provider config
