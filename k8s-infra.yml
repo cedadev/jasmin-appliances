@@ -313,7 +313,7 @@
   tasks:
   - name: Create/update cloud provider config
     template:
-      src: external-cloud-provision/cloud.conf
+      src: templates/external-cloud-provision/cloud.conf
       dest: "/etc/kubernetes/cloud.conf"
       mode: u=rw,g=r,o=
     register: provider_config
@@ -323,7 +323,7 @@
   tasks:
   - name: Create/update OCCM provider config
     template:
-      src: openstack-ccm.yml
+      src: templates/external-cloud-provision/openstack-ccm.yml
       dest: "{{ rke_config_dir }}/openstack-ccm.yml"
       mode: u=rw,g=r,o=
     register: ccm_conf
