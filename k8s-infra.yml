@@ -327,7 +327,7 @@
       dest: "{{ rke_config_dir }}/openstack-ccm.yml"
       mode: u=rw,g=r,o=
     register: ccm_conf
-    
+
   - name: Install cloud provider openstack helm repo
     kubernetes.core.helm_repository:
       name: cpo
@@ -339,7 +339,7 @@
       chart_ref: cpo/openstack-cloud-controller-manager
       release_namespace: kube-system 
       values_files: 
-        - {{ rke_config_dir }}/openstack-ccm.yml
+        - "{{ rke_config_dir }}/openstack-ccm.yml"
     
   - name: Install cinder-csi-plugin
     kubernetes.core.helm: 
