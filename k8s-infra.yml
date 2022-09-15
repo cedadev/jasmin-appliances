@@ -142,12 +142,16 @@
             - apiGroup: rbac.authorization.k8s.io
               kind: Group
               name: oidc:{{ hostvars[groups.freeipa_servers | first].user_group_name }}
-  - name: Create/update cloud provider config
-    template:
-      src: templates/external-cloud-provision/cloud.conf
-      dest: "/etc/kubernetes/cloud.conf"
-      mode: u=rw,g=r,o=
-    register: provider_config
+
+- hosts: rke_nodes
+  become: true 
+  tasks:
+    - name: Create/update cloud provider config
+      template:
+        src: templates/external-cloud-provision/cloud.conf
+        dest: "/etc/kubernetes/cloud.conf"
+        mode: u=rw,g=r,o=
+      register: provider_config
 
 - hosts: rke_masters
   become: true
