@@ -365,7 +365,11 @@
       vars: 
         helm_release_name: nfs-subdir-external-provisioner
         helm_release_chart: nfs-subdir-external-provisioner/nfs-subdir-external-provisioner
-        helm_release_extra_args: --set nfs.server="{{ hostvars[groups.nfs_servers | first].ansible_fqdn }}" --set nfs.path=/srv
+        helm_release_extra_args: 
+          - --set 
+          - nfs.server="{{ hostvars[groups.nfs_servers | first].ansible_fqdn }}" 
+          - --set 
+          - nfs.path=/srv
 
 # # Install Openstack cloud controller manager and Cinder CSI provisioner
 # - hosts: rke_hosts
