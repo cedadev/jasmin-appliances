@@ -17,6 +17,13 @@
         cluster_stack_update: false
         cluster_gw_group: "{{ identity_gw_group_name }}"
 
+    # Add the storage stack to the cluster
+    - include_role:
+        name: jasmin.cluster-infra
+      vars:
+        cluster_name: "{{ storage_name }}"
+        cluster_stack_update: false
+
     # Provision the Kubernetes infrastructure
     - import_tasks: tasks/infra/provision.yml
       vars:
