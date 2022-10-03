@@ -13,6 +13,17 @@ parameters:
       tag: identity
     immutable: true
 
+  - name: "storage_name"
+    label: "Shared storage"
+    description: |
+      The storage cluster to use for shared storage.
+
+      This storage is mounted at `/home/users`, and is used for user home directories.
+    kind: "cloud.cluster"
+    options:
+      tag: storage
+    immutable: true
+    
   - name: "kubernetes_version"
     label: "Version"
     description: "The Kubernetes version to use."
