@@ -80,6 +80,10 @@
   become: true
   any_errors_fatal: true
   pre_tasks:
+    # Mount the storage
+    - name: Mount shared storage
+      include_tasks: tasks/storage/client.yml
+
     - name: Set RKE node roles (masters)
       set_fact:
         rke_node_roles: [etcd, controlplane]
@@ -197,6 +201,8 @@
           url: https://kubernetes.github.io/ingress-nginx
         - name: cpo
           url: https://kubernetes.github.io/cloud-provider-openstack
+        - name: nfs-subdir-external-provisioner
+          url: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
       loop_control:
         label: "{{ item.name }}"
 
@@ -326,25 +332,33 @@
     #     mode: u=rw,g=r,o=
     #   register: ccm_conf
 
-    - name: Install Openstack CCM 
-      include_role:
-        name: jasmin.helm
-        tasks_from: chart.yml
-      vars:
-        helm_release_name: openstack-ccm 
-        helm_release_chart: cpo/openstack-cloud-controller-manager
-        helm_release_namespace: kube-system
-        helm_release_values_template: templates/external-cloud-provision/openstack-ccm.yml
+    # - name: Install Openstack CCM 
+    #   include_role:
+    #     name: jasmin.helm
+    #     tasks_from: chart.yml
+    #   vars:
+    #     helm_release_name: openstack-ccm 
+    #     helm_release_chart: cpo/openstack-cloud-controller-manager
+    #     helm_release_namespace: kube-system
+    #     helm_release_values_template: templates/external-cloud-provision/openstack-ccm.yml
 
-    - name: Install Cinder CSI Plugin
+    # - name: Install Cinder CSI Plugin
+    #   include_role:
+    #     name: jasmin.helm
+    #     tasks_from: chart.yml
+    #   vars:
+    #     helm_release_name: cinder-csi
+    #     helm_release_chart: cpo/openstack-cinder-csi
+    #     helm_release_namespace: kube-system
+
+    - name: Install NFS external storage provider
       include_role:
         name: jasmin.helm
         tasks_from: chart.yml
-      vars:
-        helm_release_name: cinder-csi
-        helm_release_chart: cpo/openstack-cinder-csi
-        helm_release_namespace: kube-system
-      
+      vars: 
+        helm_release_name: nfs-subdir-external-provisioner
+        helm_release_chart: nfs-subdir-external-provisioner/nfs-subdir-external-provisioner
+        helm_release_extra_args: --set nfs.server="{{ hostvars[groups.nfs_servers | first].ansible_fqdn }}" --set nfs.path=/srv
 
 # # Install Openstack cloud controller manager and Cinder CSI provisioner
 # - hosts: rke_hosts
@@ -385,6 +399,8 @@
 #       name: cinder-csi
 #       chart_ref: cpo/openstack-cinder-csi
 #       release_namespace: kube-system 
+
+
 
 
 
