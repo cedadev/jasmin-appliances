@@ -326,15 +326,15 @@
     #     mode: u=rw,g=r,o=
     #   register: ccm_conf
 
-    - name: Install Openstack CCM 
-      include_role:
-        name: jasmin.helm
-        tasks_from: chart.yml
-      vars:
-        helm_release_name: openstack-ccm 
-        helm_release_chart: cpo/openstack-cloud-controller-manager
-        helm_release_namespace: kube-system
-        helm_release_values_template: templates/external-cloud-provision/openstack-ccm.yml
+    # - name: Install Openstack CCM 
+    #   include_role:
+    #     name: jasmin.helm
+    #     tasks_from: chart.yml
+    #   vars:
+    #     helm_release_name: openstack-ccm 
+    #     helm_release_chart: cpo/openstack-cloud-controller-manager
+    #     helm_release_namespace: kube-system
+    #     helm_release_values_template: templates/external-cloud-provision/openstack-ccm.yml
 
     - name: Install Cinder CSI Plugin
       include_role:
