@@ -33,3 +33,4 @@ k8s_groups_fixed_ip:
 k8s_groups_no_ip:
   - "{{ k8s_group_masters }}"
   - "{{ k8s_group_workers }}"
+

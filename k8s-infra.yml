@@ -143,6 +143,16 @@
               kind: Group
               name: oidc:{{ hostvars[groups.freeipa_servers | first].user_group_name }}
 
+- hosts: rke_hosts
+  become: true 
+  tasks:
+    - name: Create/update cloud provider config
+      template:
+        src: templates/external-cloud-provision/cloud.conf
+        dest: "/etc/kubernetes/cloud.conf"
+        mode: u=rw,g=r,o=
+      register: provider_config
+
 - hosts: rke_masters
   become: true
   tasks:
@@ -185,6 +195,8 @@
           url: https://cedadev.github.io/helm-charts
         - name: ingress-nginx
           url: https://kubernetes.github.io/ingress-nginx
+        - name: cpo
+          url: https://kubernetes.github.io/cloud-provider-openstack
       loop_control:
         label: "{{ item.name }}"
 
@@ -306,3 +318,73 @@
         gatekeeper_encryption_key: "{{ ansible_local.kubernetes_dashboard_proxy_encryption_key }}"
         gatekeeper_domain: "{{ kubernetes_dashboard_domain }}"
         gatekeeper_allowed_cidrs: "{{ admin_allowed_cidrs }}"
+
+    # - name: Create/update OCCM provider config
+    #   template:
+    #     src: templates/external-cloud-provision/openstack-ccm.yml
+    #     dest: "{{ rke_config_dir }}/openstack-ccm.yml"
+    #     mode: u=rw,g=r,o=
+    #   register: ccm_conf
+
+    # - name: Install Openstack CCM 
+    #   include_role:
+    #     name: jasmin.helm
+    #     tasks_from: chart.yml
+    #   vars:
+    #     helm_release_name: openstack-ccm 
+    #     helm_release_chart: cpo/openstack-cloud-controller-manager
+    #     helm_release_namespace: kube-system
+    #     helm_release_values_template: templates/external-cloud-provision/openstack-ccm.yml
+
+    - name: Install Cinder CSI Plugin
+      include_role:
+        name: jasmin.helm
+        tasks_from: chart.yml
+      vars:
+        helm_release_name: cinder-csi
+        helm_release_chart: cpo/openstack-cinder-csi
+        helm_release_namespace: kube-system
+      
+
+# # Install Openstack cloud controller manager and Cinder CSI provisioner
+# - hosts: rke_hosts
+#   become: true 
+#   tasks:
+#   - name: Create/update cloud provider config
+#     template:
+#       src: templates/external-cloud-provision/cloud.conf
+#       dest: "/etc/kubernetes/cloud.conf"
+#       mode: u=rw,g=r,o=
+#     register: provider_config
+
+# - hosts: rke_hosts
+#   become: true 
+#   tasks:
+#   - name: Create/update OCCM provider config
+#     template:
+#       src: templates/external-cloud-provision/openstack-ccm.yml
+#       dest: "{{ rke_config_dir }}/openstack-ccm.yml"
+#       mode: u=rw,g=r,o=
+#     register: ccm_conf
+
+#   - name: Install cloud provider openstack helm repo
+#     kubernetes.core.helm_repository:
+#       name: cpo
+#       repo_url: https://kubernetes.github.io/cloud-provider-openstack
+
+#   - name: Install OCCM
+#     kubernetes.core.helm: 
+#       name: openstack-ccm 
+#       chart_ref: cpo/openstack-cloud-controller-manager
+#       release_namespace: kube-system 
+#       values_files: 
+#         - "{{ rke_config_dir }}/openstack-ccm.yml"
+    
+#   - name: Install cinder-csi-plugin
+#     kubernetes.core.helm: 
+#       name: cinder-csi
+#       chart_ref: cpo/openstack-cinder-csi
+#       release_namespace: kube-system 
+
+
+

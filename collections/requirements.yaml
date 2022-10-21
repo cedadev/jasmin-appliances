@@ -6,3 +6,4 @@ collections:
   - name: ansible.netcommon
   - name: ansible.utils
   - name: ansible.posix
+  - name: kubernetes.core

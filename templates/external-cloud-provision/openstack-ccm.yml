@@ -1,0 +1,11 @@
+cloudConfig:
+  global:
+    auth-url: "{{ openstack_auth_url }}"
+    user-id: "{{ openstack_trustee_id }}"
+    password: "{{ openstack_trustee_password }}"
+    trust-id: "{{ openstack_trust_id }}"
+    ca-file: "/etc/ssl/certs/ca-bundle.crt"
+  load-balancer:
+    enabled: "false"
+  storageClass:
+    enabled: "true"
