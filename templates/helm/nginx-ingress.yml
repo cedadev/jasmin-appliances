@@ -14,7 +14,7 @@ controller:
     # Increase the proxy buffer size
     #   https://github.com/int128/kubernetes-dashboard-proxy/issues/2
     proxy-buffer-size: "64k"
-    allow-snippet-annotations: "false"
+    allow-snippet-annotations: "true"
   # The controller tolerates the etcd and controlplane node-role taints
   tolerations:
     - key: node-role.kubernetes.io/etcd
