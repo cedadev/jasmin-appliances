@@ -14,4 +14,4 @@ nfs_group_server:
   inventory_groups:
     - nfs_servers
   facts:
-    nfs_export: /srv
+    nfs_export: /data
