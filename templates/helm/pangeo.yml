@@ -23,7 +23,7 @@ jupyterhub:
     db:
       type: sqlite-pvc
       pvc:
-        storageClassName: ceda-csi-cinder-sc-retain
+        storageClassName: csi-cinder-sc-retain
     services:
       dask-gateway:
         apiToken: "{{ ansible_local.pangeo_dask_gateway_api_token }}"
@@ -41,7 +41,7 @@ jupyterhub:
       type: dynamic
       capacity: "{{ pangeo_notebook_storage | default(10) }}Gi"
       dynamic:
-        storageClass: ceda-csi-cinder-sc-retain
+        storageClass: csi-cinder-sc-retain
     cpu:
       limit: {{ pangeo_notebook_cpu | default(1) }}
       guarantee: {{ pangeo_notebook_cpu | default(1) }}
