@@ -2,7 +2,7 @@
 roles:
   - name: jasmin.cluster-infra
     src: https://github.com/cedadev/jasmin-cluster-infra-ansible
-    version: vio7
+    version: 106dbd25ac646b3a5ebbc3b365b7b1e32457296e
   - name: jasmin.rke
     src: https://github.com/cedadev/rke-ansible
     version: vio7-devel
