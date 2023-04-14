@@ -344,6 +344,8 @@
         helm_release_name: cinder-csi
         helm_release_chart: cpo/openstack-cinder-csi
         helm_release_namespace: kube-system
+        helm_release_values_template: templates/helm/cinder-csi.yml
+        helm_release_version:  "2.3.0"
       
 
 # # Install Openstack cloud controller manager and Cinder CSI provisioner
