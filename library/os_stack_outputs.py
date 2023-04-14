@@ -4,13 +4,16 @@
 # Apache 2 Licence
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
+ANSIBLE_METADATA = {
+    "metadata_version": "1.1",
+    "status": ["preview"],
+    "supported_by": "community",
+}
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: os_stack_outputs
 short_description: Retrieve stack outputs
@@ -34,24 +37,24 @@ options:
         - Heat stack name or uuid.
      type: str
 extends_documentation_fragment: openstack
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 # Gather outputs from <stack> name or id:
 - os_stack_outputs:
     cloud: mycloud
     stack: xxxxx-xxxxx-xxxx-xxxx
 - debug:
     var: stack_outputs
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.openstack import (openstack_full_argument_spec,
-                                            openstack_module_kwargs,
-                                            openstack_cloud_from_module)
+from openstack.cloud.plugins.module_utils.openstack import (
+    openstack_cloud_from_module, openstack_full_argument_spec,
+    openstack_module_kwargs)
+
 
 def main():
-
     argument_spec = openstack_full_argument_spec(
         stack=dict(required=True),
     )
@@ -61,19 +64,21 @@ def main():
     sdk, cloud = openstack_cloud_from_module(module)
     try:
         result = dict()
-        stack = cloud.get_stack(module.params['stack'])
+        stack = cloud.get_stack(module.params["stack"])
         if stack:
             for item in stack.outputs:
-                result[item['output_key']] = item['output_value']
+                result[item["output_key"]] = item["output_value"]
         else:
             raise sdk.exceptions.OpenStackCloudException(
-                'Stack {} not found.'.format(module.params['stack']))
-        module.exit_json(changed=False,
-            ansible_facts=dict(openstack_stack_outputs=result))
+                "Stack {} not found.".format(module.params["stack"])
+            )
+        module.exit_json(
+            changed=False, ansible_facts=dict(openstack_stack_outputs=result)
+        )
 
     except sdk.exceptions.OpenStackCloudException as e:
         module.fail_json(msg=str(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
