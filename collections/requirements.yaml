@@ -3,6 +3,7 @@ collections:
   - name: community.general
   - name: community.crypto
   - name: openstack.cloud
+    version: "<2.0.0"
   - name: ansible.netcommon
   - name: ansible.utils
   - name: ansible.posix
