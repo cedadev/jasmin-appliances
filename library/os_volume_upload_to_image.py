@@ -90,7 +90,7 @@ import time
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from openstack.cloud.plugins.module_utils.openstack import (
+from ansible_collections.openstack.cloud.plugins.module_utils.openstack import (
     openstack_cloud_from_module, openstack_full_argument_spec,
     openstack_module_kwargs)
 
