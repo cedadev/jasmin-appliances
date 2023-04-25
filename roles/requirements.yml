@@ -5,7 +5,7 @@ roles:
     version: 14b8cd507e0becff9384193fa48b075df3396fe8
   - name: jasmin.rke
     src: https://github.com/cedadev/rke-ansible
-    version: e859ff4cddabb47084ee4e170ab603c8b29bfbee
+    version: 5b2c6f8fe3dd01214d8ddfe9394d7b668ce44a31
   - name: jasmin.helm
     src: https://github.com/cedadev/helm-ansible
     version: b7884d4a69e023ee570a551622c17bc41ca11389
