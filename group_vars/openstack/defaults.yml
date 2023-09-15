@@ -1,6 +1,6 @@
 ---
 
-cluster_image_prefix: "centos-7-"
+cluster_image_prefix: "caas-centos-7-"
 cluster_deploy_user: "root"
 
 # When making the volume that will become the cluster image, use this minimum size
